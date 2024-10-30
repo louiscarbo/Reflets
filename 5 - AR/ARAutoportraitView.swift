@@ -10,12 +10,11 @@ import RealityKit
 
 struct ARAutoportraitView: View {
     @Binding var screenNumber: Int
-    
-    @State private var addSphere: Bool = false
-    
+        
     @State private var arObjects: [ARObject] = []
-    @State private var currentObjectType: ARObjectType = .sphere(radius: 0.05)
-
+    @State private var currentObjectType: ARObjectType = .cylinder(radius: 0.05, height: 0.2)
+    @State private var lastObjectCount = 0
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             RealityView { content in
@@ -28,60 +27,66 @@ struct ARAutoportraitView: View {
                 }
                 
                 // Addind the positioning helper
-                let positioningHelper = createPositioningHelper()
+                let positioningHelper = createPositioningHelper(currentObjectType: currentObjectType)
                 content.add(positioningHelper)
                 
             } update: { content in
-                if addSphere {
-                    let sphereAnchor = createYellowMetallicSphere()
-                    content.add(sphereAnchor)
-
+                // Check if an object was added
+                if arObjects.count > lastObjectCount {
+                    let newObject = arObjects.last!
+                    let entity = newObject.generateEntity()
+                    let anchor = AnchorEntity(.camera)
+                    anchor.anchoring.trackingMode = .once
+                    anchor.addChild(entity)
+                    content.add(anchor)
+                    
                     DispatchQueue.main.async {
-                        addSphere = false
+                        lastObjectCount = arObjects.count
+                    }
+                }
+                
+                // Check if an object was removed
+                else if arObjects.count < lastObjectCount {
+                    // Remove the last object from the scene
+                    content.entities.remove(at: content.entities.count - 1)
+                    
+                    DispatchQueue.main.async {
+                        lastObjectCount = arObjects.count
                     }
                 }
             }
             .ignoresSafeArea()
             
-            Button("Add sphere") {
-                addSphere = true
+            HStack {
+                Button("Add Object") {
+                    let newObject = ARObject(type: currentObjectType, color: SimpleMaterial(color: .yellow, isMetallic: true), position: [0, 0, -1])
+                    arObjects.append(newObject)
+                }
+                .buttonBorderShape(.capsule)
+                .padding()
+                .buttonStyle(.borderedProminent)
+                
+                Button("Back") {
+                    if !arObjects.isEmpty {
+                        arObjects.removeLast()
+                    }
+                }
+                .buttonBorderShape(.capsule)
+                .padding()
+                .buttonStyle(.borderedProminent)
             }
-            .padding()
-            .buttonBorderShape(.capsule)
-            .background(.yellow)
-            
+
             AutoportraitCommandsView(screenNumber: $screenNumber)
         }
     }
 }
 
-// Function to create a yellow metallic sphere
-func createYellowMetallicSphere() -> AnchorEntity {
-    let sphereMesh = MeshResource.generateSphere(radius: 0.05)
-    let material = SimpleMaterial(color: .yellow, isMetallic: true)
-    let modelComponent = ModelComponent(mesh: sphereMesh, materials: [material])
-    let sphereEntity = ModelEntity()
-    sphereEntity.components.set(modelComponent)
-    
-    let cameraAnchor = AnchorEntity(.camera)
-    cameraAnchor.anchoring.trackingMode = .once
-    
-    sphereEntity.position = [0, 0, -1]
-    cameraAnchor.addChild(sphereEntity)
-    
-    return cameraAnchor
-}
-
 // Function to add a transparent yellow metallic sphere to help the user place the object
-func createPositioningHelper() -> AnchorEntity {
+func createPositioningHelper(currentObjectType: ARObjectType) -> AnchorEntity {
+    let entity = ARObject(type: currentObjectType, color: SimpleMaterial(color: .yellow.withAlphaComponent(0.6), isMetallic: true), position: [0, 0, -1]).generateEntity()
+    
     let dynamicCameraAnchor = AnchorEntity(.camera)
-    let sphereMesh = MeshResource.generateSphere(radius: 0.05)
-    let material = SimpleMaterial(color: .yellow.withAlphaComponent(0.5), isMetallic: true)
-    let modelComponent = ModelComponent(mesh: sphereMesh, materials: [material])
-    let sphereEntity = ModelEntity()
-    sphereEntity.position = [0, 0, -1]
-    sphereEntity.components.set(modelComponent)
-    dynamicCameraAnchor.addChild(sphereEntity)
+    dynamicCameraAnchor.addChild(entity)
     
     return dynamicCameraAnchor
 }
