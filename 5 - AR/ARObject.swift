@@ -8,13 +8,44 @@
 import RealityKit
 import Foundation
 
-enum ARObjectType {
+enum SelectedType {
+    case sphere, cube, cone, cylinder, text, image
+}
+
+enum ARObjectType: Hashable {
     case sphere(radius: Float)
     case cube(size: Float)
     case cone(radius: Float, height: Float)
     case cylinder(radius: Float, height: Float)
     case text(content: String)
     case image(url: URL)
+    
+    var hasCustomColor: Bool {
+        switch self {
+        case .sphere, .cube, .cone, .cylinder, .text:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var hasCustomText: Bool {
+        switch self {
+        case .text:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    var hasCustomRatio: Bool {
+        switch self {
+        case .cone, .cylinder:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 struct ARObject {

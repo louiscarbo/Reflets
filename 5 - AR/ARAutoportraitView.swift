@@ -9,11 +9,37 @@ import SwiftUI
 import RealityKit
 
 struct ARAutoportraitView: View {
+    // App level state
     @Binding var screenNumber: Int
-        
+    
+    // AR level state
     @State private var arObjects: [ARObject] = []
-    @State private var currentObjectType: ARObjectType = .cylinder(radius: 0.05, height: 0.2)
+    @State private var selectedType: SelectedType = .sphere
+    private var currentObjectType: ARObjectType {
+        switch selectedType {
+        case .sphere:
+            return .sphere(radius: 0.05)
+        case .cube:
+            return .cube(size: 0.1)
+        case .cone:
+            return .cone(radius: 0.05, height: Float(arObjectRatio * 0.05))
+        case .cylinder:
+            return .cylinder(radius: 0.05, height: Float(arObjectRatio * 0.05))
+        case .text:
+            return .text(content: arObjectText)
+        case .image:
+            return .text(content: "IMAGE")
+            //TODO: Implement image loading
+        }
+    }
     @State private var lastObjectCount = 0
+    @State private var updatePlacementHelper = false
+    
+    // Properties of the AR Object
+    @State private var arObjectColor = Color.yellow
+    @State private var arObjectMetallic = true
+    @State private var arObjectText = "Hello"
+    @State private var arObjectRatio = 2.0
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -27,7 +53,7 @@ struct ARAutoportraitView: View {
                 }
                 
                 // Addind the positioning helper
-                let positioningHelper = createPositioningHelper(currentObjectType: currentObjectType)
+                let positioningHelper = createPositioningHelper()
                 content.add(positioningHelper)
                 
             } update: { content in
@@ -54,43 +80,91 @@ struct ARAutoportraitView: View {
                         lastObjectCount = arObjects.count
                     }
                 }
+                
+                // Update the positioning helper according to the current object type
+                if updatePlacementHelper {
+                    content.entities.removeAll { entity in
+                        entity.components[PositioningHelperComponent.self] != nil // Detects entities with the helper component
+                    }
+                    let positioningHelper = createPositioningHelper()
+                    content.add(positioningHelper)
+                }
             }
             .ignoresSafeArea()
             
-            HStack {
-                Button("Add Object") {
-                    let newObject = ARObject(type: currentObjectType, color: SimpleMaterial(color: .yellow, isMetallic: true), position: [0, 0, -1])
-                    arObjects.append(newObject)
+            VStack {
+                if currentObjectType.hasCustomColor {
+                    ColorPicker("Object Color", selection: $arObjectColor)
+                        .onSubmit {
+                            updatePlacementHelper = true
+                        }
                 }
-                .buttonBorderShape(.capsule)
-                .padding()
-                .buttonStyle(.borderedProminent)
-                
-                Button("Back") {
-                    if !arObjects.isEmpty {
-                        arObjects.removeLast()
+
+                if currentObjectType.hasCustomText {
+                    TextField("Enter Text", text: $arObjectText)
+                        .onSubmit {
+                            updatePlacementHelper = true
+                        }
+                }
+
+                if currentObjectType.hasCustomRatio {
+                    Slider(value: $arObjectRatio, in: 0.5...10.0, label: {
+                        Text("Ratio")
+                    })
+                    .onSubmit {
+                        updatePlacementHelper = true
                     }
                 }
-                .buttonBorderShape(.capsule)
-                .padding()
-                .buttonStyle(.borderedProminent)
+                
+                Picker("Object Type", selection: $selectedType) {
+                    Text("Sphere").tag(SelectedType.sphere)
+                    Text("Cube").tag(SelectedType.cube)
+                    Text("Cone").tag(SelectedType.cone)
+                    Text("Cylinder").tag(SelectedType.cylinder)
+                    Text("Text").tag(SelectedType.text)
+                }
+                .onChange(of: selectedType) {
+                    updatePlacementHelper = true
+                }
+                
+                HStack {
+                    Button("Add Object") {
+                        let newObject = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor), isMetallic: arObjectMetallic), position: [0, 0, -1])
+                        arObjects.append(newObject)
+                    }
+                    .buttonBorderShape(.capsule)
+                    .padding()
+                    .buttonStyle(.borderedProminent)
+                    
+                    Button("Back") {
+                        if !arObjects.isEmpty {
+                            arObjects.removeLast()
+                        }
+                    }
+                    .buttonBorderShape(.capsule)
+                    .padding()
+                    .buttonStyle(.borderedProminent)
+                }
             }
 
             AutoportraitCommandsView(screenNumber: $screenNumber)
         }
     }
-}
-
-// Function to add a transparent yellow metallic sphere to help the user place the object
-func createPositioningHelper(currentObjectType: ARObjectType) -> AnchorEntity {
-    let entity = ARObject(type: currentObjectType, color: SimpleMaterial(color: .yellow.withAlphaComponent(0.6), isMetallic: true), position: [0, 0, -1]).generateEntity()
     
-    let dynamicCameraAnchor = AnchorEntity(.camera)
-    dynamicCameraAnchor.addChild(entity)
-    
-    return dynamicCameraAnchor
+    func createPositioningHelper() -> AnchorEntity {
+        let entity = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor).withAlphaComponent(0.6), isMetallic: arObjectMetallic), position: [0, 0, -1]).generateEntity()
+        
+        let dynamicCameraAnchor = AnchorEntity(.camera)
+        dynamicCameraAnchor.addChild(entity)
+        dynamicCameraAnchor.components[PositioningHelperComponent.self] = PositioningHelperComponent()
+        
+        return dynamicCameraAnchor
+    }
 }
 
 #Preview {
     ARAutoportraitView(screenNumber: .constant(5))
 }
+
+// MARK: Custom component for the positioning helper
+struct PositioningHelperComponent: Component {}
