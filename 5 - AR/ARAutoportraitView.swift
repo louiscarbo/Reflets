@@ -40,9 +40,11 @@ struct ARAutoportraitView: View {
     @State private var arObjectMetallic = true
     @State private var arObjectText = "Hello"
     @State private var arObjectRatio = 2.0
+    @State private var arObjectOpacity = 1.0
     
     var body: some View {
         ZStack(alignment: .bottom) {
+            // MARK: RealityView
             RealityView { content in
                 content.camera = .spatialTracking
                 
@@ -56,6 +58,7 @@ struct ARAutoportraitView: View {
                 let positioningHelper = createPositioningHelper()
                 content.add(positioningHelper)
                 
+            // MARK: Update closure
             } update: { content in
                 // Check if an object was added
                 if arObjects.count > lastObjectCount {
@@ -92,8 +95,19 @@ struct ARAutoportraitView: View {
             }
             .ignoresSafeArea()
             
+            // MARK: Controls Interface
             VStack {
+                Slider(value: $arObjectOpacity, in: 0.0...1.0, label: {
+                    Text("Opacity")
+                })
+                .onSubmit {
+                    updatePlacementHelper = true
+                }
                 if currentObjectType.hasCustomColor {
+                    Toggle("Metallic", isOn: $arObjectMetallic)
+                        .onSubmit {
+                            updatePlacementHelper = true
+                        }
                     ColorPicker("Object Color", selection: $arObjectColor)
                         .onSubmit {
                             updatePlacementHelper = true
@@ -129,7 +143,7 @@ struct ARAutoportraitView: View {
                 
                 HStack {
                     Button("Add Object") {
-                        let newObject = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor), isMetallic: arObjectMetallic), position: [0, 0, -1])
+                        let newObject = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor).withAlphaComponent(arObjectOpacity), isMetallic: arObjectMetallic), position: [0, 0, -1])
                         arObjects.append(newObject)
                     }
                     .buttonBorderShape(.capsule)
@@ -151,6 +165,7 @@ struct ARAutoportraitView: View {
         }
     }
     
+    // MARK: AR Functions
     func createPositioningHelper() -> AnchorEntity {
         let entity = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor).withAlphaComponent(0.6), isMetallic: arObjectMetallic), position: [0, 0, -1]).generateEntity()
         
@@ -162,9 +177,9 @@ struct ARAutoportraitView: View {
     }
 }
 
+// MARK: Custom component for the positioning helper
+struct PositioningHelperComponent: Component {}
+
 #Preview {
     ARAutoportraitView(screenNumber: .constant(5))
 }
-
-// MARK: Custom component for the positioning helper
-struct PositioningHelperComponent: Component {}

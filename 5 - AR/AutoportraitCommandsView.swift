@@ -31,10 +31,8 @@ struct AutoportraitCommandsView: View {
                 .tint(.black.opacity(0.7))
                 .buttonStyle(.borderedProminent)
                 .padding()
-                
-                Spacer()
-                
-                Button("See Objects", systemImage: "folder.fill") {
+                                
+                Button("Custom Objects", systemImage: "folder.fill") {
                     
                 }
                 .buttonBorderShape(.capsule)
