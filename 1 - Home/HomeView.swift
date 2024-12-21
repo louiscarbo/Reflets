@@ -4,25 +4,42 @@ import SwiftUI
 
 struct HomeView: View {
     @Binding var screenNumber: Int
+    @Binding var rotationAngle: Double
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
+            Image("Reflets")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 170)
+                .rotationEffect(.degrees(rotationAngle))
+                .onAppear {
+                    withAnimation(
+                        Animation.linear(duration: 10.0)
+                            .repeatForever(autoreverses: false)
+                    ) {
+                        rotationAngle = 360.0
+                    }
+                }
             Text("Reflets")
                 .bold()
-                .font(.system(.largeTitle, design: .rounded))
+                .font(.system(size: 70))
+                .fontWeight(.light)
+                .fontWidth(.expanded)
+                .padding(.bottom, 20)
             Button("Start the experience") {
-                withAnimation {
-                    screenNumber += 1
+                withAnimation(.easeInOut(duration: 1.0)) {
+                    screenNumber+=1
                 }
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(TitleButton())
             .buttonBorderShape(.capsule)
-            .font(.title3)
-            .bold()
+            .fontWeight(.medium)
+            .fontWidth(.expanded)
         }
     }
 }
 
 #Preview {
-    HomeView(screenNumber: .constant(0))
+    HomeView(screenNumber: .constant(0), rotationAngle: .constant(0))
 }

@@ -4,13 +4,14 @@ import SwiftUI
 
 struct ViewContainer: View {
     @State private var currentView = 0
+    @State private var rotationAngle = 0.0
     
     var body: some View {
         switch currentView {
         case 0:
-            HomeView(screenNumber: $currentView);
+            HomeView(screenNumber: $currentView, rotationAngle: $rotationAngle);
         case 1:
-            IntroductionView(screenNumber: $currentView);
+            IntroductionView(screenNumber: $currentView, rotationAngle: rotationAngle);
         case 2:
             PhotoBoothView(screenNumber: $currentView);
         case 3:

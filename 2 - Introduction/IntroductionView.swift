@@ -4,74 +4,120 @@ import SwiftUI
 
 struct IntroductionView: View {
     @Binding var screenNumber: Int
+    @State var rotationAngle: Double
     
     @State private var dialogueNumber = 0
+    @State private var textOpacity = 0.0
+    @State private var isAnimating = false
     
+    //MARK: View
     var body: some View {
-        ZStack {
-            DialogueView(
-                dialogueNumber: $dialogueNumber,
-                topView: .constant(contentArray[dialogueNumber].topView),
-                dialogueText: .constant(contentArray[dialogueNumber].dialogueText),
-                buttonText: .constant(contentArray[dialogueNumber].buttonText)
-            )
-            Button("Next view") {
-                withAnimation {
-                    screenNumber += 1
+        VStack(alignment: .leading) {
+            // Text VStack, used to apply opacity to the text only
+            VStack(alignment: .leading) {
+                Text(dialogueData[dialogueNumber].dialogueText)
+                    .font(.system(.title))
+                    .padding(.bottom, 30)
+                
+                HStack {
+                    Spacer()
+                    Text(dialogueData[dialogueNumber].buttonText)
+                        .italic()
+                        .opacity(0.7)
+                        .font(.headline)
                 }
             }
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.capsule)
-            .font(.title3)
-            .bold()
+            .foregroundStyle(.black)
+            .padding(20)
+            .fontDesign(.serif)
+            .opacity(textOpacity)
+            HStack {
+                Spacer()
+                Button("Next"){
+                    
+                }
+                .buttonStyle(IntentionButton())
+                Spacer()
+            }
+        }
+        .background {
+            Image("Reflets")
+                .resizable()
+                .frame(width: 700, height: 700)
+                .rotationEffect(Angle(degrees: rotationAngle))
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2.0)) {
+                textOpacity = 1.0
+            }
+        }
+        // Tap gesture to change the dialogue text and transitions
+        .onTapGesture {
+            // Prevents multiple taps
+            guard isAnimating == false else { return }
+            isAnimating = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.6) {
+                isAnimating = false
+            }
+            
+            // Animations
+            withAnimation(.easeInOut(duration: 1.5)) {
+                textOpacity = 0.0
+            }
+            withAnimation(.easeInOut(duration: 0.1).delay(1.5)) {
+                if dialogueNumber < dialogueData.count - 1 {
+                    dialogueNumber+=1
+                } else {
+                    screenNumber+=1
+                }
+            }
+            withAnimation(.easeInOut(duration: 2.0).delay(1.6)) {
+                textOpacity = 1.0
+            }
         }
     }
     
-    let contentArray: [DialogueData] = [
+    // MARK: Dialogue Data
+    let dialogueData = [
         DialogueData(
-            dialogueText: "Hi! I’m Reflecto, your guide in Reflets, an exciting experiment of self-discovery through arts!",
-            buttonText: "Nice to meet you!"
+            dialogueText:
+               """
+               Hello there! Welcome to Reflets!
+               I’m Reflecto, your guide for this creative experience.
+               """
+            , buttonText: "Tap anywhere to continue"
         ),
         DialogueData(
-            dialogueText: "Today, I’ll help you embrace your uniqueness and boost your self-confidence through the magical world of self-portraiture!",
-            buttonText: "OK"
+            dialogueText:
+               """
+               Here, you’ll create a unique self-portrait—one that reflects not just your appearance, but your emotions, experiences, and the things that inspire you.
+               """
+            , buttonText: "So, what’s next?"
         ),
         DialogueData(
-            dialogueText: "Together, we’re going to team up to create your very own 3D self portrait in Augmented Reality, or AR!",
-            buttonText: "Great!"
+            dialogueText:
+                """
+                We’ll start by picking an intention—something to focus on as you create. Don’t worry, it’s super easy, and there’s no wrong way to do it!
+                """
+                , buttonText: "Let’s get started!"
         ),
         DialogueData(
-            dialogueText: "But first, what are even self-portraits?"
-        ),
-        DialogueData(
-            dialogueText: "Self-portraits are a way for you to represent yourself as you see yourself. This includes not only your physical appearance, but also your personality, your thoughts, and your emotions.",
-            buttonText: "OK"
-        ),
-        DialogueData(
-            dialogueText: "By creating your own self-portrait, you gain a better understanding of how you treat and see yourself. This is the first step towards improving your self-confidence and self-esteem!",
-            buttonText: "OK"
-        ),
-        DialogueData(
-            dialogueText: "Now that you know the magic behind self-portraits, let's draw inspiration from some of the most renowned artists in history. Check out these incredible examples!",
-            buttonText: "OK, I’m ready to create my own self portrait!"
-        ),
-        DialogueData(
-            dialogueText: "Now, it's your turn! I'll guide you through a few questions, then we'll take a quick selfie, and finally, the fun part – creating your own 3D self-portrait! Ready?",
-            buttonText: "Yes"
-        ),
-        DialogueData(
-            dialogueText: "Remember, this is all about embracing your creativity, no matter your level of artistic skills – so be kind to yourself and let's have some fun!",
-            buttonText: "OK, let’s get started!"
+            dialogueText:
+                """
+                Think of it as the focus for your self-portrait—what you want it to reflect about you.
+                
+                I’ve prepared a few intentions to help guide you. Or, if you’re feeling creative, you can pick your own path and go freeform!
+                """
+                , buttonText: "I’m ready!"
         )
     ]
 }
 
 struct DialogueData {
-    var topView: AnyView?
-    var dialogueText = ""
-    var buttonText = "Next"
+    var dialogueText: String
+    var buttonText: String
 }
 
 #Preview {
-    IntroductionView(screenNumber: .constant(1))
+    IntroductionView(screenNumber: .constant(1), rotationAngle: 0)
 }
