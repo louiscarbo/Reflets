@@ -10,6 +10,17 @@ import Foundation
 
 enum SelectedType {
     case sphere, cube, cone, cylinder, text, image
+    
+    var SFSymbolName: String {
+        switch self {
+        case .cone: return "cone"
+        case .sphere: return "rotate.3d"
+        case .cube: return "cube"
+        case .cylinder: return "cylinder"
+        case .text: return "textformat"
+        default: return "questionmark"
+        }
+    }
 }
 
 enum ARObjectType: Hashable {
@@ -44,17 +55,6 @@ enum ARObjectType: Hashable {
             return true
         default:
             return false
-        }
-    }
-    
-    var SFSymbolName: String {
-        switch self {
-        case .cone: return "cone"
-        case .sphere: return "rotate.3d"
-        case .cube: return "cube"
-        case .cylinder: return "cylinder"
-        case .text: return "textformat"
-        default: return "questionmark"
         }
     }
 }

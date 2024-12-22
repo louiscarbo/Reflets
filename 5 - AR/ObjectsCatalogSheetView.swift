@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct ObjectsCatalogSheetView: View {
+    
+    @Environment(\.dismiss) var dismiss
+    
     let hapticFeedback = UINotificationFeedbackGenerator()
     
-    let items = ["rotate.3d", "cube", "cone", "cylinder", "textformat"]
+    @Binding var selectedType: SelectedType
+    
+    @State private var availableTypes: [SelectedType] = [.sphere, .cube, .cone, .cylinder, .text]
     
     var body: some View {
         let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
@@ -30,11 +35,13 @@ struct ObjectsCatalogSheetView: View {
                         .font(.title2)
                     
                     LazyVGrid(columns: gridColumns) {
-                        ForEach(items, id: \.self) { item in
+                        ForEach(availableTypes, id: \.self) { type in
                             Button {
+                                dismiss()
                                 hapticFeedback.notificationOccurred(.success)
+                                selectedType = type
                             } label: {
-                                Image(systemName: item)
+                                Image(systemName: type.SFSymbolName)
                             }
                             .buttonStyle(SFSymbolButtonStyle())
                             .padding(.bottom, 10)
@@ -75,7 +82,7 @@ struct ObjectsCatalogSheetView: View {
             .ignoresSafeArea()
         ARControlsView(
             showReflectoHelp: .constant(false),
-            showComponentsSheet: $isPresented,
+            showObjectsCatalog: $isPresented,
             artworkIsDone: .constant(false),
             shouldGoBack: .constant(false),
             shouldAddObject: .constant(false),
@@ -83,7 +90,7 @@ struct ObjectsCatalogSheetView: View {
             sliderValue: .constant(0.8)
         )
         .sheet(isPresented: $isPresented) {
-            ObjectsCatalogSheetView()
+            ObjectsCatalogSheetView(selectedType: .constant(.cube))
         }
     }
 }

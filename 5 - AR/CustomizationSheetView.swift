@@ -8,16 +8,14 @@
 import SwiftUI
 
 struct CustomizationSheetView: View {
-    @Binding var updatePlacementHelper: Bool
-    
     @Binding var selectedColor: Color
     @Binding var selectedOpacity: Double
     @Binding var isMetallic: Bool
     
-    @Binding var needsText: Bool
+    @State var needsText: Bool
     @Binding var textInput: String
     
-    @Binding var needsProportionSlider: Bool
+    @State var needsProportionSlider: Bool
     @Binding var selectedProportion: Double
     
     var body: some View {
@@ -33,9 +31,6 @@ struct CustomizationSheetView: View {
                     .fontWidth(.expanded)
                 Spacer()
                 ColorPicker("", selection: $selectedColor, supportsOpacity: false)
-                    .onSubmit {
-                        updatePlacementHelper = true
-                    }
             }
             
             HStack {
@@ -44,9 +39,6 @@ struct CustomizationSheetView: View {
                 Spacer()
                 Slider(value: $selectedOpacity)
                     .frame(width: 220)
-                    .onSubmit {
-                        updatePlacementHelper = true
-                    }
             }
             
             HStack {
@@ -54,9 +46,6 @@ struct CustomizationSheetView: View {
                     .fontWidth(.expanded)
                 Spacer()
                 Toggle(isOn: $isMetallic) { }
-                    .onSubmit {
-                        updatePlacementHelper = true
-                    }
             }
             
             if needsText {
@@ -68,9 +57,6 @@ struct CustomizationSheetView: View {
                         .textFieldStyle(.roundedBorder)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 220)
-                        .onSubmit {
-                            updatePlacementHelper = true
-                        }
                 }
             }
             
@@ -81,9 +67,6 @@ struct CustomizationSheetView: View {
                     Spacer()
                     Slider(value: $selectedProportion)
                         .frame(width: 220)
-                        .onSubmit {
-                            updatePlacementHelper = true
-                        }
                 }
             }
             
@@ -108,7 +91,7 @@ struct CustomizationSheetView: View {
             .ignoresSafeArea()
         ARControlsView(
             showReflectoHelp: .constant(false),
-            showComponentsSheet: .constant(false),
+            showObjectsCatalog: .constant(false),
             artworkIsDone: .constant(false),
             shouldGoBack: .constant(false),
             shouldAddObject: .constant(false),
@@ -118,13 +101,12 @@ struct CustomizationSheetView: View {
         .sheet(isPresented: $isPresented) {
             NavigationStack {
                 CustomizationSheetView(
-                    updatePlacementHelper: .constant(true),
                     selectedColor: .constant(.red),
                     selectedOpacity: .constant(0.9),
                     isMetallic: .constant(true),
-                    needsText: .constant(true),
+                    needsText: true,
                     textInput: $textInput,
-                    needsProportionSlider: .constant(true),
+                    needsProportionSlider: true,
                     selectedProportion: .constant(1.0)
                 )
             }

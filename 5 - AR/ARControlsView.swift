@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ARControlsView: View {
     @Binding var showReflectoHelp: Bool
-    @Binding var showComponentsSheet: Bool
+    @Binding var showObjectsCatalog: Bool
     @Binding var artworkIsDone: Bool
     @Binding var shouldGoBack: Bool
     @Binding var shouldAddObject: Bool
@@ -27,7 +27,6 @@ struct ARControlsView: View {
                         withAnimation {
                             showReflectoHelp = true
                         }
-                        hapticFeedback.notificationOccurred(.success)
                     } label: {
                         Image("Reflets")
                             .resizable()
@@ -37,9 +36,8 @@ struct ARControlsView: View {
                     .buttonStyle(SFSymbolButtonStyle(symbolSize: 16))
                     Button {
                         withAnimation {
-                            showComponentsSheet = true
+                            showObjectsCatalog = true
                         }
-                        hapticFeedback.notificationOccurred(.success)
                     } label: {
                         Image(systemName: "folder.badge.plus")
                     }
@@ -48,7 +46,6 @@ struct ARControlsView: View {
                         withAnimation {
                             artworkIsDone = true
                         }
-                        hapticFeedback.notificationOccurred(.success)
                     } label: {
                         Image(systemName: "checkmark")
                     }
@@ -102,7 +99,6 @@ struct ARControlsView: View {
                         withAnimation {
                             showCustomizationSheet = true
                         }
-                        hapticFeedback.notificationOccurred(.success)
                     } label: {
                         Image(systemName: "paintbrush")
                     }
@@ -147,7 +143,7 @@ struct ARControlsView: View {
             .ignoresSafeArea()
         ARControlsView(
             showReflectoHelp: .constant(false),
-            showComponentsSheet: .constant(false),
+            showObjectsCatalog: .constant(false),
             artworkIsDone: .constant(false),
             shouldGoBack: .constant(false),
             shouldAddObject: .constant(false),

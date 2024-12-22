@@ -22,11 +22,11 @@ struct ARAutoportraitView: View {
         case .cube:
             return .cube(size: 0.1)
         case .cone:
-            return .cone(radius: 0.05, height: Float(arObjectRatio * 0.05))
+            return .cone(radius: 0.05, height: Float(arObjectProperties.ratio * 0.05))
         case .cylinder:
-            return .cylinder(radius: 0.05, height: Float(arObjectRatio * 0.05))
+            return .cylinder(radius: 0.05, height: Float(arObjectProperties.ratio * 0.05))
         case .text:
-            return .text(content: arObjectText)
+            return .text(content: arObjectProperties.text)
         case .image:
             return .text(content: "IMAGE")
             //TODO: Implement image loading
@@ -34,13 +34,17 @@ struct ARAutoportraitView: View {
     }
     @State private var lastObjectCount = 0
     @State private var updatePlacementHelper = false
+    @State private var shouldUpdatePlacementHelper = false
     
     // Properties of the AR Object
-    @State private var arObjectColor = Color.yellow
-    @State private var arObjectMetallic = true
-    @State private var arObjectText = "Hello"
-    @State private var arObjectRatio = 2.0
-    @State private var arObjectOpacity = 1.0
+    @State private var arObjectProperties = ARObjectProperties(color: .yellow, metallic: true, text: "Hello", ratio: 2.0, opacity: 1.0)
+    
+    // Properties of the controls
+    @State private var showObjectsCatalog = false
+    @State private var showCustomizationSheet = false
+    @State private var shouldGoBack = false
+    @State private var shouldAddObject = false
+    @State private var sizeSliderValue: Double = 0.5
         
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -96,77 +100,58 @@ struct ARAutoportraitView: View {
             .ignoresSafeArea()
             
             // MARK: Controls Interface
-            VStack {
-                Slider(value: $arObjectOpacity, in: 0.0...1.0, label: {
-                    Text("Opacity")
-                })
-                .onSubmit {
+            ARControlsView(
+                showReflectoHelp: .constant(false),
+                showObjectsCatalog: $showObjectsCatalog,
+                artworkIsDone: .constant(false),
+                shouldGoBack: $shouldGoBack,
+                shouldAddObject: $shouldAddObject,
+                showCustomizationSheet: $showCustomizationSheet,
+                sliderValue: $sizeSliderValue
+            )
+            .onChange(of: shouldAddObject) {
+                if shouldAddObject {
+                    addCurrentObject()
+                }
+                shouldAddObject = false
+            }
+            .sheet(isPresented: $showCustomizationSheet) {
+                CustomizationSheetView(
+                    selectedColor: $arObjectProperties.color,
+                    selectedOpacity: $arObjectProperties.opacity,
+                    isMetallic: $arObjectProperties.metallic,
+                    needsText: currentObjectType.hasCustomText,
+                    textInput:  $arObjectProperties.text,
+                    needsProportionSlider: currentObjectType.hasCustomRatio,
+                    selectedProportion: $arObjectProperties.ratio
+                )
+                .onChange(of: arObjectProperties) {
                     updatePlacementHelper = true
                 }
-                if currentObjectType.hasCustomColor {
-                    Toggle("Metallic", isOn: $arObjectMetallic)
-                        .onSubmit {
-                            updatePlacementHelper = true
-                        }
-                    ColorPicker("Object Color", selection: $arObjectColor)
-                        .onSubmit {
-                            updatePlacementHelper = true
-                        }
-                }
-
-                if currentObjectType.hasCustomText {
-                    TextField("Enter Text", text: $arObjectText)
-                        .onSubmit {
-                            updatePlacementHelper = true
-                        }
-                }
-
-                if currentObjectType.hasCustomRatio {
-                    Slider(value: $arObjectRatio, in: 0.5...10.0, label: {
-                        Text("Ratio")
-                    })
-                    .onSubmit {
-                        updatePlacementHelper = true
-                    }
-                }
-                
-                Picker("Object Type", selection: $selectedType) {
-                    Text("Sphere").tag(SelectedType.sphere)
-                    Text("Cube").tag(SelectedType.cube)
-                    Text("Cone").tag(SelectedType.cone)
-                    Text("Cylinder").tag(SelectedType.cylinder)
-                    Text("Text").tag(SelectedType.text)
-                }
-                .onChange(of: selectedType) {
-                    updatePlacementHelper = true
-                }
-                
-                HStack {
-                    Button("Add Object") {
-                        addCurrentObject()
-                    }
-                    .buttonBorderShape(.capsule)
-                    .padding()
-                    .buttonStyle(.borderedProminent)
-                    
-                    Button("Back") {
-                        if !arObjects.isEmpty {
-                            arObjects.removeLast()
-                        }
-                    }
-                    .buttonBorderShape(.capsule)
-                    .padding()
-                    .buttonStyle(.borderedProminent)
+                .onChange(of: shouldGoBack) {
+                    goBack()
+                    shouldGoBack = false
                 }
             }
-
-            AutoportraitCommandsView(screenNumber: $screenNumber)
+            .sheet(isPresented: $showObjectsCatalog) {
+                ObjectsCatalogSheetView(selectedType: $selectedType)
+                    .onChange(of: selectedType) {
+                        updatePlacementHelper = true
+                    }
+            }
         }
     }
     
     // MARK: AR Functions
     func createPositioningHelper() -> AnchorEntity {
-        let entity = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor).withAlphaComponent(0.6), isMetallic: arObjectMetallic), position: [0, 0, -1]).generateEntity()
+        let entity = ARObject(
+            type: currentObjectType,
+            color: SimpleMaterial(
+                color: UIColor(arObjectProperties.color).withAlphaComponent(0.6),
+                isMetallic: arObjectProperties.metallic
+            ),
+            position: [0, 0, -1]
+        ).generateEntity()
         
         let dynamicCameraAnchor = AnchorEntity(.camera)
         dynamicCameraAnchor.addChild(entity)
@@ -176,13 +161,34 @@ struct ARAutoportraitView: View {
     }
     
     func addCurrentObject() {
-        let newObject = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor).withAlphaComponent(arObjectOpacity), isMetallic: arObjectMetallic), position: [0, 0, -1])
+        let newObject = ARObject(
+            type: currentObjectType,
+            color: SimpleMaterial(
+                color: UIColor(arObjectProperties.color).withAlphaComponent(arObjectProperties.opacity),
+                isMetallic: arObjectProperties.metallic
+            ),
+            position: [0, 0, -1]
+        )
         arObjects.append(newObject)
+    }
+    
+    func goBack() {
+        if !arObjects.isEmpty {
+            arObjects.removeLast()
+        }
     }
 }
 
 // MARK: Custom component for the positioning helper
 struct PositioningHelperComponent: Component {}
+
+struct ARObjectProperties: Equatable {
+    var color: Color
+    var metallic: Bool
+    var text: String
+    var ratio: Double
+    var opacity: Double
+}
 
 #Preview {
     ARAutoportraitView(screenNumber: .constant(5))
