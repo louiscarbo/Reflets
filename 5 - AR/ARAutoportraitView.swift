@@ -41,9 +41,7 @@ struct ARAutoportraitView: View {
     @State private var arObjectText = "Hello"
     @State private var arObjectRatio = 2.0
     @State private var arObjectOpacity = 1.0
-    
-    @StateObject private var volumeListener = VolumeButtonListener()
-    
+        
     var body: some View {
         ZStack(alignment: .bottom) {
             // MARK: RealityView

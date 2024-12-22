@@ -46,6 +46,17 @@ enum ARObjectType: Hashable {
             return false
         }
     }
+    
+    var SFSymbolName: String {
+        switch self {
+        case .cone: return "cone"
+        case .sphere: return "rotate.3d"
+        case .cube: return "cube"
+        case .cylinder: return "cylinder"
+        case .text: return "textformat"
+        default: return "questionmark"
+        }
+    }
 }
 
 struct ARObject {

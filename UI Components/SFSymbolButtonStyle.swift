@@ -47,7 +47,7 @@ struct SFSymbolButtonStyle: ButtonStyle {
                         endPoint: .bottom)
                     .opacity(configuration.isPressed ? 0.1 : 0.2)
                 )
-                .padding(9)
+                .padding(0.3 * symbolSize)
                 .offset(y: -2)
                 .blur(radius: 4)
             
@@ -56,7 +56,7 @@ struct SFSymbolButtonStyle: ButtonStyle {
                 .font(.system(size: symbolSize)) // SF Symbol size
                 .fontWeight(.semibold)
                 .foregroundColor(foregroundColor) // Icon color
-                .padding()
+                .padding(16/30 * symbolSize)
                 .rotationEffect(configuration.isPressed ? .degrees(rotateInTrigonometricDirection ? -15 : 15) : .zero)
             
             Circle()
@@ -75,14 +75,14 @@ struct SFSymbolButtonStyle: ButtonStyle {
             Button {
                 
             } label: {
-                Image(systemName: "arrowshape.turn.up.backward")
+                Image(systemName: "gearshape")
             }
             .padding()
             .buttonStyle(SFSymbolButtonStyle(rotateInTrigonometricDirection: true))
             Button {
                 
             } label: {
-                Image(systemName: "checkmark")
+                Image(systemName: "folder")
             }
             .padding()
             .buttonStyle(SFSymbolButtonStyle())
