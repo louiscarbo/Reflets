@@ -2,11 +2,9 @@
 
 import SwiftUI
 
-struct IntentionButton: ButtonStyle {
+struct TitleButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
-            let offset: CGFloat = 5
-
             Capsule()
                 .frame(maxWidth: .infinity) // Constraint to the label's size
                 .foregroundStyle(
@@ -14,12 +12,12 @@ struct IntentionButton: ButtonStyle {
                         colors:
                             configuration.isPressed ?
                         [
-                            Color(red: 240/255, green: 200/255, blue: 234/255),
-                            Color(red: 240/255, green: 180/255, blue: 115/255),
+                            Color(red: 245/255, green: 110/255, blue: 50/255),
+                            Color(red: 240/255, green: 60/255, blue: 0/255),
                         ] :
                         [
-                            Color(red: 255/255, green: 216/255, blue: 244/255),
-                            Color(red: 255/255, green: 189/255, blue: 125/255),
+                            Color(red: 255/255, green: 120/255, blue: 60/255),
+                            Color(red: 250/255, green: 70/255, blue: 0/255),
                         ],
                         startPoint: .top,
                         endPoint: .bottom
@@ -27,17 +25,19 @@ struct IntentionButton: ButtonStyle {
                 )
             
             Capsule()
-                .stroke(Color.black.opacity(0.1), lineWidth: 3)
+                .stroke(Color.black.opacity(0.1), lineWidth: 7)
+                .blur(radius: 3)
+                .clipShape(Capsule())
             
             configuration.label
-                .fontDesign(.serif)
-                .italic()
+                .foregroundStyle(.white)
+                .fontWidth(.expanded)
                 .fontWeight(.medium)
-                .padding(.vertical, 15) // Add intrinsic height
-                .padding(.horizontal, 50) // Add intrinsic width
+                .padding(.vertical, 15)
+                .padding(.horizontal, 30)
         }
-        .scaleEffect(configuration.isPressed ? 1.1 : 1)
-        .rotationEffect(configuration.isPressed ? .degrees(-5) : .zero)
+        .scaleEffect(configuration.isPressed ? 1.05 : 1)
+        .rotationEffect(configuration.isPressed ? .degrees(-1) : .zero)
         .fixedSize()
     }
 }
@@ -46,9 +46,9 @@ struct IntentionButton: ButtonStyle {
     ZStack {
         Rectangle()
             .foregroundStyle(.green)
-        Button("What I'm proud of.") {
+        Button("Start the experience") {
             
         }
-        .buttonStyle(IntentionButton())
+        .buttonStyle(TitleButton())
     }
 }

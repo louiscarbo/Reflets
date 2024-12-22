@@ -2,7 +2,7 @@
 
 import SwiftUI
 
-struct TitleButton: ButtonStyle {
+struct IntentionButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
             Capsule()
@@ -12,29 +12,30 @@ struct TitleButton: ButtonStyle {
                         colors:
                             configuration.isPressed ?
                         [
-                            Color(red: 245/255, green: 110/255, blue: 50/255),
-                            Color(red: 240/255, green: 60/255, blue: 0/255),
+                            Color(red: 240/255, green: 200/255, blue: 234/255),
+                            Color(red: 240/255, green: 180/255, blue: 115/255),
                         ] :
                         [
-                            Color(red: 255/255, green: 120/255, blue: 60/255),
-                            Color(red: 250/255, green: 70/255, blue: 0/255),
+                            Color(red: 255/255, green: 216/255, blue: 244/255),
+                            Color(red: 255/255, green: 189/255, blue: 125/255),
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
             
             Capsule()
-                .stroke(Color.black.opacity(0.1), lineWidth: 4)
+                .stroke(Color.black.opacity(0.1), lineWidth: 5)
                 .blur(radius: 2)
                 .clipShape(Capsule())
             
             configuration.label
-                .foregroundStyle(.white)
-                .fontWidth(.expanded)
+                .fontDesign(.serif)
+                .italic()
                 .fontWeight(.medium)
-                .padding(.vertical, 15)
-                .padding(.horizontal, 30)
+                .padding(.vertical, 15) // Add intrinsic height
+                .padding(.horizontal, 50) // Add intrinsic width
         }
         .scaleEffect(configuration.isPressed ? 1.05 : 1)
         .rotationEffect(configuration.isPressed ? .degrees(-1) : .zero)
@@ -46,9 +47,9 @@ struct TitleButton: ButtonStyle {
     ZStack {
         Rectangle()
             .foregroundStyle(.green)
-        Button("Start the experience") {
+        Button("Where I feel at home") {
             
         }
-        .buttonStyle(TitleButton())
+        .buttonStyle(IntentionButton())
     }
 }

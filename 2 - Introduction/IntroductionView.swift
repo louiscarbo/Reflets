@@ -4,11 +4,11 @@ import SwiftUI
 
 struct IntroductionView: View {
     @Binding var screenNumber: Int
-    @State var rotationAngle: Double
     
+    @State private var rotationAngle: Double = 0
     @State private var dialogueNumber = 0
     @State private var textOpacity = 0.0
-    @State private var isAnimating = false
+    let hapticFeedback = UINotificationFeedbackGenerator()
     
     //MARK: View
     var body: some View {
@@ -21,57 +21,45 @@ struct IntroductionView: View {
                 
                 HStack {
                     Spacer()
-                    Text(dialogueData[dialogueNumber].buttonText)
-                        .italic()
-                        .opacity(0.7)
-                        .font(.headline)
+                    Spacer()
+                    Button(dialogueData[dialogueNumber].buttonText) {
+                        hapticFeedback.notificationOccurred(.success)
+                        withAnimation(.easeInOut(duration: 1.5)) {
+                            textOpacity = 0.0
+                        }
+                        withAnimation(.easeInOut(duration: 0.1).delay(1.5)) {
+                            if dialogueNumber < dialogueData.count - 1 {
+                                dialogueNumber+=1
+                            } else {
+                                screenNumber+=1
+                            }
+                        }
+                        withAnimation(.easeInOut(duration: 2.0).delay(1.6)) {
+                            textOpacity = 1.0
+                        }
+                    }
+                    .buttonStyle(IntentionButton())
                 }
             }
             .foregroundStyle(.black)
             .padding(20)
             .fontDesign(.serif)
             .opacity(textOpacity)
-            HStack {
-                Spacer()
-                Button("Next"){
-                    
-                }
-                .buttonStyle(IntentionButton())
-                Spacer()
-            }
         }
         .background {
             Image("Reflets")
                 .resizable()
                 .frame(width: 700, height: 700)
                 .rotationEffect(Angle(degrees: rotationAngle))
+                .onAppear {
+                    withAnimation(
+                        Animation.linear(duration: 120.0)
+                            .repeatForever(autoreverses: false)
+                    ) { rotationAngle = 360 }
+                }
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 2.0)) {
-                textOpacity = 1.0
-            }
-        }
-        // Tap gesture to change the dialogue text and transitions
-        .onTapGesture {
-            // Prevents multiple taps
-            guard isAnimating == false else { return }
-            isAnimating = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.6) {
-                isAnimating = false
-            }
-            
-            // Animations
-            withAnimation(.easeInOut(duration: 1.5)) {
-                textOpacity = 0.0
-            }
-            withAnimation(.easeInOut(duration: 0.1).delay(1.5)) {
-                if dialogueNumber < dialogueData.count - 1 {
-                    dialogueNumber+=1
-                } else {
-                    screenNumber+=1
-                }
-            }
-            withAnimation(.easeInOut(duration: 2.0).delay(1.6)) {
                 textOpacity = 1.0
             }
         }
@@ -85,14 +73,14 @@ struct IntroductionView: View {
                Hello there! Welcome to Reflets!
                I’m Reflecto, your guide for this creative experience.
                """
-            , buttonText: "Tap anywhere to continue"
+            , buttonText: "Hello Reflecto!"
         ),
         DialogueData(
             dialogueText:
                """
                Here, you’ll create a unique self-portrait—one that reflects not just your appearance, but your emotions, experiences, and the things that inspire you.
                """
-            , buttonText: "So, what’s next?"
+            , buttonText: "Sounds exciting!"
         ),
         DialogueData(
             dialogueText:
@@ -119,5 +107,5 @@ struct DialogueData {
 }
 
 #Preview {
-    IntroductionView(screenNumber: .constant(1), rotationAngle: 0)
+    IntroductionView(screenNumber: .constant(1))
 }
