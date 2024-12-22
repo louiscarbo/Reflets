@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var timer: Timer? = nil
     
     let notificationFeedback = UINotificationFeedbackGenerator()
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack {
@@ -17,9 +18,13 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 .foregroundStyle(
                     RadialGradient(
-                        colors: [
+                        colors: colorScheme == .light ?
+                        [
                             Color(red: 255/255, green: 250/255, blue: 250/255),
                             Color(red: 255/255, green: 220/255, blue: 180/255),
+                        ] : [
+                            Color(red: 0/255, green: 5/255, blue: 5/255),
+                            Color(red: 60/255, green: 30/255, blue: 40/255),
                         ],
                         center: .center,
                         startRadius: 0, endRadius: 500
@@ -58,7 +63,7 @@ struct HomeView: View {
                                 stopHapticFeedback()
                             }
                     )
-                    .scaleEffect(isTouching ? 5 : 1.0)
+                    .scaleEffect(isTouching ? 3 : 1.0)
                     .zIndex(10)
                 
                 Text("Reflets")

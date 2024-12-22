@@ -42,6 +42,8 @@ struct ARAutoportraitView: View {
     @State private var arObjectRatio = 2.0
     @State private var arObjectOpacity = 1.0
     
+    @StateObject private var volumeListener = VolumeButtonListener()
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             // MARK: RealityView
@@ -143,8 +145,7 @@ struct ARAutoportraitView: View {
                 
                 HStack {
                     Button("Add Object") {
-                        let newObject = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor).withAlphaComponent(arObjectOpacity), isMetallic: arObjectMetallic), position: [0, 0, -1])
-                        arObjects.append(newObject)
+                        addCurrentObject()
                     }
                     .buttonBorderShape(.capsule)
                     .padding()
@@ -174,6 +175,11 @@ struct ARAutoportraitView: View {
         dynamicCameraAnchor.components[PositioningHelperComponent.self] = PositioningHelperComponent()
         
         return dynamicCameraAnchor
+    }
+    
+    func addCurrentObject() {
+        let newObject = ARObject(type: currentObjectType, color: SimpleMaterial(color: UIColor(arObjectColor).withAlphaComponent(arObjectOpacity), isMetallic: arObjectMetallic), position: [0, 0, -1])
+        arObjects.append(newObject)
     }
 }
 

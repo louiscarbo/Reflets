@@ -31,6 +31,7 @@ struct IntentionButton: ButtonStyle {
                 .clipShape(Capsule())
             
             configuration.label
+                .foregroundColor(.black)
                 .fontDesign(.serif)
                 .italic()
                 .fontWeight(.medium)
