@@ -8,6 +8,10 @@
 import SwiftUI
 import RealityKit
 
+struct UniqueIDComponent: Component {
+    var id: Int
+}
+
 struct ARAutoportraitView: View {
     // App level state
     @Binding var screenNumber: Int
@@ -16,23 +20,25 @@ struct ARAutoportraitView: View {
     @State private var arObjects: [ARObject] = []
     @State private var selectedType: SelectedType = .sphere
     private var currentObjectType: ARObjectType {
+        let scaleFactor = Float(sizeSliderValue * 5 + 0.5)
+
         switch selectedType {
         case .sphere:
-            return .sphere(radius: 0.05)
+            return .sphere(radius: 0.05 * scaleFactor)
         case .cube:
-            return .cube(size: 0.1)
+            return .cube(size: 0.1 * scaleFactor)
         case .cone:
-            return .cone(radius: 0.05, height: Float(arObjectProperties.ratio * 0.05))
+            return .cone(radius: 0.05 * scaleFactor, height: Float(arObjectProperties.ratio * 0.05) * scaleFactor)
         case .cylinder:
-            return .cylinder(radius: 0.05, height: Float(arObjectProperties.ratio * 0.05))
+            return .cylinder(radius: 0.05 * scaleFactor, height: Float(arObjectProperties.ratio * 0.05) * scaleFactor)
         case .text:
-            return .text(content: arObjectProperties.text)
+            return .text(content: arObjectProperties.text) // Text size adjustment could be separate
         case .image:
-            return .text(content: "IMAGE")
-            //TODO: Implement image loading
+            return .text(content: "IMAGE") // Placeholder for image resizing
         }
     }
     @State private var lastObjectCount = 0
+    @State private var nextEntityID = 0
     @State private var updatePlacementHelper = false
     @State private var shouldUpdatePlacementHelper = false
     
@@ -66,24 +72,42 @@ struct ARAutoportraitView: View {
             } update: { content in
                 // Check if an object was added
                 if arObjects.count > lastObjectCount {
+                                        
+                    // Create the new object entity
                     let newObject = arObjects.last!
                     let entity = newObject.generateEntity()
+                    entity.components[UniqueIDComponent.self] = UniqueIDComponent(id: nextEntityID)
+                    
+                    // Create the anchor entity
                     let anchor = AnchorEntity(.camera)
                     anchor.anchoring.trackingMode = .once
                     anchor.addChild(entity)
-                    content.add(anchor)
+                    anchor.components[UniqueIDComponent.self] = UniqueIDComponent(id: nextEntityID)
                     
+                    content.add(anchor)
+                                        
                     DispatchQueue.main.async {
+                        nextEntityID += 1
                         lastObjectCount = arObjects.count
                     }
                 }
                 
                 // Check if an object was removed
                 else if arObjects.count < lastObjectCount {
-                    // Remove the last object from the scene
-                    content.entities.remove(at: content.entities.count - 1)
+                    
+                    if content.entities.count > 0 {
+                        let entityToRemoveID = nextEntityID - 1
+                            
+                        content.entities.removeAll(where: { entity in
+                            if let uniqueIDComponent = entity.components[UniqueIDComponent.self] {
+                                return uniqueIDComponent.id == entityToRemoveID
+                            }
+                            return false
+                        })
+                    }
                     
                     DispatchQueue.main.async {
+                        nextEntityID -= 1
                         lastObjectCount = arObjects.count
                     }
                 }
@@ -104,9 +128,9 @@ struct ARAutoportraitView: View {
                 showReflectoHelp: .constant(false),
                 showObjectsCatalog: $showObjectsCatalog,
                 artworkIsDone: .constant(false),
-                shouldGoBack: $shouldGoBack,
                 shouldAddObject: $shouldAddObject,
                 showCustomizationSheet: $showCustomizationSheet,
+                arObjects: $arObjects,
                 sliderValue: $sizeSliderValue
             )
             .onChange(of: shouldAddObject) {
@@ -115,8 +139,11 @@ struct ARAutoportraitView: View {
                 }
                 shouldAddObject = false
             }
+            .onChange(of: sizeSliderValue) {
+                updatePlacementHelper = true
+            }
             .sheet(isPresented: $showCustomizationSheet) {
-                CustomizationSheetView(
+                ObjectSettingsView(
                     selectedColor: $arObjectProperties.color,
                     selectedOpacity: $arObjectProperties.opacity,
                     isMetallic: $arObjectProperties.metallic,
@@ -127,10 +154,6 @@ struct ARAutoportraitView: View {
                 )
                 .onChange(of: arObjectProperties) {
                     updatePlacementHelper = true
-                }
-                .onChange(of: shouldGoBack) {
-                    goBack()
-                    shouldGoBack = false
                 }
             }
             .sheet(isPresented: $showObjectsCatalog) {
@@ -170,12 +193,6 @@ struct ARAutoportraitView: View {
             position: [0, 0, -1]
         )
         arObjects.append(newObject)
-    }
-    
-    func goBack() {
-        if !arObjects.isEmpty {
-            arObjects.removeLast()
-        }
     }
 }
 

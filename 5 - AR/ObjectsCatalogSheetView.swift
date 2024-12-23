@@ -84,9 +84,9 @@ struct ObjectsCatalogSheetView: View {
             showReflectoHelp: .constant(false),
             showObjectsCatalog: $isPresented,
             artworkIsDone: .constant(false),
-            shouldGoBack: .constant(false),
             shouldAddObject: .constant(false),
             showCustomizationSheet: .constant(false),
+            arObjects: .constant([]),
             sliderValue: .constant(0.8)
         )
         .sheet(isPresented: $isPresented) {

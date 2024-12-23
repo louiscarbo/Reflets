@@ -67,8 +67,12 @@ struct HomeView: View {
                     .zIndex(10)
                 
                 Text("Reflets")
-                    .bold()
                     .font(.system(size: 70))
+                    .fontWeight(.light)
+                    .fontWidth(.expanded)
+                
+                Text("Your AR self-portrait")
+                    .font(.title2)
                     .fontWeight(.light)
                     .fontWidth(.expanded)
                     .padding(.bottom, 20)

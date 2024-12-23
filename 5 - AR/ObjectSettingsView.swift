@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CustomizationSheetView: View {
+struct ObjectSettingsView: View {
     @Binding var selectedColor: Color
     @Binding var selectedOpacity: Double
     @Binding var isMetallic: Bool
@@ -62,10 +62,10 @@ struct CustomizationSheetView: View {
             
             if needsProportionSlider {
                 HStack {
-                    Text("Proportion")
+                    Text("Ratio")
                         .fontWidth(.expanded)
                     Spacer()
-                    Slider(value: $selectedProportion)
+                    Slider(value: $selectedProportion, in: 0.1...7.0)
                         .frame(width: 220)
                 }
             }
@@ -93,14 +93,14 @@ struct CustomizationSheetView: View {
             showReflectoHelp: .constant(false),
             showObjectsCatalog: .constant(false),
             artworkIsDone: .constant(false),
-            shouldGoBack: .constant(false),
             shouldAddObject: .constant(false),
             showCustomizationSheet: $isPresented,
+            arObjects: .constant([]),
             sliderValue: .constant(0.8)
         )
         .sheet(isPresented: $isPresented) {
             NavigationStack {
-                CustomizationSheetView(
+                ObjectSettingsView(
                     selectedColor: .constant(.red),
                     selectedOpacity: .constant(0.9),
                     isMetallic: .constant(true),

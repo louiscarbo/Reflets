@@ -9,11 +9,18 @@ import SwiftUI
 
 struct ARControlsView: View {
     @Binding var showReflectoHelp: Bool
+    
     @Binding var showObjectsCatalog: Bool
+    
     @Binding var artworkIsDone: Bool
-    @Binding var shouldGoBack: Bool
+    
     @Binding var shouldAddObject: Bool
+    @State private var addObjectsTimer: Timer? = nil
+    @State private var removeObjectsTimer: Timer? = nil
+    
     @Binding var showCustomizationSheet: Bool
+    
+    @Binding var arObjects: [ARObject]
 
     @Binding var sliderValue: Double
     
@@ -78,23 +85,76 @@ struct ARControlsView: View {
                 
                 HStack(spacing: 20) {
                     Button {
-                        withAnimation {
-                            shouldGoBack = true
+                        if !arObjects.isEmpty {
+                            arObjects.removeLast()
+                        }
+                        if removeObjectsTimer != nil {
+                            removeObjectsTimer?.invalidate()
+                            removeObjectsTimer = nil
                         }
                         hapticFeedback.notificationOccurred(.success)
                     } label: {
                         Image(systemName: "arrowshape.turn.up.backward")
                     }
                     .buttonStyle(SFSymbolButtonStyle(rotateInTrigonometricDirection: true))
+                    .disabled(arObjects.isEmpty)
+                    .gesture(
+                        LongPressGesture(minimumDuration: 0.2)
+                            .onEnded { _ in
+                                removeObjectsTimer?.invalidate()
+                                removeObjectsTimer = nil
+                            }
+                    )
+                    .simultaneousGesture(
+                        DragGesture(minimumDistance: 0) // Detects continuous press while dragging slightly
+                            .onChanged { _ in
+                                if !arObjects.isEmpty {
+                                    if removeObjectsTimer == nil {
+                                        removeObjectsTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
+                                            if !arObjects.isEmpty {
+                                                arObjects.removeLast()
+                                            }
+                                            hapticFeedback.notificationOccurred(.success)
+                                        }
+                                    }
+                                }
+                            }
+                    )
+                    
                     Button {
                         withAnimation {
                             shouldAddObject = true
+                        }
+                        if addObjectsTimer != nil {
+                            addObjectsTimer?.invalidate()
+                            addObjectsTimer = nil
                         }
                         hapticFeedback.notificationOccurred(.success)
                     } label: {
                         Image(systemName: "plus")
                     }
                     .buttonStyle(SFSymbolButtonStyle(symbolSize: 45))
+                    .gesture(
+                        LongPressGesture(minimumDuration: 0.2)
+                            .onEnded { _ in
+                                addObjectsTimer?.invalidate()
+                                addObjectsTimer = nil
+                            }
+                    )
+                    .simultaneousGesture(
+                        DragGesture(minimumDistance: 0) // Detects continuous press while dragging slightly
+                            .onChanged { _ in
+                                if addObjectsTimer == nil {
+                                    addObjectsTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
+                                        withAnimation {
+                                            shouldAddObject = true
+                                        }
+                                        hapticFeedback.notificationOccurred(.success)
+                                    }
+                                }
+                            }
+                    )
+                    
                     Button {
                         withAnimation {
                             showCustomizationSheet = true
@@ -126,9 +186,10 @@ struct ARControlsView: View {
                             .clipShape(Capsule())
                     }
                 }
-            }
+            } // VStack
             
             SizeSliderView(sliderValue: $sliderValue)
+                .offset(y: -30)
         }
     }
 }
@@ -145,9 +206,9 @@ struct ARControlsView: View {
             showReflectoHelp: .constant(false),
             showObjectsCatalog: .constant(false),
             artworkIsDone: .constant(false),
-            shouldGoBack: .constant(false),
             shouldAddObject: .constant(false),
             showCustomizationSheet: .constant(false),
+            arObjects: .constant([]),
             sliderValue: $value
         )
         Text("\(value)")

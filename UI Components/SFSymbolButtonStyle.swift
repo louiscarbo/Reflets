@@ -11,10 +11,13 @@ struct SFSymbolButtonStyle: ButtonStyle {
     var symbolSize: CGFloat = 30
     var foregroundColor: Color = .black
     var backgroundColor: Color = Color(red: 240/255, green: 240/255, blue: 230/255)
-    var pressedEffectScale: CGFloat = 0.9
     var rotateInTrigonometricDirection: Bool = false
+    @Environment(\.isEnabled) var isEnabled
 
     func makeBody(configuration: Configuration) -> some View {
+        let disabled = isEnabled == false
+        let pressedEffectScale: CGFloat = disabled ? 1.0 : 0.9
+        
         ZStack {
             Circle()
                 .foregroundStyle(backgroundColor)
@@ -32,7 +35,10 @@ struct SFSymbolButtonStyle: ButtonStyle {
                         endPoint: .bottom
                     ),
                     lineWidth: 7)
-                .opacity(configuration.isPressed ? 0.4 : 1.0)
+                .opacity(
+                    disabled ? 1.0 :
+                        configuration.isPressed ? 0.4 : 1.0
+                )
                 .blur(radius: 2)
                 .clipShape(Circle())
             
@@ -45,7 +51,10 @@ struct SFSymbolButtonStyle: ButtonStyle {
                         ],
                         startPoint: .top,
                         endPoint: .bottom)
-                    .opacity(configuration.isPressed ? 0.1 : 0.2)
+                    .opacity(
+                        disabled ? 0.2 :
+                            configuration.isPressed ? 0.1 : 0.2
+                    )
                 )
                 .padding(0.3 * symbolSize)
                 .offset(y: -2)
@@ -57,10 +66,19 @@ struct SFSymbolButtonStyle: ButtonStyle {
                 .fontWeight(.semibold)
                 .foregroundColor(foregroundColor) // Icon color
                 .padding(16/30 * symbolSize)
-                .rotationEffect(configuration.isPressed ? .degrees(rotateInTrigonometricDirection ? -15 : 15) : .zero)
+                .rotationEffect(
+                    disabled ? .zero :
+                        configuration.isPressed ? .degrees(rotateInTrigonometricDirection ? -15 : 15) : .zero
+                )
+                .opacity(disabled ? 0.3 : 1.0)
             
             Circle()
-                .foregroundStyle(Color.black.opacity(configuration.isPressed ? 0.1 : 0.0))
+                .foregroundStyle(
+                    Color.black.opacity(
+                        disabled ? 0.0 :
+                            configuration.isPressed ? 0.1 : 0.0
+                    )
+                )
         }
         .fixedSize()
         .scaleEffect(configuration.isPressed ? pressedEffectScale : 1.0) // Pressed effect
@@ -68,6 +86,8 @@ struct SFSymbolButtonStyle: ButtonStyle {
 }
 
 #Preview {
+    @Previewable @State var bool = false
+    
     ZStack(alignment: .top) {
         Rectangle()
             .foregroundStyle(.green)
@@ -79,13 +99,22 @@ struct SFSymbolButtonStyle: ButtonStyle {
             }
             .padding()
             .buttonStyle(SFSymbolButtonStyle(rotateInTrigonometricDirection: true))
+            .disabled(bool)
+            
             Button {
-                
+                bool.toggle()
             } label: {
                 Image(systemName: "folder")
             }
             .padding()
             .buttonStyle(SFSymbolButtonStyle())
+            
+            Button("Hi bitches") {
+                
+            }
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
+            .disabled(true)
         }
     }
 }
