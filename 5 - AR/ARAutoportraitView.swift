@@ -58,12 +58,6 @@ struct ARAutoportraitView: View {
             RealityView { content in
                 content.camera = .spatialTracking
                 
-                // Example URL for the PNG (use your actual image URL here)
-                if let url = getSegmentedImageURL() {
-                    let entity = create2DEntityFromImage(url: url)
-                    content.add(entity)
-                }
-                
                 // Addind the positioning helper
                 let positioningHelper = createPositioningHelper()
                 content.add(positioningHelper)

@@ -3,6 +3,8 @@
 import SwiftUI
 
 struct IntentionButton: ButtonStyle {
+    var horizontalPadding: CGFloat = 50
+    
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
             Capsule()
@@ -36,7 +38,7 @@ struct IntentionButton: ButtonStyle {
                 .italic()
                 .fontWeight(.medium)
                 .padding(.vertical, 15) // Add intrinsic height
-                .padding(.horizontal, 50) // Add intrinsic width
+                .padding(.horizontal, horizontalPadding) // Add intrinsic width
         }
         .scaleEffect(configuration.isPressed ? 1.05 : 1)
         .rotationEffect(configuration.isPressed ? .degrees(-1) : .zero)

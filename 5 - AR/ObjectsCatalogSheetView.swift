@@ -17,8 +17,15 @@ struct ObjectsCatalogSheetView: View {
     
     @State private var availableTypes: [SelectedType] = [.sphere, .cube, .cone, .cylinder, .text]
     
+    @State private var showObjectCaptureSheet: Bool = false
+    
+    private var customObjects: [CustomObjectPreview] {
+        fetchSegmentedImagesFromTemporaryDirectory()
+    }
+    
     var body: some View {
-        let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
+        let simpleShapesColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
+        let customObjectsColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
         
         VStack {
             ScrollView {
@@ -34,7 +41,7 @@ struct ObjectsCatalogSheetView: View {
                         .fontWidth(.expanded)
                         .font(.title2)
                     
-                    LazyVGrid(columns: gridColumns) {
+                    LazyVGrid(columns: simpleShapesColumns) {
                         ForEach(availableTypes, id: \.self) { type in
                             Button {
                                 dismiss()
@@ -54,12 +61,31 @@ struct ObjectsCatalogSheetView: View {
                         .fontWidth(.expanded)
                         .font(.title2)
                     
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "plus")
+                    LazyVGrid(columns: customObjectsColumns) {
+                        ForEach(customObjects, id: \.self) { object in
+                            Button {
+                                dismiss()
+                                hapticFeedback.notificationOccurred(.success)
+                                // TODO: Logic to add custom object
+                            } label: {
+                                Image(uiImage: object.preview)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 50, height: 50)
+                            }
+                            .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
+                            .padding(.bottom, 10)
+                        }
+                        Button {
+                            showObjectCaptureSheet = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                        .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
+                        .sheet(isPresented: $showObjectCaptureSheet) {
+                            ObjectCaptureSheetView()
+                        }
                     }
-                    .buttonStyle(SFSymbolButtonStyle())
                 }
             }
         }

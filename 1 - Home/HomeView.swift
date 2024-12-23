@@ -87,7 +87,22 @@ struct HomeView: View {
                 .buttonBorderShape(.capsule)
                 .fontWeight(.medium)
                 .fontWidth(.expanded)
+                
+                Button("Skip to camera") {
+                    withAnimation(.easeInOut(duration: 1.0)) {
+                        screenNumber = 3
+                    }
+                    notificationFeedback.notificationOccurred(.success)
+                }
+                .buttonStyle(TitleButton())
+                .buttonBorderShape(.capsule)
+                .fontWeight(.medium)
+                .fontWidth(.expanded)
+                .padding()
             }
+        }
+        .onAppear {
+            deleteAllSegmentedPNGs()
         }
     }
     

@@ -7,6 +7,7 @@
 
 import RealityKit
 import Foundation
+import UIKit
 
 enum SelectedType {
     case sphere, cube, cone, cylinder, text, image
@@ -86,4 +87,9 @@ struct ARObject {
         entity.position = position
         return entity
     }
+}
+
+struct CustomObjectPreview: Hashable {
+    var preview: UIImage
+    var url: URL
 }

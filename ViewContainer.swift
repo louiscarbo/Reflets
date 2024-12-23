@@ -13,8 +13,6 @@ struct ViewContainer: View {
             IntroductionView(screenNumber: $currentView);
         case 2:
             IntentionSelectionView(screenNumber: $currentView);
-        case 3:
-            SelfiesView(screenNumber: $currentView);
         default:
             ARAutoportraitView(screenNumber: $currentView);
         }
