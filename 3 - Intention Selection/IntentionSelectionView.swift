@@ -19,13 +19,20 @@ struct IntentionSelectionView: View {
     
     let intentions = [
         "What I’m proud of",
-        "Who I want to be",
         "What makes me, me",
         "Me, 10 years from now",
-        "The moments that shaped me",
         "A memory I cherish",
         "Where I feel at home",
         "I have another idea"
+    ]
+    
+    let comments = [
+        "Pride is powerful! Exploring what makes you proud can be a great confidence boost. I’ll be here to guide you!",
+        "You’re one of a kind! Let’s explore what makes you, you—I’ll help with prompts to spark your reflection.",
+        "Dreaming about the future is exciting! Don’t worry, I’ll be here to guide your reflection.",
+        "Your favorite moments tell a story. Let’s reflect on one—I’ll help you capture it in your artwork!",
+        "Home is where the heart is—or maybe something else entirely! Let me guide you as you reflect.",
+        "Going your own way? Awesome! I’ll be here if you need inspiration, but the stage is yours!"
     ]
     
     //MARK: View
@@ -42,11 +49,12 @@ struct IntentionSelectionView: View {
                     }
                 }
             
-            if (focusedButtonIndex != nil) {
+            // Buttons when focused
+            if focusedButtonIndex != nil {
                 HStack {
                     Button {
                         withAnimation {
-                            focusedButtonIndex = nil
+                            self.focusedButtonIndex = nil
                         }
                     } label: {
                         Image(systemName: "arrowshape.turn.up.backward")
@@ -61,8 +69,27 @@ struct IntentionSelectionView: View {
                     }
                     .buttonStyle(SFSymbolButtonStyle())
                 }
+                .transition(.opacity.combined(with: .scale(scale: 0.5, anchor: .bottom)))
                 .zIndex(1.0)
-                .offset(y: 70)
+                .offset(y: 50)
+            }
+            
+            if let focusedButtonIndex = focusedButtonIndex {
+                Text(comments[focusedButtonIndex])
+                    .padding(40)
+                    .multilineTextAlignment(.center)
+                    .font(.title2)
+                    .fontDesign(.serif)
+                    .foregroundStyle(.white)
+                    .background {
+                        RoundedRectangle(cornerRadius: 30)
+                            .foregroundStyle(.ultraThinMaterial.opacity(1.0))
+                            .blur(radius: 5)
+                            .padding(20)
+                    }
+                    .offset(y: 170)
+                    .zIndex(1.0)
+                    .transition(.opacity.combined(with: .scale(scale: 0.5, anchor: .bottom)))
             }
 
             // Content layer
