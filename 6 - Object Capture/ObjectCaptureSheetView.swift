@@ -10,6 +10,8 @@ import PhotosUI
 import Vision
 
 struct ObjectCaptureSheetView: View {
+    @Binding var shouldUpdateCustomObjects: Bool
+    
     @State private var selectedImage: UIImage?
     @State private var selectedImageRotationAngle: CGFloat = 0
 
@@ -57,69 +59,37 @@ struct ObjectCaptureSheetView: View {
                             }
                         }
                 } else if hasTimedOut {
-                    var rotatedSelectedImage = selectedImage
-                    
-                    Rectangle()
-                        .foregroundStyle(Color.clear)
-                        .overlay {
-                            Image(uiImage: selectedImage!)
-                                .resizable()
-                                .scaledToFit()
-                                .rotationEffect(Angle(degrees: Double(selectedImageRotationAngle)))
-                                .onTapGesture {
-                                    withAnimation {
-                                        selectedImageRotationAngle += 90
-                                    }
-                                    rotatedSelectedImage = rotateImage90Degrees(image: rotatedSelectedImage!)
+                    if let selectedImage = selectedImage {
+                        ImageApprovalView(
+                            image: selectedImage,
+                            imageHasNotBeenSegmented: true,
+                            selectedImage: $selectedImage,
+                            segmentedImage: $segmentedImage,
+                            shouldUpdateCustomObjects: $shouldUpdateCustomObjects
+                        )
+                    } else {
+                        Text("An error occured. Please try again.")
+                            .onAppear{
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                    dismiss()
                                 }
-                        }
-                    .aspectRatio(contentMode: .fit)
-                    
-                    Text("The background cannot be removed. Do you still want to add this image to your custom objects?")
-                    HStack {
-                        Button("Choose another photo") {
-                            hasTimedOut = false
-                            selectedImage = nil
-                            segmentedImage = nil
-                        }
-                        .buttonStyle(IntentionButton(horizontalPadding: 30))
-                        Button("Add") {
-                            if saveImageToTemporaryDirectory(image: rotatedSelectedImage!) != nil {
-                                dismiss()
                             }
-                        }
-                        .buttonStyle(IntentionButton(horizontalPadding: 30))
                     }
                 } else {
-                    var rotatedSegmentedImage = segmentedImage
-                    Rectangle()
-                        .foregroundStyle(Color.clear)
-                        .overlay {
-                            Image(uiImage: segmentedImage!)
-                                .resizable()
-                                .scaledToFit()
-                                .onTapGesture {
-                                    withAnimation {
-                                        segmentedImageRotationAngle += 90
-                                    }
-                                    rotatedSegmentedImage = rotateImage90Degrees(image: rotatedSegmentedImage!)
+                    if let segmentedImage = segmentedImage {
+                        ImageApprovalView(
+                            image: segmentedImage,
+                            selectedImage: $selectedImage,
+                            segmentedImage: $segmentedImage,
+                            shouldUpdateCustomObjects: $shouldUpdateCustomObjects
+                        )
+                    } else {
+                        Text("An error occured. Please try again.")
+                            .onAppear{
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                    dismiss()
                                 }
-                                .rotationEffect(Angle(degrees: Double(segmentedImageRotationAngle)))
-                        }
-                        .aspectRatio(contentMode: .fit)
-                    HStack {
-                        Button("Choose another photo") {
-                            hasTimedOut = false
-                            selectedImage = nil
-                            segmentedImage = nil
-                        }
-                        .buttonStyle(IntentionButton(horizontalPadding: 30))
-                        Button("Add") {
-                            if saveImageToTemporaryDirectory(image: rotatedSegmentedImage!) != nil {
-                                dismiss()
                             }
-                        }
-                        .buttonStyle(IntentionButton(horizontalPadding: 30))
                     }
                 }
             }
@@ -215,6 +185,63 @@ struct CameraView: UIViewControllerRepresentable {
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             picker.dismiss(animated: true)
+        }
+    }
+}
+
+struct ImageApprovalView: View {
+    @State var image: UIImage
+    @State var imageHasNotBeenSegmented = false
+    
+    @Binding var selectedImage: UIImage?
+    @Binding var segmentedImage: UIImage?
+    @Binding var shouldUpdateCustomObjects: Bool
+    
+    @State private var imageRotationAngle: CGFloat = 0
+    @State private var hasTimedOut = false
+    
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        VStack {
+            var rotatedImage = image
+            Rectangle()
+                .foregroundStyle(Color.clear)
+                .overlay {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .onTapGesture {
+                            withAnimation {
+                                imageRotationAngle -= 90
+                            }
+                            rotatedImage = rotateImage90Degrees(image: rotatedImage) ?? rotatedImage
+                        }
+                        .rotationEffect(Angle(degrees: Double(imageRotationAngle)))
+                }
+                .aspectRatio(contentMode: .fit)
+            if imageHasNotBeenSegmented {
+                Text("The background could not be removed from this image. Do you still want to add it?")
+            }
+            HStack {
+                Button("Choose another photo") {
+                    hasTimedOut = false
+                    selectedImage = nil
+                    segmentedImage = nil
+                }
+                .buttonStyle(IntentionButton(horizontalPadding: 30))
+                Button("Add") {
+                    addToCustomObjects(image: rotatedImage)
+                }
+                .buttonStyle(IntentionButton(horizontalPadding: 30))
+            }
+        }
+    }
+    
+    private func addToCustomObjects(image: UIImage) {
+        if saveImageToTemporaryDirectory(image: image) != nil {
+            dismiss()
+            shouldUpdateCustomObjects = true
         }
     }
 }

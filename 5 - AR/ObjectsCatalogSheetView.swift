@@ -19,9 +19,8 @@ struct ObjectsCatalogSheetView: View {
     
     @State private var showObjectCaptureSheet: Bool = false
     
-    private var customObjects: [CustomObjectPreview] {
-        fetchSegmentedImagesFromTemporaryDirectory()
-    }
+    @State private var shouldUpdateCustomObjects = false
+    @State private var customObjects: [CustomObjectPreview] = []
     
     var body: some View {
         let simpleShapesColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
@@ -83,8 +82,14 @@ struct ObjectsCatalogSheetView: View {
                         }
                         .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
                         .sheet(isPresented: $showObjectCaptureSheet) {
-                            ObjectCaptureSheetView()
+                            ObjectCaptureSheetView(shouldUpdateCustomObjects: $shouldUpdateCustomObjects)
                         }
+                    } // LazyVGrid
+                    .onChange(of: shouldUpdateCustomObjects) {
+                        updateCustomObject()
+                    }
+                    .onAppear {
+                        updateCustomObject()
                     }
                 }
             }
@@ -94,6 +99,13 @@ struct ObjectsCatalogSheetView: View {
         .presentationDetents([.fraction(0.8), .large])
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(40.0)
+    }
+    
+    func updateCustomObject() {
+        customObjects = fetchSegmentedImagesFromTemporaryDirectory()
+        DispatchQueue.main.async {
+            shouldUpdateCustomObjects = false
+        }
     }
 }
 

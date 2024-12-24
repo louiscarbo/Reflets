@@ -46,12 +46,6 @@ func getSegmentedImage(from image: UIImage?) async -> UIImage? {
             return nil
         }
         
-        // Save the segmented image to the temporary directory
-        guard saveImageToTemporaryDirectory(image: uiImageOutput) != nil else {
-            print("Error saving segmented image.")
-            return nil
-        }
-        
         return uiImageOutput
     } catch {
         print("Error during segmentation: \(error.localizedDescription)")
@@ -154,4 +148,17 @@ func rotateImage90Degrees(image: UIImage) -> UIImage? {
 
     // Get the rotated image
     return UIGraphicsGetImageFromCurrentImageContext()
+}
+
+func logTemporaryDirectoryContents() {
+    let tempDirectory = FileManager.default.temporaryDirectory
+    do {
+        let contents = try FileManager.default.contentsOfDirectory(at: tempDirectory, includingPropertiesForKeys: nil)
+        print("Contents of Temporary Directory:")
+        for file in contents {
+            print("File: \(file.lastPathComponent)")
+        }
+    } catch {
+        print("Error reading temporary directory: \(error.localizedDescription)")
+    }
 }
