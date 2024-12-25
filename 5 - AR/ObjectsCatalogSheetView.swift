@@ -14,6 +14,7 @@ struct ObjectsCatalogSheetView: View {
     let hapticFeedback = UINotificationFeedbackGenerator()
     
     @Binding var selectedType: SelectedType
+    @Binding var imageURL: URL?
     
     @State private var availableTypes: [SelectedType] = [.sphere, .cube, .cone, .cylinder, .text]
     
@@ -65,7 +66,7 @@ struct ObjectsCatalogSheetView: View {
                             Button {
                                 dismiss()
                                 hapticFeedback.notificationOccurred(.success)
-                                // TODO: Logic to add custom object
+                                imageURL = object.url
                             } label: {
                                 Image(uiImage: object.preview)
                                     .resizable()

@@ -30,7 +30,7 @@ enum ARObjectType: Hashable {
     case cone(radius: Float, height: Float)
     case cylinder(radius: Float, height: Float)
     case text(content: String)
-    case image(url: URL)
+    case image(url: URL?)
     
     var hasCustomColor: Bool {
         switch self {

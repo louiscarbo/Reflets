@@ -18,6 +18,7 @@ struct ARAutoportraitView: View {
     
     // AR level state
     @State private var arObjects: [ARObject] = []
+    @State private var imageURL: URL?
     @State private var selectedType: SelectedType = .sphere
     private var currentObjectType: ARObjectType {
         let scaleFactor = Float(sizeSliderValue * 5 + 0.5)
@@ -34,7 +35,7 @@ struct ARAutoportraitView: View {
         case .text:
             return .text(content: arObjectProperties.text) // Text size adjustment could be separate
         case .image:
-            return .text(content: "IMAGE") // Placeholder for image resizing
+            return .image(url: imageURL) // Placeholder for image resizing
         }
     }
     @State private var lastObjectCount = 0
@@ -151,7 +152,7 @@ struct ARAutoportraitView: View {
                 }
             }
             .sheet(isPresented: $showObjectsCatalog) {
-                ObjectsCatalogSheetView(selectedType: $selectedType)
+                ObjectsCatalogSheetView(selectedType: $selectedType, imageURL: $imageURL)
                     .onChange(of: selectedType) {
                         updatePlacementHelper = true
                     }
