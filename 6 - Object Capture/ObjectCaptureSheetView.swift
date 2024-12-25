@@ -22,11 +22,8 @@ struct ObjectCaptureSheetView: View {
     @State private var hasTimedOut = false
     
     @Environment(\.dismiss) var dismiss
-    
-    var segmentedImages: [UIImage] {
-        fetchSegmentedImagesFromTemporaryDirectory().map{ $0.preview }
-    }
 
+    // MARK: - ObjectCaptureSheetView
     var body: some View {
         VStack {
             Text("New Custom Object")
@@ -62,6 +59,7 @@ struct ObjectCaptureSheetView: View {
                     if let selectedImage = selectedImage {
                         ImageApprovalView(
                             image: selectedImage,
+                            rotatedImage: selectedImage,
                             imageHasNotBeenSegmented: true,
                             selectedImage: $selectedImage,
                             segmentedImage: $segmentedImage,
@@ -79,6 +77,7 @@ struct ObjectCaptureSheetView: View {
                     if let segmentedImage = segmentedImage {
                         ImageApprovalView(
                             image: segmentedImage,
+                            rotatedImage: segmentedImage,
                             selectedImage: $selectedImage,
                             segmentedImage: $segmentedImage,
                             shouldUpdateCustomObjects: $shouldUpdateCustomObjects
@@ -189,8 +188,10 @@ struct CameraView: UIViewControllerRepresentable {
     }
 }
 
+// MARK: ImageApprovalView
 struct ImageApprovalView: View {
     @State var image: UIImage
+    @State var rotatedImage: UIImage
     @State var imageHasNotBeenSegmented = false
     
     @Binding var selectedImage: UIImage?
@@ -204,20 +205,25 @@ struct ImageApprovalView: View {
     
     var body: some View {
         VStack {
-            var rotatedImage = image
             Rectangle()
                 .foregroundStyle(Color.clear)
                 .overlay {
-                    Image(uiImage: image)
+                    Image(uiImage: rotatedImage)
                         .resizable()
                         .scaledToFit()
-                        .onTapGesture {
-                            withAnimation {
-                                imageRotationAngle -= 90
-                            }
-                            rotatedImage = rotateImage90Degrees(image: rotatedImage) ?? rotatedImage
-                        }
-                        .rotationEffect(Angle(degrees: Double(imageRotationAngle)))
+                }
+                .onTapGesture {
+                    print("Before rotationEffect: \(imageRotationAngle) degrees")
+                    
+                    rotatedImage = rotateImage90Degrees(image: rotatedImage)
+                    
+                    print("After rotateImage90Degrees")
+                    
+                    withAnimation {
+                        imageRotationAngle -= 90
+                    }
+                    
+                    print("After animation update: \(imageRotationAngle) degrees")
                 }
                 .aspectRatio(contentMode: .fit)
             if imageHasNotBeenSegmented {

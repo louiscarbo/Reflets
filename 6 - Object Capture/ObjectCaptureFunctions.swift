@@ -79,21 +79,34 @@ func saveImageToTemporaryDirectory(image: UIImage) -> URL? {
     }
 }
 
-func fetchSegmentedImagesFromTemporaryDirectory() -> [CustomObjectPreview] {
+func fetchSegmentedImagesFromTemporaryDirectory() async -> [CustomObjectPreview] {
     let temporaryDirectory = FileManager.default.temporaryDirectory
     do {
         let fileURLs = try FileManager.default.contentsOfDirectory(at: temporaryDirectory, includingPropertiesForKeys: nil)
         
-        return fileURLs
-            .filter { $0.pathExtension == "png" }
-            .compactMap { url -> CustomObjectPreview? in
-                if let image = UIImage(contentsOfFile: url.path),
-                   let resizedImage = resizeImage(image, to: CGSize(width: 50, height: 50)) {
-                    return CustomObjectPreview(preview: resizedImage, url: url)
-                } else {
-                    return nil
+        // Filter and process PNG files concurrently
+        let previews = await withTaskGroup(of: CustomObjectPreview?.self) { group in
+            for url in fileURLs.filter({ $0.pathExtension == "png" }) {
+                group.addTask {
+                    if let image = UIImage(contentsOfFile: url.path),
+                       let resizedImage = resizeImage(image, to: CGSize(width: 50, height: 50)) {
+                        return CustomObjectPreview(preview: resizedImage, url: url)
+                    } else {
+                        return nil
+                    }
                 }
             }
+            
+            var results = [CustomObjectPreview]()
+            for await preview in group {
+                if let preview = preview {
+                    results.append(preview)
+                }
+            }
+            return results
+        }
+        
+        return previews
     } catch {
         print("Error fetching images: \(error.localizedDescription)")
         return []
@@ -128,26 +141,37 @@ func deleteAllSegmentedPNGs() {
     }
 }
 
-func rotateImage90Degrees(image: UIImage) -> UIImage? {
-    let size = CGSize(width: image.size.height, height: image.size.width) // Swap dimensions for 90 degrees
+func rotateImage90Degrees(image: UIImage) -> UIImage {
+    // Define the new size: width becomes height, height becomes width
+    let size = CGSize(width: image.size.height, height: image.size.width)
+    
+    // Begin a new image context
     UIGraphicsBeginImageContextWithOptions(size, false, image.scale)
     defer { UIGraphicsEndImageContext() }
-
-    guard let context = UIGraphicsGetCurrentContext() else { return nil }
-
+    
+    guard let context = UIGraphicsGetCurrentContext() else {
+        print("Failed to get graphics context")
+        return image
+    }
+    
     // Move origin to the center of the canvas
     context.translateBy(x: size.width / 2, y: size.height / 2)
-
-    // Rotate context 90 degrees (π/2 radians)
+    
+    // Rotate context by 90 degrees (π/2 radians)
     context.rotate(by: .pi / 2)
-
-    // Draw the image into the context
-    context.scaleBy(x: 1.0, y: -1.0) // Correct the coordinate system
+    
+    // Draw the original image into the context
+    context.scaleBy(x: 1.0, y: -1.0) // Flip vertically to match UIKit coordinate system
     let rect = CGRect(x: -image.size.width / 2, y: -image.size.height / 2, width: image.size.width, height: image.size.height)
     context.draw(image.cgImage!, in: rect)
-
+    
     // Get the rotated image
-    return UIGraphicsGetImageFromCurrentImageContext()
+    if let rotatedImage = UIGraphicsGetImageFromCurrentImageContext() {
+        return rotatedImage
+    } else {
+        print("Failed to get rotated image from context")
+        return image
+    }
 }
 
 func logTemporaryDirectoryContents() {

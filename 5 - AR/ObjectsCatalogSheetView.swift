@@ -79,32 +79,38 @@ struct ObjectsCatalogSheetView: View {
                         }
                         Button {
                             showObjectCaptureSheet = true
+                            
                         } label: {
                             Image(systemName: "plus")
                         }
-                        .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
+                        .buttonStyle(SFSymbolButtonStyle(symbolSize: 43))
                         .sheet(isPresented: $showObjectCaptureSheet) {
                             ObjectCaptureSheetView(shouldUpdateCustomObjects: $shouldUpdateCustomObjects)
                         }
                     } // LazyVGrid
                     .onChange(of: shouldUpdateCustomObjects) {
-                        updateCustomObject()
+                        Task {
+                            await updateCustomObject()
+                        }
                     }
                     .onAppear {
-                        updateCustomObject()
+                        Task {
+                            await updateCustomObject()
+                        }
                     }
                 }
             }
+            .padding(25)
         }
-        .padding(25)
+        .ignoresSafeArea()
         .presentationBackground(.thinMaterial)
-        .presentationDetents([.fraction(0.8), .large])
+        .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(40.0)
     }
     
-    func updateCustomObject() {
-        customObjects = fetchSegmentedImagesFromTemporaryDirectory()
+    func updateCustomObject() async {
+        customObjects = await fetchSegmentedImagesFromTemporaryDirectory()
         DispatchQueue.main.async {
             shouldUpdateCustomObjects = false
         }
