@@ -128,6 +128,13 @@ struct ARAutoportraitView: View {
                 arObjects: $arObjects,
                 sliderValue: $sizeSliderValue
             )
+            .onChange(of: arObjectProperties) {
+                updatePlacementHelper = true
+            }
+            .onChange(of: selectedType) {
+                print("Update Placement Helper asked after object type change")
+                updatePlacementHelper = true
+            }
             .onChange(of: shouldAddObject) {
                 if shouldAddObject {
                     addCurrentObject()
@@ -148,15 +155,9 @@ struct ARAutoportraitView: View {
                     needsProportionSlider: currentObjectType.hasCustomRatio,
                     selectedProportion: $arObjectProperties.ratio
                 )
-                .onChange(of: arObjectProperties) {
-                    updatePlacementHelper = true
-                }
             }
             .sheet(isPresented: $showObjectsCatalog) {
                 ObjectsCatalogSheetView(selectedType: $selectedType, imageURL: $imageURL)
-                    .onChange(of: selectedType) {
-                        updatePlacementHelper = true
-                    }
             }
         }
     }
