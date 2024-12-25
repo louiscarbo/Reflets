@@ -147,7 +147,7 @@ struct ObjectCaptureSheetView: View {
             sliderValue: .constant(0.8)
         )
         .sheet(isPresented: .constant(true)) {
-            ObjectsCatalogSheetView(selectedType: .constant(.cube))
+            ObjectsCatalogSheetView(selectedType: .constant(.cube), imageURL: .constant(nil))
         }
     }
 }

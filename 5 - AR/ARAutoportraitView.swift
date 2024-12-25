@@ -33,9 +33,9 @@ struct ARAutoportraitView: View {
         case .cylinder:
             return .cylinder(radius: 0.05 * scaleFactor, height: Float(arObjectProperties.ratio * 0.05) * scaleFactor)
         case .text:
-            return .text(content: arObjectProperties.text) // Text size adjustment could be separate
+            return .text(content: arObjectProperties.text, size: scaleFactor * 0.6)
         case .image:
-            return .image(url: imageURL) // Placeholder for image resizing
+            return .image(url: imageURL, size: scaleFactor * 0.3)
         }
     }
     @State private var lastObjectCount = 0
@@ -139,9 +139,10 @@ struct ARAutoportraitView: View {
             }
             .sheet(isPresented: $showCustomizationSheet) {
                 ObjectSettingsView(
+                    needsColor: currentObjectType.hasCustomColor,
                     selectedColor: $arObjectProperties.color,
-                    selectedOpacity: $arObjectProperties.opacity,
                     isMetallic: $arObjectProperties.metallic,
+                    selectedOpacity: $arObjectProperties.opacity,
                     needsText: currentObjectType.hasCustomText,
                     textInput:  $arObjectProperties.text,
                     needsProportionSlider: currentObjectType.hasCustomRatio,
@@ -165,10 +166,11 @@ struct ARAutoportraitView: View {
         let entity = ARObject(
             type: currentObjectType,
             color: SimpleMaterial(
-                color: UIColor(arObjectProperties.color).withAlphaComponent(0.6),
+                color: UIColor(arObjectProperties.color).withAlphaComponent(0.6 * arObjectProperties.opacity),
                 isMetallic: arObjectProperties.metallic
             ),
-            position: [0, 0, -1]
+            position: [0, 0, -1],
+            imageOpacity: Float(0.5 * arObjectProperties.opacity)
         ).generateEntity()
         
         let dynamicCameraAnchor = AnchorEntity(.camera)
@@ -185,7 +187,8 @@ struct ARAutoportraitView: View {
                 color: UIColor(arObjectProperties.color).withAlphaComponent(arObjectProperties.opacity),
                 isMetallic: arObjectProperties.metallic
             ),
-            position: [0, 0, -1]
+            position: [0, 0, -1],
+            imageOpacity: Float(arObjectProperties.opacity)
         )
         arObjects.append(newObject)
     }

@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct ObjectSettingsView: View {
+    @State var needsColor: Bool = true
     @Binding var selectedColor: Color
-    @Binding var selectedOpacity: Double
     @Binding var isMetallic: Bool
+    
+    @Binding var selectedOpacity: Double
     
     @State var needsText: Bool
     @Binding var textInput: String
@@ -26,11 +28,13 @@ struct ObjectSettingsView: View {
                 .fontWeight(.semibold)
                 .fontWidth(.expanded)
             
-            HStack {
-                Text("Color")
-                    .fontWidth(.expanded)
-                Spacer()
-                ColorPicker("", selection: $selectedColor, supportsOpacity: false)
+            if needsColor {
+                HStack {
+                    Text("Color")
+                        .fontWidth(.expanded)
+                    Spacer()
+                    ColorPicker("", selection: $selectedColor, supportsOpacity: false)
+                }
             }
             
             HStack {
@@ -41,11 +45,13 @@ struct ObjectSettingsView: View {
                     .frame(width: 220)
             }
             
-            HStack {
-                Text("Metallic")
-                    .fontWidth(.expanded)
-                Spacer()
-                Toggle(isOn: $isMetallic) { }
+            if needsColor {
+                HStack {
+                    Text("Metallic")
+                        .fontWidth(.expanded)
+                    Spacer()
+                    Toggle(isOn: $isMetallic) { }
+                }
             }
             
             if needsText {
@@ -101,9 +107,10 @@ struct ObjectSettingsView: View {
         .sheet(isPresented: $isPresented) {
             NavigationStack {
                 ObjectSettingsView(
+                    needsColor: true,
                     selectedColor: .constant(.red),
-                    selectedOpacity: .constant(0.9),
                     isMetallic: .constant(true),
+                    selectedOpacity: .constant(0.9),
                     needsText: true,
                     textInput: $textInput,
                     needsProportionSlider: true,

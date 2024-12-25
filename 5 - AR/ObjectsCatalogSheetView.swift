@@ -66,6 +66,7 @@ struct ObjectsCatalogSheetView: View {
                             Button {
                                 dismiss()
                                 hapticFeedback.notificationOccurred(.success)
+                                selectedType = .image
                                 imageURL = object.url
                             } label: {
                                 Image(uiImage: object.preview)
@@ -129,7 +130,7 @@ struct ObjectsCatalogSheetView: View {
             sliderValue: .constant(0.8)
         )
         .sheet(isPresented: $isPresented) {
-            ObjectsCatalogSheetView(selectedType: .constant(.cube))
+            ObjectsCatalogSheetView(selectedType: .constant(.cube), imageURL: .constant(nil))
         }
     }
 }
