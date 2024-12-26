@@ -96,10 +96,7 @@ struct ObjectSettingsView: View {
             .scaledToFill()
             .ignoresSafeArea()
         ARControlsView(
-            showReflectoHelp: .constant(false),
-            showObjectsCatalog: .constant(false),
             artworkIsDone: .constant(false),
-            showCustomizationSheet: $isPresented,
             arObjects: .constant([]),
             arObjectProperties: .constant(ARObjectProperties())
         )

@@ -137,10 +137,7 @@ struct ObjectCaptureSheetView: View {
             .scaledToFill()
             .ignoresSafeArea()
         ARControlsView(
-            showReflectoHelp: .constant(false),
-            showObjectsCatalog: $isPresented,
             artworkIsDone: .constant(false),
-            showCustomizationSheet: .constant(false),
             arObjects: .constant([]),
             arObjectProperties: .constant(ARObjectProperties())
         )
