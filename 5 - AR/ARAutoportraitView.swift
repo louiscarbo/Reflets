@@ -21,10 +21,6 @@ struct ARAutoportraitView: View {
     @State private var arObjects: [ARObject] = []
     @State private var arObjectProperties = ARObjectProperties()
     
-    // Controls UI
-    @State private var showObjectsCatalog = false
-    @State private var showCustomizationSheet = false
-    
     var body: some View {
         ZStack(alignment: .bottom) {
             // MARK: RealityView
@@ -51,33 +47,12 @@ struct ARAutoportraitView: View {
             
             // MARK: Controls Interface
             ARControlsView(
-                showReflectoHelp: .constant(false),
-                showObjectsCatalog: $showObjectsCatalog,
                 artworkIsDone: .constant(false),
-                showCustomizationSheet: $showCustomizationSheet,
                 arObjects: $arObjects,
                 arObjectProperties: $arObjectProperties
             )
             .onChange(of: arObjectProperties) {
                 updatePositioningHelper()
-            }
-            .sheet(isPresented: $showCustomizationSheet) {
-                ObjectSettingsView(
-                    needsColor: arObjectProperties.type.hasCustomColor,
-                    selectedColor: $arObjectProperties.color,
-                    isMetallic: $arObjectProperties.metallic,
-                    selectedOpacity: $arObjectProperties.opacity,
-                    needsText: arObjectProperties.type.hasCustomText,
-                    textInput:  $arObjectProperties.text,
-                    needsProportionSlider: arObjectProperties.type.hasCustomRatio,
-                    selectedProportion: $arObjectProperties.ratio
-                )
-            }
-            .sheet(isPresented: $showObjectsCatalog) {
-                ObjectsCatalogSheetView(
-                    selectedType: $arObjectProperties.type,
-                    imageURL: $arObjectProperties.imageURL
-                )
             }
         }
     }

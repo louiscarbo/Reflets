@@ -9,14 +9,14 @@ import SwiftUI
 
 struct ARControlsView: View {
     // Top row buttons
-    @Binding var showReflectoHelp: Bool
-    @Binding var showObjectsCatalog: Bool
+    @State var showReflectoHelp: Bool = false
+    @State var showObjectsCatalog: Bool = false
     @Binding var artworkIsDone: Bool
     
     // Bottom row buttons
     @State private var addObjectsTimer: Timer? = nil // Timer for adding button
     @State private var removeObjectsTimer: Timer? = nil // Timer for removing button
-    @Binding var showCustomizationSheet: Bool
+    @State var showCustomizationSheet: Bool = false
     
     // AR Objects modification
     @Binding var arObjects: [ARObject]
@@ -205,6 +205,24 @@ struct ARControlsView: View {
             SizeSliderView(sliderValue: $arObjectProperties.resizingFactor)
                 .offset(y: -30)
         }
+        .sheet(isPresented: $showCustomizationSheet) {
+            ObjectSettingsView(
+                needsColor: arObjectProperties.type.hasCustomColor,
+                selectedColor: $arObjectProperties.color,
+                isMetallic: $arObjectProperties.metallic,
+                selectedOpacity: $arObjectProperties.opacity,
+                needsText: arObjectProperties.type.hasCustomText,
+                textInput:  $arObjectProperties.text,
+                needsProportionSlider: arObjectProperties.type.hasCustomRatio,
+                selectedProportion: $arObjectProperties.ratio
+            )
+        }
+        .sheet(isPresented: $showObjectsCatalog) {
+            ObjectsCatalogSheetView(
+                selectedType: $arObjectProperties.type,
+                imageURL: $arObjectProperties.imageURL
+            )
+        }
     }
 }
 
@@ -215,10 +233,7 @@ struct ARControlsView: View {
             .scaledToFill()
             .ignoresSafeArea()
         ARControlsView(
-            showReflectoHelp: .constant(false),
-            showObjectsCatalog: .constant(false),
             artworkIsDone: .constant(false),
-            showCustomizationSheet: .constant(false),
             arObjects: .constant([]),
             arObjectProperties: .constant(ARObjectProperties())
         )
