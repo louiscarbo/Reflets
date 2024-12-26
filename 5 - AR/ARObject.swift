@@ -102,7 +102,6 @@ struct ARObject {
             modelEntity.model?.materials = [color]
             entity = modelEntity
         case .image(let url, let size):
-            // For images, create a 2D entity
             if let url = url {
                 entity = create2DEntityFromImage(url: url, size: size, opacity: imageOpacity)
             } else {

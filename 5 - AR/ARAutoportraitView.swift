@@ -38,7 +38,8 @@ struct ARAutoportraitView: View {
         }
     }
     @State private var lastObjectCount = 0
-    @State private var updatePlacementHelper = false
+    @State private var shouldUpdatePositioningHelper = false
+    @State private var dynamicCameraAnchor = AnchorEntity(.camera)
     
     // Entity ID management
     @State private var nextEntityID = 0
@@ -56,10 +57,10 @@ struct ARAutoportraitView: View {
             // MARK: RealityView
             RealityView { content in
                 content.camera = .spatialTracking
+                content.add(dynamicCameraAnchor)
                 
                 // Addind the positioning helper
-                let positioningHelper = createPositioningHelper()
-                content.add(positioningHelper)
+                updatePositioningHelper()
                 
             // MARK: Update closure
             } update: { content in
@@ -108,15 +109,6 @@ struct ARAutoportraitView: View {
                         lastObjectCount = arObjects.count
                     }
                 }
-                
-                // Update the positioning helper according to the current object type
-                if updatePlacementHelper {
-                    content.entities.removeAll { entity in
-                        entity.components[PositioningHelperComponent.self] != nil
-                    }
-                    let positioningHelper = createPositioningHelper()
-                    content.add(positioningHelper)
-                }
             }
             .ignoresSafeArea()
             
@@ -131,19 +123,16 @@ struct ARAutoportraitView: View {
                 sliderValue: $arObjectProperties.size
             )
             .onChange(of: arObjectProperties) {
-                updatePlacementHelper = true
+                updatePositioningHelper()
             }
             .onChange(of: selectedType) {
-                updatePlacementHelper = true
+                updatePositioningHelper()
             }
             .onChange(of: shouldAddObject) {
                 if shouldAddObject {
                     addCurrentObject()
                 }
                 shouldAddObject = false
-            }
-            .onChange(of: arObjectProperties.size) {
-                updatePlacementHelper = true
             }
             .sheet(isPresented: $showCustomizationSheet) {
                 ObjectSettingsView(
@@ -167,7 +156,13 @@ struct ARAutoportraitView: View {
     }
     
     // MARK: AR Functions
-    func createPositioningHelper() -> AnchorEntity {
+    func updatePositioningHelper() {
+        // Remove the previous Positioning Helper entity
+        if let previousChild = dynamicCameraAnchor.children.first(where: {$0.components[PositioningHelperComponent.self] != nil}) {
+            dynamicCameraAnchor.removeChild(previousChild)
+        }
+        
+        // Create the new Positioning Helper entity
         let entity = ARObject(
             type: currentObjectType,
             color: SimpleMaterial(
@@ -177,12 +172,10 @@ struct ARAutoportraitView: View {
             position: [0, 0, -1],
             imageOpacity: Float(0.5 * arObjectProperties.opacity)
         ).generateEntity()
+        entity.components[PositioningHelperComponent.self] = PositioningHelperComponent()
         
-        let dynamicCameraAnchor = AnchorEntity(.camera)
+        // Add the new Positioning Helper entity to the dynamicCameraAnchor
         dynamicCameraAnchor.addChild(entity)
-        dynamicCameraAnchor.components[PositioningHelperComponent.self] = PositioningHelperComponent()
-        
-        return dynamicCameraAnchor
     }
     
     func addCurrentObject() {
