@@ -18,7 +18,6 @@ struct ARAutoportraitView: View {
     
     // AR level state
     @State private var arObjects: [ARObject] = []
-    @State private var imageURL: URL?
     @State private var selectedType: SelectedType = .sphere
     private var currentObjectType: ARObjectType {
         let scaleFactor = Float(arObjectProperties.size * 5 + 0.5)
@@ -35,7 +34,7 @@ struct ARAutoportraitView: View {
         case .text:
             return .text(content: arObjectProperties.text, size: scaleFactor * 0.6)
         case .image:
-            return .image(url: imageURL, size: scaleFactor * 0.3)
+            return .image(url: arObjectProperties.imageURL, size: scaleFactor * 0.3)
         }
     }
     @State private var lastObjectCount = 0
@@ -43,7 +42,6 @@ struct ARAutoportraitView: View {
     
     // Entity ID management
     @State private var nextEntityID = 0
-    private let entityIDQueue = DispatchQueue(label: "com.yourapp.entityIDQueue")
     
     // Properties of the AR Object
     @State private var arObjectProperties = ARObjectProperties()
@@ -160,7 +158,10 @@ struct ARAutoportraitView: View {
                 )
             }
             .sheet(isPresented: $showObjectsCatalog) {
-                ObjectsCatalogSheetView(selectedType: $selectedType, imageURL: $imageURL)
+                ObjectsCatalogSheetView(
+                    selectedType: $selectedType,
+                    imageURL: $arObjectProperties.imageURL
+                )
             }
         }
     }
@@ -208,6 +209,7 @@ struct ARObjectProperties: Equatable {
     var ratio: Double = 2.0
     var opacity: Double = 1.0
     var size: Double = 0.5
+    var imageURL: URL? = nil
 }
 
 #Preview {
