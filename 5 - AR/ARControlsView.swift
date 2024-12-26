@@ -8,27 +8,28 @@
 import SwiftUI
 
 struct ARControlsView: View {
+    // Top row buttons
     @Binding var showReflectoHelp: Bool
-    
     @Binding var showObjectsCatalog: Bool
-    
     @Binding var artworkIsDone: Bool
     
-    @Binding var shouldAddObject: Bool
-    @State private var addObjectsTimer: Timer? = nil
-    @State private var removeObjectsTimer: Timer? = nil
-    
+    // Bottom row buttons
+    @State private var addObjectsTimer: Timer? = nil // Timer for adding button
+    @State private var removeObjectsTimer: Timer? = nil // Timer for removing button
     @Binding var showCustomizationSheet: Bool
     
+    // AR Objects modification
     @Binding var arObjects: [ARObject]
-
-    @Binding var sliderValue: Float
+    @Binding var arObjectProperties: ARObjectProperties
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
+    // MARK: - ARControlsView body
     var body: some View {
         ZStack(alignment: .leading) {
             VStack {
+                
+                // MARK: Top row buttons
                 HStack(spacing: 10) {
                     Button {
                         withAnimation {
@@ -83,7 +84,10 @@ struct ARControlsView: View {
                 
                 Spacer()
                 
+                // MARK: Bottom row buttons
                 HStack(spacing: 20) {
+                    
+                    // Remove button
                     Button {
                         if !arObjects.isEmpty {
                             arObjects.removeLast()
@@ -121,10 +125,14 @@ struct ARControlsView: View {
                             }
                     )
                     
+                    // Add button
                     Button {
-                        withAnimation {
-                            shouldAddObject = true
-                        }
+                        let newObject = ARObject(
+                            properties: arObjectProperties,
+                            position: [0, 0, -1]
+                        )
+                        arObjects.append(newObject)
+                        
                         if addObjectsTimer != nil {
                             addObjectsTimer?.invalidate()
                             addObjectsTimer = nil
@@ -147,7 +155,11 @@ struct ARControlsView: View {
                                 if addObjectsTimer == nil {
                                     addObjectsTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
                                         withAnimation {
-                                            shouldAddObject = true
+                                            let newObject = ARObject(
+                                                properties: arObjectProperties,
+                                                position: [0, 0, -1]
+                                            )
+                                            arObjects.append(newObject)
                                         }
                                         hapticFeedback.notificationOccurred(.success)
                                     }
@@ -155,6 +167,7 @@ struct ARControlsView: View {
                             }
                     )
                     
+                    // Customization button
                     Button {
                         withAnimation {
                             showCustomizationSheet = true
@@ -186,17 +199,16 @@ struct ARControlsView: View {
                             .clipShape(Capsule())
                     }
                 }
-            } // VStack
+            }
             
-            SizeSliderView(sliderValue: $sliderValue)
+            // MARK: Slider
+            SizeSliderView(sliderValue: $arObjectProperties.resizingFactor)
                 .offset(y: -30)
         }
     }
 }
 
 #Preview {
-    @Previewable @State var value: Float = 0.0
-    
     ZStack {
         Image("previewImage")
             .resizable()
@@ -206,18 +218,14 @@ struct ARControlsView: View {
             showReflectoHelp: .constant(false),
             showObjectsCatalog: .constant(false),
             artworkIsDone: .constant(false),
-            shouldAddObject: .constant(false),
             showCustomizationSheet: .constant(false),
             arObjects: .constant([]),
-            sliderValue: $value
+            arObjectProperties: .constant(ARObjectProperties())
         )
-        Text("\(value)")
-            .font(.largeTitle)
     }
 }
 
-import SwiftUI
-
+// MARK: SizeSliderView
 struct SizeSliderView: View {
     @Binding var sliderValue: Float // From 0 to 1
     @State private var dragOffset: CGFloat = 0 // Offset for the handle

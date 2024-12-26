@@ -99,10 +99,9 @@ struct ObjectSettingsView: View {
             showReflectoHelp: .constant(false),
             showObjectsCatalog: .constant(false),
             artworkIsDone: .constant(false),
-            shouldAddObject: .constant(false),
             showCustomizationSheet: $isPresented,
             arObjects: .constant([]),
-            sliderValue: .constant(0.8)
+            arObjectProperties: .constant(ARObjectProperties())
         )
         .sheet(isPresented: $isPresented) {
             NavigationStack {

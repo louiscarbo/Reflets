@@ -67,7 +67,7 @@ struct ARObjectProperties: Equatable {
 }
 
 // MARK: ARObject struct
-struct ARObject {
+struct ARObject: Equatable {
     var properties: ARObjectProperties
     var position: SIMD3<Float>
     

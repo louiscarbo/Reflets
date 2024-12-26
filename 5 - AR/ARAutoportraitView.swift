@@ -16,23 +16,15 @@ struct ARAutoportraitView: View {
     // App level state
     @Binding var screenNumber: Int
     
-    // AR level state
-    @State private var arObjects: [ARObject] = []
-    @State private var lastObjectCount = 0
-    @State private var shouldUpdatePositioningHelper = false
+    // AR Objects
     let positioningHelperAnchor = AnchorEntity(.camera) // Anchor at the camera position
-    
-    // Entity ID management
-    @State private var nextEntityID = 0
-    
-    // Properties of the AR Object
+    @State private var arObjects: [ARObject] = []
     @State private var arObjectProperties = ARObjectProperties()
     
-    // Properties of the controls
+    // Controls UI
     @State private var showObjectsCatalog = false
     @State private var showCustomizationSheet = false
-    @State private var shouldAddObject = false
-            
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             // MARK: RealityView
@@ -46,49 +38,13 @@ struct ARAutoportraitView: View {
             // MARK: Update closure
             } update: { content in
                 // Check if an object was added
-                if arObjects.count > lastObjectCount {
-                    
-                    // Create the new object entity
-                    let newObject = arObjects.last!
-                    let entity = newObject.generateEntity()
-                    entity.components[UniqueIDComponent.self] = UniqueIDComponent(id: nextEntityID)
-                    
-                    // Create the anchor entity
-                    let anchor = AnchorEntity(.camera)
-                    anchor.anchoring.trackingMode = .once
-                    anchor.addChild(entity)
-                    anchor.components[UniqueIDComponent.self] = UniqueIDComponent(id: nextEntityID)
-                    
-                    print("Added entity with ID: \(nextEntityID)")
-                    content.add(anchor)
-                                        
-                    DispatchQueue.main.async {
-                        print("Incrementing nextEntityID")
-                        nextEntityID += 1
-                        lastObjectCount = arObjects.count
-                    }
+                if arObjects.count > content.entities.count - 1 {
+                    addNewEntity(in: content)
                 }
                 
                 // Check if an object was removed
-                else if arObjects.count < lastObjectCount {
-                    
-                    if content.entities.count > 0 {
-                        print("Removing entity with ID: \(nextEntityID - 1)")
-                        let entityToRemoveID = nextEntityID - 1
-                            
-                        content.entities.removeAll(where: { entity in
-                            if let uniqueIDComponent = entity.components[UniqueIDComponent.self] {
-                                return uniqueIDComponent.id == entityToRemoveID
-                            }
-                            return false
-                        })
-                    }
-                    
-                    DispatchQueue.main.async {
-                        print("Decrementing nextEntityID")
-                        nextEntityID -= 1
-                        lastObjectCount = arObjects.count
-                    }
+                else if arObjects.count < content.entities.count - 1 {
+                    removeLastEntity(in: content)
                 }
             }
             .ignoresSafeArea()
@@ -98,19 +54,12 @@ struct ARAutoportraitView: View {
                 showReflectoHelp: .constant(false),
                 showObjectsCatalog: $showObjectsCatalog,
                 artworkIsDone: .constant(false),
-                shouldAddObject: $shouldAddObject,
                 showCustomizationSheet: $showCustomizationSheet,
                 arObjects: $arObjects,
-                sliderValue: $arObjectProperties.resizingFactor
+                arObjectProperties: $arObjectProperties
             )
             .onChange(of: arObjectProperties) {
                 updatePositioningHelper()
-            }
-            .onChange(of: shouldAddObject) {
-                if shouldAddObject {
-                    addCurrentObject()
-                }
-                shouldAddObject = false
             }
             .sheet(isPresented: $showCustomizationSheet) {
                 ObjectSettingsView(
@@ -152,13 +101,32 @@ struct ARAutoportraitView: View {
         // Add the new Positioning Helper entity to the dynamicCameraAnchor
         positioningHelperAnchor.addChild(entity)
     }
+      
+    func addNewEntity(in content: RealityViewCameraContent) {
+        // Create the new object entity
+        let newObject = arObjects.last!
+        let entity = newObject.generateEntity()
+        entity.components[UniqueIDComponent.self] = UniqueIDComponent(id: arObjects.count)
+        
+        // Create the anchor entity
+        let anchor = AnchorEntity(.camera)
+        anchor.anchoring.trackingMode = .once
+        anchor.addChild(entity)
+        anchor.components[UniqueIDComponent.self] = UniqueIDComponent(id: arObjects.count)
+        
+        print("Added entity with ID: \(arObjects.count)")
+        content.add(anchor)
+    }
     
-    func addCurrentObject() {
-        let newObject = ARObject(
-            properties: arObjectProperties,
-            position: [0, 0, -1]
-        )
-        arObjects.append(newObject)
+    func removeLastEntity(in content: RealityViewCameraContent) {
+        print("Removing entity with ID: \(arObjects.count + 1)")
+        
+        content.entities.removeAll(where: { entity in
+            if let uniqueIDComponent = entity.components[UniqueIDComponent.self] {
+                return uniqueIDComponent.id == arObjects.count + 1
+            }
+            return false
+        })
     }
 }
 

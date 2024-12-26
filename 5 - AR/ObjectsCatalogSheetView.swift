@@ -130,10 +130,9 @@ struct ObjectsCatalogSheetView: View {
             showReflectoHelp: .constant(false),
             showObjectsCatalog: $isPresented,
             artworkIsDone: .constant(false),
-            shouldAddObject: .constant(false),
             showCustomizationSheet: .constant(false),
             arObjects: .constant([]),
-            sliderValue: .constant(0.8)
+            arObjectProperties: .constant(ARObjectProperties())
         )
         .sheet(isPresented: $isPresented) {
             ObjectsCatalogSheetView(selectedType: .constant(.cube), imageURL: .constant(nil))
