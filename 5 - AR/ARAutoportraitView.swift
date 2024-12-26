@@ -21,7 +21,7 @@ struct ARAutoportraitView: View {
     @State private var imageURL: URL?
     @State private var selectedType: SelectedType = .sphere
     private var currentObjectType: ARObjectType {
-        let scaleFactor = Float(sizeSliderValue * 5 + 0.5)
+        let scaleFactor = Float(arObjectProperties.size * 5 + 0.5)
 
         switch selectedType {
         case .sphere:
@@ -46,13 +46,12 @@ struct ARAutoportraitView: View {
     private let entityIDQueue = DispatchQueue(label: "com.yourapp.entityIDQueue")
     
     // Properties of the AR Object
-    @State private var arObjectProperties = ARObjectProperties(color: .yellow, metallic: true, text: "Hello", ratio: 2.0, opacity: 1.0)
+    @State private var arObjectProperties = ARObjectProperties()
     
     // Properties of the controls
     @State private var showObjectsCatalog = false
     @State private var showCustomizationSheet = false
     @State private var shouldAddObject = false
-    @State private var sizeSliderValue: Double = 0.5
             
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -131,7 +130,7 @@ struct ARAutoportraitView: View {
                 shouldAddObject: $shouldAddObject,
                 showCustomizationSheet: $showCustomizationSheet,
                 arObjects: $arObjects,
-                sliderValue: $sizeSliderValue
+                sliderValue: $arObjectProperties.size
             )
             .onChange(of: arObjectProperties) {
                 updatePlacementHelper = true
@@ -145,7 +144,7 @@ struct ARAutoportraitView: View {
                 }
                 shouldAddObject = false
             }
-            .onChange(of: sizeSliderValue) {
+            .onChange(of: arObjectProperties.size) {
                 updatePlacementHelper = true
             }
             .sheet(isPresented: $showCustomizationSheet) {
@@ -203,11 +202,12 @@ struct ARAutoportraitView: View {
 struct PositioningHelperComponent: Component {}
 
 struct ARObjectProperties: Equatable {
-    var color: Color
-    var metallic: Bool
-    var text: String
-    var ratio: Double
-    var opacity: Double
+    var color: Color = .yellow
+    var metallic: Bool = true
+    var text: String = "Hello!"
+    var ratio: Double = 2.0
+    var opacity: Double = 1.0
+    var size: Double = 0.5
 }
 
 #Preview {
