@@ -9,6 +9,7 @@ import RealityKit
 import Foundation
 import UIKit
 
+// MARK: SelectedType enum
 enum SelectedType {
     case sphere, cube, cone, cylinder, text, image
     
@@ -24,6 +25,7 @@ enum SelectedType {
     }
 }
 
+// MARK: ARObjectType enum
 enum ARObjectType: Hashable {
     case sphere(radius: Float)
     case cube(size: Float)
@@ -60,6 +62,7 @@ enum ARObjectType: Hashable {
     }
 }
 
+// MARK: ARObject struct
 struct ARObject {
     var type: ARObjectType
     var color: SimpleMaterial
@@ -114,11 +117,13 @@ struct ARObject {
     }
 }
 
+// MARK: CustomObjectPreview struct
 struct CustomObjectPreview: Hashable {
     var preview: UIImage
     var url: URL
 }
 
+// MARK: Helper functions
 private func loadPNGFromURL(url: URL) -> UIImage? {
     if let data = try? Data(contentsOf: url),
        let uiImage = UIImage(data: data) {
