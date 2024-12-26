@@ -18,28 +18,9 @@ struct ARAutoportraitView: View {
     
     // AR level state
     @State private var arObjects: [ARObject] = []
-    @State private var selectedType: SelectedType = .sphere
-    private var currentObjectType: ARObjectType {
-        let scaleFactor = Float(arObjectProperties.size * 5 + 0.5)
-
-        switch selectedType {
-        case .sphere:
-            return .sphere(radius: 0.05 * scaleFactor)
-        case .cube:
-            return .cube(size: 0.1 * scaleFactor)
-        case .cone:
-            return .cone(radius: 0.05 * scaleFactor, height: Float(arObjectProperties.ratio * 0.05) * scaleFactor)
-        case .cylinder:
-            return .cylinder(radius: 0.05 * scaleFactor, height: Float(arObjectProperties.ratio * 0.05) * scaleFactor)
-        case .text:
-            return .text(content: arObjectProperties.text, size: scaleFactor * 0.6)
-        case .image:
-            return .image(url: arObjectProperties.imageURL, size: scaleFactor * 0.3)
-        }
-    }
     @State private var lastObjectCount = 0
     @State private var shouldUpdatePositioningHelper = false
-    let dynamicCameraAnchor = AnchorEntity(.camera)
+    let positioningHelperAnchor = AnchorEntity(.camera) // Anchor at the camera position
     
     // Entity ID management
     @State private var nextEntityID = 0
@@ -57,7 +38,7 @@ struct ARAutoportraitView: View {
             // MARK: RealityView
             RealityView { content in
                 content.camera = .spatialTracking
-                content.add(dynamicCameraAnchor)
+                content.add(positioningHelperAnchor)
                 
                 // Addind the positioning helper
                 updatePositioningHelper()
@@ -120,12 +101,9 @@ struct ARAutoportraitView: View {
                 shouldAddObject: $shouldAddObject,
                 showCustomizationSheet: $showCustomizationSheet,
                 arObjects: $arObjects,
-                sliderValue: $arObjectProperties.size
+                sliderValue: $arObjectProperties.resizingFactor
             )
             .onChange(of: arObjectProperties) {
-                updatePositioningHelper()
-            }
-            .onChange(of: selectedType) {
                 updatePositioningHelper()
             }
             .onChange(of: shouldAddObject) {
@@ -136,19 +114,19 @@ struct ARAutoportraitView: View {
             }
             .sheet(isPresented: $showCustomizationSheet) {
                 ObjectSettingsView(
-                    needsColor: currentObjectType.hasCustomColor,
+                    needsColor: arObjectProperties.type.hasCustomColor,
                     selectedColor: $arObjectProperties.color,
                     isMetallic: $arObjectProperties.metallic,
                     selectedOpacity: $arObjectProperties.opacity,
-                    needsText: currentObjectType.hasCustomText,
+                    needsText: arObjectProperties.type.hasCustomText,
                     textInput:  $arObjectProperties.text,
-                    needsProportionSlider: currentObjectType.hasCustomRatio,
+                    needsProportionSlider: arObjectProperties.type.hasCustomRatio,
                     selectedProportion: $arObjectProperties.ratio
                 )
             }
             .sheet(isPresented: $showObjectsCatalog) {
                 ObjectsCatalogSheetView(
-                    selectedType: $selectedType,
+                    selectedType: $arObjectProperties.type,
                     imageURL: $arObjectProperties.imageURL
                 )
             }
@@ -158,35 +136,27 @@ struct ARAutoportraitView: View {
     // MARK: AR Functions
     func updatePositioningHelper() {
         // Remove the previous Positioning Helper entity
-        if let previousChild = dynamicCameraAnchor.children.first(where: {$0.components[PositioningHelperComponent.self] != nil}) {
-            dynamicCameraAnchor.removeChild(previousChild)
+        if let previousChild = positioningHelperAnchor.children.first(where: {$0.components[PositioningHelperComponent.self] != nil}) {
+            positioningHelperAnchor.removeChild(previousChild)
         }
         
         // Create the new Positioning Helper entity
+        var positioningHelperProperties = arObjectProperties
+        positioningHelperProperties.opacity = 0.5 * arObjectProperties.opacity
         let entity = ARObject(
-            type: currentObjectType,
-            color: SimpleMaterial(
-                color: UIColor(arObjectProperties.color).withAlphaComponent(0.6 * arObjectProperties.opacity),
-                isMetallic: arObjectProperties.metallic
-            ),
-            position: [0, 0, -1],
-            imageOpacity: Float(0.5 * arObjectProperties.opacity)
+            properties: positioningHelperProperties,
+            position: [0, 0, -1]
         ).generateEntity()
         entity.components[PositioningHelperComponent.self] = PositioningHelperComponent()
         
         // Add the new Positioning Helper entity to the dynamicCameraAnchor
-        dynamicCameraAnchor.addChild(entity)
+        positioningHelperAnchor.addChild(entity)
     }
     
     func addCurrentObject() {
         let newObject = ARObject(
-            type: currentObjectType,
-            color: SimpleMaterial(
-                color: UIColor(arObjectProperties.color).withAlphaComponent(arObjectProperties.opacity),
-                isMetallic: arObjectProperties.metallic
-            ),
-            position: [0, 0, -1],
-            imageOpacity: Float(arObjectProperties.opacity)
+            properties: arObjectProperties,
+            position: [0, 0, -1]
         )
         arObjects.append(newObject)
     }
@@ -194,16 +164,6 @@ struct ARAutoportraitView: View {
 
 // MARK: Custom component for the positioning helper
 struct PositioningHelperComponent: Component {}
-
-struct ARObjectProperties: Equatable {
-    var color: Color = .yellow
-    var metallic: Bool = true
-    var text: String = "Hello!"
-    var ratio: Double = 2.0
-    var opacity: Double = 1.0
-    var size: Double = 0.5
-    var imageURL: URL? = nil
-}
 
 #Preview {
     ARAutoportraitView(screenNumber: .constant(5))

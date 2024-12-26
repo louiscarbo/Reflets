@@ -22,7 +22,7 @@ struct ARControlsView: View {
     
     @Binding var arObjects: [ARObject]
 
-    @Binding var sliderValue: Double
+    @Binding var sliderValue: Float
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -195,7 +195,7 @@ struct ARControlsView: View {
 }
 
 #Preview {
-    @Previewable @State var value = 0.0
+    @Previewable @State var value: Float = 0.0
     
     ZStack {
         Image("previewImage")
@@ -219,7 +219,7 @@ struct ARControlsView: View {
 import SwiftUI
 
 struct SizeSliderView: View {
-    @Binding var sliderValue: Double // From 0 to 1
+    @Binding var sliderValue: Float // From 0 to 1
     @State private var dragOffset: CGFloat = 0 // Offset for the handle
     @State private var sliderHeight: CGFloat = 300 // Height of the slider
     @State private var hasReachedEdge: Bool = false // To block repetitive haptic feedback
@@ -276,7 +276,7 @@ struct SizeSliderView: View {
                             dragOffset = max(sliderTop, min(sliderBottom, newOffset))
 
                             // Update the slider value based on the offset
-                            sliderValue = Double(1 - (dragOffset + sliderHeight / 2) / sliderHeight)
+                            sliderValue = Float(1 - (dragOffset + sliderHeight / 2) / sliderHeight)
 
                             // Trigger haptic feedback at edges (once per edge)
                             if (sliderValue == 0 || sliderValue == 1), !hasReachedEdge {
@@ -294,7 +294,7 @@ struct SizeSliderView: View {
             }
             .onAppear {
                 // Set initial drag offset based on sliderValue
-                dragOffset = CGFloat((1 - sliderValue) * sliderHeight - sliderHeight / 2)
+                dragOffset = CGFloat(CGFloat(1 - sliderValue) * sliderHeight - sliderHeight / 2)
                 sliderHeight = geometry.size.height - 260 // Dynamically adjust height
             }
         }

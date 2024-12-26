@@ -18,7 +18,7 @@ struct ObjectSettingsView: View {
     @Binding var textInput: String
     
     @State var needsProportionSlider: Bool
-    @Binding var selectedProportion: Double
+    @Binding var selectedProportion: Float
     
     var body: some View {
         VStack {

@@ -8,31 +8,11 @@
 import RealityKit
 import Foundation
 import UIKit
-
-// MARK: SelectedType enum
-enum SelectedType {
-    case sphere, cube, cone, cylinder, text, image
-    
-    var SFSymbolName: String {
-        switch self {
-        case .cone: return "cone"
-        case .sphere: return "rotate.3d"
-        case .cube: return "cube"
-        case .cylinder: return "cylinder"
-        case .text: return "textformat"
-        default: return "questionmark"
-        }
-    }
-}
+import SwiftUI
 
 // MARK: ARObjectType enum
-enum ARObjectType: Hashable {
-    case sphere(radius: Float)
-    case cube(size: Float)
-    case cone(radius: Float, height: Float)
-    case cylinder(radius: Float, height: Float)
-    case text(content: String, size: Float)
-    case image(url: URL?, size: Float)
+enum ARObjectType {
+    case sphere, cube, cone, cylinder, text, image
     
     var hasCustomColor: Bool {
         switch self {
@@ -60,50 +40,97 @@ enum ARObjectType: Hashable {
             return false
         }
     }
+    
+    var SFSymbolName: String {
+        switch self {
+        case .cone: return "cone"
+        case .sphere: return "rotate.3d"
+        case .cube: return "cube"
+        case .cylinder: return "cylinder"
+        case .text: return "textformat"
+        default: return "questionmark"
+        }
+    }
+}
+
+// MARK: ARObjectProperties struct
+struct ARObjectProperties: Equatable {
+    var type: ARObjectType = .sphere
+    var color: Color = .yellow
+    var metallic: Bool = true
+    var text: String = "Hello!"
+    var ratio: Float = 2.0
+    var opacity: Double = 1.0
+    var size: Float = 1.0 // Radius or length depending on the object type
+    var resizingFactor: Float = 0.5
+    var imageURL: URL? = nil
 }
 
 // MARK: ARObject struct
 struct ARObject {
-    var type: ARObjectType
-    var color: SimpleMaterial
+    var properties: ARObjectProperties
     var position: SIMD3<Float>
-    var imageOpacity: Float = 1.0
+    
+    var material: SimpleMaterial {
+        SimpleMaterial(
+            color: UIColor(properties.color.opacity(properties.opacity)),
+            isMetallic: properties.metallic
+        )
+    }
     
     func generateEntity() -> Entity {
         let entity: Entity
-        switch type {
-        case .sphere(let radius):
-            let modelEntity = ModelEntity(mesh: MeshResource.generateSphere(radius: radius))
-            modelEntity.model?.materials = [color]
+        
+        let resizingFactor = properties.resizingFactor * 0.4 + 0.01
+        
+        // Create the entity based on the object type
+        switch properties.type {
+        case .sphere:
+            let modelEntity = ModelEntity(mesh: MeshResource.generateSphere(radius: properties.size * resizingFactor))
+            modelEntity.model?.materials = [material]
             entity = modelEntity
-        case .cube(let size):
-            let modelEntity = ModelEntity(mesh: MeshResource.generateBox(size: size))
-            modelEntity.model?.materials = [color]
+        case .cube:
+            let modelEntity = ModelEntity(mesh: MeshResource.generateBox(size: properties.size * resizingFactor))
+            modelEntity.model?.materials = [material]
             entity = modelEntity
-        case .cone(let radius, let height):
-            let modelEntity = ModelEntity(mesh: MeshResource.generateCone(height: height, radius: radius))
-            modelEntity.model?.materials = [color]
+        case .cone:
+            let modelEntity = ModelEntity(
+                mesh: MeshResource.generateCone(
+                    height: properties.ratio * properties.size * resizingFactor,
+                    radius: properties.size * resizingFactor
+                )
+            )
+            modelEntity.model?.materials = [material]
             entity = modelEntity
-        case .cylinder(let radius, let height):
-            let modelEntity = ModelEntity(mesh: MeshResource.generateCylinder(height: height, radius: radius))
-            modelEntity.model?.materials = [color]
+        case .cylinder:
+            let modelEntity = ModelEntity(
+                mesh: MeshResource.generateCylinder(
+                    height: properties.ratio * properties.size * resizingFactor,
+                    radius: properties.size * resizingFactor
+                )
+            )
+            modelEntity.model?.materials = [material]
             entity = modelEntity
-        case .text(let content, let size):
+        case .text:
             let modelEntity = ModelEntity(
                 mesh: MeshResource.generateText(
-                    content,
+                    properties.text,
                     extrusionDepth: 0.05,
-                    font: .systemFont(ofSize: 0.1 * CGFloat(size)),
+                    font: .systemFont(ofSize: 1.0 * CGFloat(properties.size * resizingFactor)),
                     containerFrame: CGRect.zero,
                     alignment: .center,
                     lineBreakMode: .byWordWrapping
                 )
             )
-            modelEntity.model?.materials = [color]
+            modelEntity.model?.materials = [material]
             entity = modelEntity
-        case .image(let url, let size):
-            if let url = url {
-                entity = create2DEntityFromImage(url: url, size: size, opacity: imageOpacity)
+        case .image:
+            if let url = properties.imageURL {
+                entity = create2DEntityFromImage(
+                    url: url,
+                    size: properties.size * resizingFactor * 3.5,
+                    opacity: properties.opacity
+                )
             } else {
                 entity = Entity()
             }
@@ -150,7 +177,7 @@ private func createTextureFromPNG(image: UIImage) -> (TextureResource?, Float)? 
     }
 }
 
-func create2DEntityFromImage(url: URL, size: Float, opacity: Float = 1.0) -> Entity {
+func create2DEntityFromImage(url: URL, size: Float, opacity: Double = 1.0) -> Entity {
     // Load the PNG image from the URL
     guard let uiImage = loadPNGFromURL(url: url),
           let (texture, aspectRatio) = createTextureFromPNG(image: uiImage) else {

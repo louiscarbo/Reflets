@@ -13,10 +13,10 @@ struct ObjectsCatalogSheetView: View {
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
-    @Binding var selectedType: SelectedType
+    @Binding var selectedType: ARObjectType
     @Binding var imageURL: URL?
     
-    @State private var availableTypes: [SelectedType] = [.sphere, .cube, .cone, .cylinder, .text]
+    @State private var availableTypes: [ARObjectType] = [.sphere, .cube, .cone, .cylinder, .text]
     
     @State private var showObjectCaptureSheet: Bool = false
     
