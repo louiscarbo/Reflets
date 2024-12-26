@@ -39,7 +39,7 @@ struct ARAutoportraitView: View {
     }
     @State private var lastObjectCount = 0
     @State private var shouldUpdatePositioningHelper = false
-    @State private var dynamicCameraAnchor = AnchorEntity(.camera)
+    let dynamicCameraAnchor = AnchorEntity(.camera)
     
     // Entity ID management
     @State private var nextEntityID = 0
