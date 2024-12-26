@@ -39,9 +39,11 @@ struct ARAutoportraitView: View {
         }
     }
     @State private var lastObjectCount = 0
-    @State private var nextEntityID = 0
     @State private var updatePlacementHelper = false
-    @State private var shouldUpdatePlacementHelper = false
+    
+    // Entity ID management
+    @State private var nextEntityID = 0
+    private let entityIDQueue = DispatchQueue(label: "com.yourapp.entityIDQueue")
     
     // Properties of the AR Object
     @State private var arObjectProperties = ARObjectProperties(color: .yellow, metallic: true, text: "Hello", ratio: 2.0, opacity: 1.0)
@@ -49,10 +51,9 @@ struct ARAutoportraitView: View {
     // Properties of the controls
     @State private var showObjectsCatalog = false
     @State private var showCustomizationSheet = false
-    @State private var shouldGoBack = false
     @State private var shouldAddObject = false
     @State private var sizeSliderValue: Double = 0.5
-        
+            
     var body: some View {
         ZStack(alignment: .bottom) {
             // MARK: RealityView
@@ -67,7 +68,7 @@ struct ARAutoportraitView: View {
             } update: { content in
                 // Check if an object was added
                 if arObjects.count > lastObjectCount {
-                                        
+                    
                     // Create the new object entity
                     let newObject = arObjects.last!
                     let entity = newObject.generateEntity()
@@ -79,9 +80,11 @@ struct ARAutoportraitView: View {
                     anchor.addChild(entity)
                     anchor.components[UniqueIDComponent.self] = UniqueIDComponent(id: nextEntityID)
                     
+                    print("Added entity with ID: \(nextEntityID)")
                     content.add(anchor)
                                         
                     DispatchQueue.main.async {
+                        print("Incrementing nextEntityID")
                         nextEntityID += 1
                         lastObjectCount = arObjects.count
                     }
@@ -91,6 +94,7 @@ struct ARAutoportraitView: View {
                 else if arObjects.count < lastObjectCount {
                     
                     if content.entities.count > 0 {
+                        print("Removing entity with ID: \(nextEntityID - 1)")
                         let entityToRemoveID = nextEntityID - 1
                             
                         content.entities.removeAll(where: { entity in
@@ -102,6 +106,7 @@ struct ARAutoportraitView: View {
                     }
                     
                     DispatchQueue.main.async {
+                        print("Decrementing nextEntityID")
                         nextEntityID -= 1
                         lastObjectCount = arObjects.count
                     }
@@ -110,7 +115,7 @@ struct ARAutoportraitView: View {
                 // Update the positioning helper according to the current object type
                 if updatePlacementHelper {
                     content.entities.removeAll { entity in
-                        entity.components[PositioningHelperComponent.self] != nil // Detects entities with the helper component
+                        entity.components[PositioningHelperComponent.self] != nil
                     }
                     let positioningHelper = createPositioningHelper()
                     content.add(positioningHelper)
@@ -132,7 +137,6 @@ struct ARAutoportraitView: View {
                 updatePlacementHelper = true
             }
             .onChange(of: selectedType) {
-                print("Update Placement Helper asked after object type change")
                 updatePlacementHelper = true
             }
             .onChange(of: shouldAddObject) {
