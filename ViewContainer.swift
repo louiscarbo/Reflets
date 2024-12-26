@@ -14,7 +14,7 @@ struct ViewContainer: View {
         case 2:
             IntentionSelectionView(screenNumber: $currentView);
         default:
-            ARAutoportraitView(screenNumber: $currentView);
+            ARSelfPortraitView(screenNumber: $currentView);
         }
     }
 }

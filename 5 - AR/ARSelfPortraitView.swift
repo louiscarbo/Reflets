@@ -12,7 +12,7 @@ struct UniqueIDComponent: Component {
     var id: Int
 }
 
-struct ARAutoportraitView: View {
+struct ARSelfPortraitView: View {
     // App level state
     @Binding var screenNumber: Int
     
@@ -109,5 +109,5 @@ struct ARAutoportraitView: View {
 struct PositioningHelperComponent: Component {}
 
 #Preview {
-    ARAutoportraitView(screenNumber: .constant(5))
+    ARSelfPortraitView(screenNumber: .constant(5))
 }
