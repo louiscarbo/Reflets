@@ -21,6 +21,9 @@ struct ARSelfPortraitView: View {
     @State private var arObjects: [ARObject] = []
     @State private var arObjectProperties = ARObjectProperties()
     
+    // Intention
+    @State var selectedIntention: Intention
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             // MARK: RealityView
@@ -49,7 +52,8 @@ struct ARSelfPortraitView: View {
             ARControlsView(
                 artworkIsDone: .constant(false),
                 arObjects: $arObjects,
-                arObjectProperties: $arObjectProperties
+                arObjectProperties: $arObjectProperties,
+                selectedIntention: selectedIntention
             )
             .onChange(of: arObjectProperties) {
                 updatePositioningHelper()
@@ -109,5 +113,7 @@ struct ARSelfPortraitView: View {
 struct PositioningHelperComponent: Component {}
 
 #Preview {
-    ARSelfPortraitView(screenNumber: .constant(5))
+    ARSelfPortraitView(
+        screenNumber: .constant(5),
+        selectedIntention: Intentions.proud.details)
 }

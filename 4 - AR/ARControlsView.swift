@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ARControlsView: View {
     // Top row buttons
-    @State var showReflectoHelp: Bool = false
+    @State var showInspirationSheet: Bool = false
     @State var showObjectsCatalog: Bool = false
     @Binding var artworkIsDone: Bool
     
@@ -22,6 +22,9 @@ struct ARControlsView: View {
     @Binding var arObjects: [ARObject]
     @Binding var arObjectProperties: ARObjectProperties
     
+    // Intention
+    @State  var selectedIntention: Intention
+    
     let hapticFeedback = UINotificationFeedbackGenerator()
     
     // MARK: - ARControlsView body
@@ -33,7 +36,7 @@ struct ARControlsView: View {
                 HStack(spacing: 10) {
                     Button {
                         withAnimation {
-                            showReflectoHelp = true
+                            showInspirationSheet = true
                         }
                     } label: {
                         Image("Reflets")
@@ -223,6 +226,9 @@ struct ARControlsView: View {
                 imageURL: $arObjectProperties.imageURL
             )
         }
+        .sheet(isPresented: $showInspirationSheet) {
+            InspirationSheetView(selectedIntention: selectedIntention)
+        }
     }
 }
 
@@ -235,7 +241,8 @@ struct ARControlsView: View {
         ARControlsView(
             artworkIsDone: .constant(false),
             arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties())
+            arObjectProperties: .constant(ARObjectProperties()),
+            selectedIntention: Intentions.proud.details
         )
     }
 }

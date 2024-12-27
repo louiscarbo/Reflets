@@ -98,7 +98,8 @@ struct ObjectSettingsView: View {
         ARControlsView(
             artworkIsDone: .constant(false),
             arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties())
+            arObjectProperties: .constant(ARObjectProperties()),
+            selectedIntention: Intentions.proud.details
         )
         .sheet(isPresented: $isPresented) {
             NavigationStack {

@@ -129,7 +129,8 @@ struct ObjectsCatalogSheetView: View {
         ARControlsView(
             artworkIsDone: .constant(false),
             arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties())
+            arObjectProperties: .constant(ARObjectProperties()),
+            selectedIntention: Intentions.proud.details
         )
         .sheet(isPresented: $isPresented) {
             ObjectsCatalogSheetView(selectedType: .constant(.cube), imageURL: .constant(nil))

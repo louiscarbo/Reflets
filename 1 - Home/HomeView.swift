@@ -39,12 +39,6 @@ struct HomeView: View {
                     .rotationEffect(.degrees(rotationAngle))
                     .onAppear {
                         notificationFeedback.prepare()
-                        withAnimation(
-                            Animation.linear(duration: 20.0)
-                                .repeatForever(autoreverses: false)
-                        ) {
-                            rotationAngle = 360
-                        }
                     }
                     .gesture(
                         DragGesture(minimumDistance: 0) // Detect touch and movement
@@ -102,6 +96,9 @@ struct HomeView: View {
             }
         }
         .onAppear {
+            withAnimation(.easeInOut(duration: 20.0).repeatForever(autoreverses: false)) {
+                rotationAngle = 360
+            }
             deleteAllSegmentedPNGs()
         }
     }

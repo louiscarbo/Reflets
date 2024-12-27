@@ -3,43 +3,40 @@
 import SwiftUI
 
 struct IntentionSelectionView: View {
+    // App navigation variables
     @Binding var screenNumber: Int
     
+    // Animation
     @State private var rotationAngle: Double = 0
-    @State private var dialogueNumber = 0
-    @State private var textOpacity = 0.0
-    @State private var visibleButtons = 0
     
-    @State private var floatingOffsets: [Int: CGSize] = [:]
-    @State private var floatingRotations: [Int: Double] = [:]
+    // Buttons positioning
+    @State private var buttonPositions: [Intention: CGRect] = [:]
     
-    var selectedIntention: String = ""
-    @State private var focusedButtonIndex: Int? = nil
-    @State private var buttonPositions: [Int: CGRect] = [:]
-    
-    let intentions = Intentions.allCases.map { $0.details.title }
-    let comments = Intentions.allCases.map { $0.details.comment}
+    // Intention selection
+    @State private var visibleIntentions: [Intention] = []
+    let intentions = Intentions.allCases.map { $0.details }
+    @Binding var selectedIntention: Intention?
     
     //MARK: View
     var body: some View {
         ZStack {
             // Background layer dims when a button is focused
             Color.black
-                .opacity(focusedButtonIndex == nil ? 0.0 : 0.6)
-                .animation(.easeInOut, value: focusedButtonIndex)
+                .opacity(selectedIntention == nil ? 0.0 : 0.6)
+                .animation(.easeInOut, value: selectedIntention)
                 .ignoresSafeArea()
                 .onTapGesture {
                     withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                        focusedButtonIndex = nil
+                        selectedIntention = nil
                     }
                 }
             
             // Buttons when focused
-            if focusedButtonIndex != nil {
+            if selectedIntention != nil {
                 HStack {
                     Button {
                         withAnimation {
-                            self.focusedButtonIndex = nil
+                            selectedIntention = nil
                         }
                     } label: {
                         Image(systemName: "arrowshape.turn.up.backward")
@@ -59,8 +56,9 @@ struct IntentionSelectionView: View {
                 .offset(y: 50)
             }
             
-            if let focusedButtonIndex = focusedButtonIndex {
-                Text(comments[focusedButtonIndex])
+            // Intention comment when focused
+            if let selectedIntention = selectedIntention {
+                Text(selectedIntention.comment)
                     .padding(40)
                     .multilineTextAlignment(.center)
                     .font(.title2)
@@ -93,35 +91,34 @@ struct IntentionSelectionView: View {
 
                 // Buttons
                 VStack {
-                    ForEach(intentions.indices, id: \.self) { index in
-                        let isFocused = focusedButtonIndex == index
-
-                        if index < visibleButtons {
+                    ForEach(intentions, id: \.self) { intention in
+                        if visibleIntentions.contains(intention) {
+                            
+                            let isFocused = selectedIntention == intention
                             IntentionButtonView(
-                                index: index,
-                                floatingOffsets: $floatingOffsets,
-                                floatingRotations: $floatingRotations,
-                                text: intentions[index],
-                                focusedButtonIndex: $focusedButtonIndex
+                                intention: intention,
+                                selectedIntention: $selectedIntention
                             )
                             .background(
                                 GeometryReader { geometry in
                                     Color.clear
                                         .onAppear {
-                                            buttonPositions[index] = geometry.frame(in: .global)
+                                            buttonPositions[intention] = geometry.frame(in: .global)
                                         }
                                         .onChange(of: geometry.frame(in: .global)) {
-                                            buttonPositions[index] = geometry.frame(in: .global)
+                                            buttonPositions[intention] = geometry.frame(in: .global)
                                         }
                                 }
                             )
-                            .offset(x: isFocused ? centerOffset(for: index).width : 0,
-                                    y: isFocused ? centerOffset(for: index).height : 0)
+                            .offset(
+                                x: isFocused ? centerOffset(for: intention).width : 0,
+                                y: isFocused ? centerOffset(for: intention).height : 0
+                            )
                         }
                     }
                 }
                 .onAppear {
-                    animateButtons()
+                    animateButtonsAppearance()
                 }
             }
         }
@@ -131,26 +128,27 @@ struct IntentionSelectionView: View {
                 .frame(width: 700, height: 700)
                 .rotationEffect(Angle(degrees: rotationAngle))
                 .onAppear {
-                    withAnimation(
-                        Animation.linear(duration: 120.0)
-                            .repeatForever(autoreverses: false)
-                    ) { rotationAngle = 360 }
+                    withAnimation(.easeInOut(duration: 120.0).repeatForever(autoreverses: false)) {
+                        rotationAngle = 360
+                    }
                 }
         }
     }
     
-    private func animateButtons() {
-        for index in intentions.indices {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.9) {
+    private func animateButtonsAppearance() {
+        var index: Int = 0
+        for intention in intentions {
+            index += 1
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index + 1) * 0.9) {
                 withAnimation(.easeInOut(duration: 1.0)) {
-                    visibleButtons += 1
+                    visibleIntentions.append(intention)
                 }
             }
         }
     }
     
-    private func centerOffset(for index: Int) -> CGSize {
-        guard let buttonFrame = buttonPositions[index] else { return .zero }
+    private func centerOffset(for intention: Intention) -> CGSize {
+        guard let buttonFrame = buttonPositions[intention] else { return .zero }
         let screenCenter = CGPoint(x: UIScreen.main.bounds.midX, y: UIScreen.main.bounds.midY)
         let buttonCenter = CGPoint(x: buttonFrame.midX, y: buttonFrame.midY)
 
@@ -162,52 +160,55 @@ struct IntentionSelectionView: View {
 }
 
 #Preview {
-    IntentionSelectionView(screenNumber: .constant(2))
+    @Previewable @State var intention: Intention? = nil
+    
+    IntentionSelectionView(
+        screenNumber: .constant(2),
+        selectedIntention: $intention
+    )
 }
 
 // MARK: Subviews
 private struct IntentionButtonView: View {
-    var index: Int
-    @Binding var floatingOffsets: [Int: CGSize]
-    @Binding var floatingRotations: [Int: Double]
-    var text: String
+    var intention: Intention
+    @Binding var selectedIntention: Intention?
+    
+    @State private var offset: CGSize = .zero
+    @State private var rotation: Double = 0
+    
     let hapticFeedback = UINotificationFeedbackGenerator()
     
-    @Binding var focusedButtonIndex: Int?
-    
     var body: some View {
-        let isFocused = focusedButtonIndex == index
-        let rotation = floatingRotations[index] ?? Double.random(in: -2...2)
-        let xOffset = floatingOffsets[index]?.width ?? CGFloat.random(in: -10...10)
+        let isFocused = selectedIntention == intention
         
-        Button(text) {
+        Button(intention.title) {
             hapticFeedback.notificationOccurred(.success)
             withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                focusedButtonIndex = isFocused ? nil : index
+                selectedIntention = isFocused ? nil : intention
             }
         }
         .buttonStyle(IntentionButton())
         .rotationEffect(.degrees(rotation))
-        .offset(x: isFocused ? 0 : xOffset, y: 0)
+        .offset(x: isFocused ? 0 : offset.width, y: 0)
         .padding(.vertical, 3)
         .scaleEffect(isFocused ? 1.5 : 1.0)
         .zIndex(isFocused ? 1 : 0)
-        .opacity(focusedButtonIndex == nil || isFocused ? 1.0 : 0.5)
+        .opacity(selectedIntention == nil || isFocused ? 1.0 : 0.5)
         .onAppear {
-            startFloatingEffect(for: index)
+            startFloatingEffect()
         }
     }
     
-    private func startFloatingEffect(for index: Int) {
+    private func startFloatingEffect() {
         withAnimation(
             Animation.easeInOut(duration: Double.random(in: 2.0...4.0))
                 .repeatForever(autoreverses: true)
         ) {
-            floatingOffsets[index] = CGSize(
+            offset = CGSize(
                 width: CGFloat.random(in: -10...10),
                 height: 0
             )
-            floatingRotations[index] = Double.random(in: -5...5)
+            rotation = Double.random(in: -5...5)
         }
     }
 }

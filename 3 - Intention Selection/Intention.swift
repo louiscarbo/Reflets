@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Intention {
+struct Intention: Equatable, Hashable {
     var title: String
     var comment: String
     var prompts: [String]

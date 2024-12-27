@@ -51,16 +51,13 @@ struct IntroductionView: View {
                 .resizable()
                 .frame(width: 700, height: 700)
                 .rotationEffect(Angle(degrees: rotationAngle))
-                .onAppear {
-                    withAnimation(
-                        Animation.linear(duration: 120.0)
-                            .repeatForever(autoreverses: false)
-                    ) { rotationAngle = 360 }
-                }
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 2.0)) {
                 textOpacity = 1.0
+            }
+            withAnimation(.easeInOut(duration: 120.0).repeatForever(autoreverses: false)) {
+                rotationAngle = 360
             }
         }
     }
