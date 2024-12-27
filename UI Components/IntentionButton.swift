@@ -34,11 +34,10 @@ struct IntentionButton: ButtonStyle {
             
             configuration.label
                 .foregroundColor(.black)
-                .fontDesign(.serif)
-                .italic()
+                .fontWidth(.expanded)
                 .fontWeight(.medium)
-                .padding(.vertical, 15) // Add intrinsic height
-                .padding(.horizontal, horizontalPadding) // Add intrinsic width
+                .padding(.vertical, 15)
+                .padding(.horizontal, horizontalPadding)
         }
         .scaleEffect(configuration.isPressed ? 1.05 : 1)
         .rotationEffect(configuration.isPressed ? .degrees(-1) : .zero)

@@ -16,7 +16,8 @@ struct IntroductionView: View {
             // Text VStack, used to apply opacity to the text only
             VStack(alignment: .leading) {
                 Text(dialogueData[dialogueNumber].dialogueText)
-                    .font(.system(.title))
+                    .font(.title)
+                    .fontWidth(.expanded)
                     .padding(.bottom, 30)
                 
                 HStack {
@@ -43,7 +44,6 @@ struct IntroductionView: View {
             }
             .foregroundStyle(.black)
             .padding(20)
-            .fontDesign(.serif)
             .opacity(textOpacity)
         }
         .background {

@@ -62,7 +62,7 @@ struct IntentionSelectionView: View {
                     .padding(40)
                     .multilineTextAlignment(.center)
                     .font(.title2)
-                    .fontDesign(.serif)
+                    .fontWidth(Font.Width(0.05))
                     .foregroundStyle(.white)
                     .background {
                         RoundedRectangle(cornerRadius: 30)
@@ -80,9 +80,10 @@ struct IntentionSelectionView: View {
                 // Title
                 HStack {
                     Text("What will your intention be?")
-                        .font(.system(.largeTitle))
+                        .font(.largeTitle)
                         .foregroundStyle(.black)
-                        .fontDesign(.serif)
+                        .fontWidth(.expanded)
+                        .fontWeight(.semibold)
                         .shadow(color: Color.white.opacity(0.2), radius: 10, x: 0, y: 0)
                     Spacer()
                 }
@@ -190,7 +191,7 @@ private struct IntentionButtonView: View {
         .buttonStyle(IntentionButton())
         .rotationEffect(.degrees(rotation))
         .offset(x: isFocused ? 0 : offset.width, y: 0)
-        .padding(.vertical, 3)
+        .padding(.vertical, 4)
         .scaleEffect(isFocused ? 1.5 : 1.0)
         .zIndex(isFocused ? 1 : 0)
         .opacity(selectedIntention == nil || isFocused ? 1.0 : 0.5)
