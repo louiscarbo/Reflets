@@ -17,23 +17,8 @@ struct IntentionSelectionView: View {
     @State private var focusedButtonIndex: Int? = nil
     @State private var buttonPositions: [Int: CGRect] = [:]
     
-    let intentions = [
-        "What I’m proud of",
-        "What makes me, me",
-        "Me, 10 years from now",
-        "A memory I cherish",
-        "Where I feel at home",
-        "I have another idea"
-    ]
-    
-    let comments = [
-        "Pride is powerful! Exploring what makes you proud can be a great confidence boost. I’ll be here to guide you!",
-        "You’re one of a kind! Let’s explore what makes you, you—I’ll help with prompts to spark your reflection.",
-        "Dreaming about the future is exciting! Don’t worry, I’ll be here to guide your reflection.",
-        "Your favorite moments tell a story. Let’s reflect on one—I’ll help you capture it in your artwork!",
-        "Home is where the heart is—or maybe something else entirely! Let me guide you as you reflect.",
-        "Going your own way? Awesome! I’ll be here if you need inspiration, but the stage is yours!"
-    ]
+    let intentions = Intentions.allCases.map { $0.details.title }
+    let comments = Intentions.allCases.map { $0.details.comment}
     
     //MARK: View
     var body: some View {
