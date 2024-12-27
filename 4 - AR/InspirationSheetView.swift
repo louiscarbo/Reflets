@@ -47,6 +47,10 @@ struct InspirationSheetView: View {
                         .fontWidth(.expanded)
                 }
             }
+            
+            .background {
+                RandomSymbolsView()
+            }
             .padding([.top, .horizontal], 25)
         }
         .presentationBackground(.thinMaterial)
@@ -81,7 +85,7 @@ struct PromptView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 40)
                 .foregroundStyle(.thinMaterial)
-                .shadow(radius: 2)
+                .shadow(radius: 2, y:3)
             
             RoundedRectangle(cornerRadius: 40)
                 .strokeBorder(Color.black.opacity(0.3), lineWidth: 2)
