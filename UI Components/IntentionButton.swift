@@ -49,9 +49,17 @@ struct IntentionButton: ButtonStyle {
     ZStack {
         Rectangle()
             .foregroundStyle(.green)
-        Button("Where I feel at home") {
-            
+        VStack {
+            Button("Where I feel at home") {
+                
+            }
+            .buttonStyle(IntentionButton())
+            Button {
+                
+            } label: {
+                Label("Where I feel at home", systemImage: "house")
+            }
+            .buttonStyle(IntentionButton())
         }
-        .buttonStyle(IntentionButton())
     }
 }

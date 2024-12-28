@@ -32,7 +32,7 @@ struct ObjectCaptureSheetView: View {
                 .fontWidth(.expanded)
                 
             if selectedImage == nil {
-                HStack {
+                VStack {
                     PhotosPicker("Choose Photo", selection: $photoPickerItem, matching: .images)
                         .onChange(of: photoPickerItem) {
                             loadImageFromPicker()
@@ -226,7 +226,7 @@ struct ImageApprovalView: View {
             if imageHasNotBeenSegmented {
                 Text("The background could not be removed from this image. Do you still want to add it?")
             }
-            HStack {
+            VStack {
                 Button("Choose another photo") {
                     hasTimedOut = false
                     selectedImage = nil

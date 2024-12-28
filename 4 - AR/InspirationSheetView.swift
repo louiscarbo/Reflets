@@ -16,6 +16,44 @@ struct InspirationSheetView: View {
         "Could it be interesting to add a selfie in the artwork? If so, how can you customize it with objects to make it more impactful?"
     ]
     
+    let generalChallenges: [Challenge] = [
+        Challenge(
+            title: "Abstract You",
+            content: "Create a self-portrait using only shapes, colors, and textures. No selfies allowed!"
+        ),
+        Challenge(
+            title: "Environment Fusion",
+            content: "Blend your self-portrait with your surroundings. Can you make it feel like it belongs in the space?"
+        ),
+        Challenge(
+            title: "Layer Up",
+            content: "Build your self-portrait in layers—start with your environment, then add objects that reflect deeper aspects of yourself."
+        ),
+        Challenge(
+            title: "Perspective Play",
+            content: "Use size and distance creatively. Make one part of your self-portrait tiny and another part huge."
+        ),
+        Challenge(
+            title: "Opposite Worlds",
+            content: "Create a self-portrait with two contrasting themes—light/dark, calm/chaotic, or old/new. How do they interact?"
+        ),
+        Challenge(
+            title: "Color Story",
+            content: "Tell a story with colors. Choose a color palette that represents your personality or mood."
+        ),
+        Challenge(
+            title: "Word Art",
+            content: "Add words or phrases that represent you. How can you integrate them into your self-portrait?"
+        )
+    ]
+    
+    var allChallenges: [Challenge] {
+        generalChallenges + selectedIntention.challenges
+    }
+    
+    @State var currentChallenge: Challenge?
+    
+    // MARK: - InspirationSheetView
     var body: some View {
         ScrollView {
             VStack {
@@ -29,25 +67,57 @@ struct InspirationSheetView: View {
                     .fontWidth(.expanded)
                 Divider()
                     .padding(5)
-                Text("It can be difficult to find inspiration! Here are some ideas to think about as you get started:")
+                Text("It can be difficult to find inspiration! Here are some ideas to get you started.")
                     .font(.body)
                     .fontWidth(.expanded)
                 
+                // General Tips -------------------------------------
+                Divider()
+                Text("General Tips")
+                    .font(.title)
+                    .fontWeight(.semibold)
+                    .fontWidth(.expanded)
+
                 ForEach(generalPrompts, id: \.self) { prompt in
                     PromptView(prompt: prompt)
                 }
                 
+                // Specific Intention --------------------------------
                 Divider()
-                Text("It's also helpful to think about the intention you selected:")
-                    .font(.body)
+                Text("Your Intention")
+                    .font(.title)
+                    .fontWeight(.semibold)
                     .fontWidth(.expanded)
                 ForEach(selectedIntention.prompts, id: \.self) { prompt in
                     PromptView(prompt: prompt)
-                        .font(.body)
-                        .fontWidth(.expanded)
+                }
+                
+                // Challenges -------------------------------------
+                Divider()
+                Text("Challenges")
+                    .font(.title)
+                    .fontWeight(.semibold)
+                    .fontWidth(.expanded)
+                if let currentChallenge = currentChallenge {
+                    PromptView(title: currentChallenge.title, prompt: currentChallenge.content)
+                        .id(currentChallenge)
+                        .transition(.slide.combined(with: .scale))
+                    Button {
+                        withAnimation(.bouncy) {
+                            self.currentChallenge = allChallenges.filter { $0 != currentChallenge }.randomElement()
+                        }
+                    } label: {
+                        Label("New Challenge", systemImage: "shuffle")
+                    }
+                    .buttonStyle(IntentionButton())
+                    .offset(x:10, y: -20)
+                    .rotationEffect(.degrees(Double.random(in: -3...3)))
+                    .shadow(radius: 3, y: 3)
                 }
             }
-            
+            .onAppear {
+                currentChallenge = allChallenges.randomElement()
+            }
             .background {
                 RandomSymbolsView()
             }
@@ -78,7 +148,9 @@ struct InspirationSheetView: View {
     }
 }
 
+// MARK: - PromptView
 struct PromptView: View {
+    var title: String? = nil
     var prompt: String
     
     var body: some View {
@@ -91,13 +163,29 @@ struct PromptView: View {
                 .strokeBorder(Color.black.opacity(0.3), lineWidth: 2)
                 .blur(radius: 1)
         
-            Text(prompt)
-                .multilineTextAlignment(.center)
-                .font(.body)
-                .fontWidth(.expanded)
-                .padding()
+            VStack(spacing: 0) {
+                if let title = title {
+                    Text(title)
+                        .bold()
+                        .multilineTextAlignment(.center)
+                        .font(.body)
+                        .fontWidth(.expanded)
+                        .padding(.bottom, 5)
+                }
+                Text(prompt)
+                    .multilineTextAlignment(.center)
+                    .font(.body)
+                    .fontWidth(.expanded)
+            }
+            .padding()
+        }
+        .rotationEffect(.degrees(Double.random(in: -2...2)))
+        .scrollTransition(axis: .vertical) { content, phase in
+            content
+                .scaleEffect(phase.isIdentity ? 1 : 0.7)
+                .opacity(phase.isIdentity ? 1 : 0)
+                .blur(radius: phase.isIdentity ? 0 : 2)
         }
         .padding(5)
-        .rotationEffect(.degrees(Double.random(in: -2...2)))
     }
 }
