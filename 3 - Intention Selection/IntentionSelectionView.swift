@@ -78,17 +78,17 @@ struct IntentionSelectionView: View {
             // Content layer
             VStack {
                 // Title
-                HStack {
+                VStack(alignment: .leading) {
                     Text("What will your intention be?")
                         .font(.largeTitle)
                         .foregroundStyle(.black)
                         .fontWidth(.expanded)
                         .fontWeight(.semibold)
                         .shadow(color: Color.white.opacity(0.2), radius: 10, x: 0, y: 0)
-                    Spacer()
+                    Text("Based on your intention, we'll give you tips and inspiration to help you create your self-portrait.")
+                        .fontWidth(.expanded)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 20)
+                .padding(20)
 
                 // Buttons
                 VStack {

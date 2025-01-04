@@ -67,31 +67,30 @@ struct IntroductionView: View {
         DialogueData(
             dialogueText:
                """
-               Hello there! Welcome to Reflets!
-               I’m Reflecto, your guide for this creative experience.
+               Hello there!
+               Welcome to Reflets!
+               In this experience, you'll use Augmented Reality to create your own self-portrait.
                """
-            , buttonText: "Hello Reflecto!"
+            , buttonText: "Continue"
         ),
         DialogueData(
             dialogueText:
                """
-               Here, you’ll create a unique self-portrait—one that reflects not just your appearance, but your emotions, experiences, and the things that inspire you.
+               You'll create a unique self-portrait. One that reflects not just your appearance, but your emotions, experiences, and the things that inspire you.
                """
             , buttonText: "Sounds exciting!"
         ),
         DialogueData(
             dialogueText:
                 """
-                We’ll start by picking an intention—something to focus on as you create. Don’t worry, it’s super easy, and there’s no wrong way to do it!
+                We'll start by picking an intention for your artwork. Think of it as a guiding principle that will help you create a piece that is truly you.
                 """
                 , buttonText: "Let’s get started!"
         ),
         DialogueData(
             dialogueText:
                 """
-                Think of it as the focus for your self-portrait—what you want it to reflect about you.
-                
-                I’ve prepared a few intentions to help guide you. Or, if you’re feeling creative, you can pick your own path and go freeform!
+                We've prepared a few intentions to help guide you. Or, if you’re feeling creative, you can pick your own path and go freeform!
                 """
                 , buttonText: "I’m ready!"
         )
