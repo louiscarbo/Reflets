@@ -85,8 +85,9 @@ struct IntentionSelectionView: View {
                         .fontWidth(.expanded)
                         .fontWeight(.semibold)
                         .shadow(color: Color.white.opacity(0.2), radius: 10, x: 0, y: 0)
-                    Text("Based on your intention, we'll give you tips and inspiration to help you create your self-portrait.")
+                    Text("Each intention comes with its own unique tips and ideas to help you create your self-portrait.")
                         .fontWidth(.expanded)
+                        .foregroundStyle(.black)
                 }
                 .padding(20)
 
@@ -126,7 +127,7 @@ struct IntentionSelectionView: View {
         .background {
             Image("Reflets")
                 .resizable()
-                .frame(width: 700, height: 700)
+                .frame(width: 800, height: 800)
                 .rotationEffect(Angle(degrees: rotationAngle))
                 .onAppear {
                     withAnimation(.easeInOut(duration: 120.0).repeatForever(autoreverses: false)) {

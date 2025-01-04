@@ -25,17 +25,17 @@ struct IntroductionView: View {
                     Spacer()
                     Button(dialogueData[dialogueNumber].buttonText) {
                         hapticFeedback.notificationOccurred(.success)
-                        withAnimation(.easeInOut(duration: 1.5)) {
+                        withAnimation(.easeInOut(duration: 1)) {
                             textOpacity = 0.0
                         }
-                        withAnimation(.easeInOut(duration: 0.1).delay(1.5)) {
+                        withAnimation(.easeInOut(duration: 0.1).delay(1)) {
                             if dialogueNumber < dialogueData.count - 1 {
                                 dialogueNumber+=1
                             } else {
                                 screenNumber+=1
                             }
                         }
-                        withAnimation(.easeInOut(duration: 2.0).delay(1.6)) {
+                        withAnimation(.easeInOut(duration: 1).delay(1.1)) {
                             textOpacity = 1.0
                         }
                     }
@@ -49,7 +49,7 @@ struct IntroductionView: View {
         .background {
             Image("Reflets")
                 .resizable()
-                .frame(width: 700, height: 700)
+                .frame(width: 800, height: 800)
                 .rotationEffect(Angle(degrees: rotationAngle))
         }
         .onAppear {
@@ -66,33 +66,34 @@ struct IntroductionView: View {
     let dialogueData = [
         DialogueData(
             dialogueText:
-               """
-               Hello there!
-               Welcome to Reflets!
-               In this experience, you'll use Augmented Reality to create your own self-portrait.
-               """
-            , buttonText: "Continue"
-        ),
-        DialogueData(
-            dialogueText:
-               """
-               You'll create a unique self-portrait. One that reflects not just your appearance, but your emotions, experiences, and the things that inspire you.
-               """
-            , buttonText: "Sounds exciting!"
+                """
+                Welcome to Reflets!
+                In this experience, you’ll create a self-portrait that’s all about you.
+                """
+            , buttonText: "Sounds great!"
         ),
         DialogueData(
             dialogueText:
                 """
-                We'll start by picking an intention for your artwork. Think of it as a guiding principle that will help you create a piece that is truly you.
+                This isn’t just any self-portrait—it’s one that reflects your emotions, your experiences, and the things that inspire you.
+                Don’t worry, no art skills are needed—just your imagination!
                 """
-                , buttonText: "Let’s get started!"
+            , buttonText: "I’m ready!"
         ),
         DialogueData(
             dialogueText:
                 """
-                We've prepared a few intentions to help guide you. Or, if you’re feeling creative, you can pick your own path and go freeform!
+                To start, you’ll choose an intention for your artwork. Think of it as a focus that helps make your self-portrait meaningful and uniquely yours.
                 """
-                , buttonText: "I’m ready!"
+            , buttonText: "Let’s do this!"
+        ),
+        DialogueData(
+            dialogueText:
+                """
+                You can pick from intentions we’ve prepared to guide you, or go freeform if you’re feeling creative.
+                Ready to start creating something amazing?
+                """
+            , buttonText: "Yes, I’m ready!"
         )
     ]
 }
