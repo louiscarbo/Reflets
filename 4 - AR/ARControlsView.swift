@@ -54,7 +54,7 @@ struct ARControlsView: View {
                     }
                     .buttonStyle(SFSymbolButtonStyle(symbolSize: 20))
                     Button {
-                        withAnimation {
+                        withAnimation(.easeInOut(duration: 1.0)) {
                             artworkIsDone = true
                         }
                     } label: {

@@ -15,6 +15,7 @@ struct UniqueIDComponent: Component {
 struct ARSelfPortraitView: View {
     // App level state
     @Binding var screenNumber: Int
+    @State private var artworkIsDone: Bool = false
     
     // AR Objects
     let positioningHelperAnchor = AnchorEntity(.camera) // Anchor at the camera position
@@ -49,14 +50,21 @@ struct ARSelfPortraitView: View {
             .ignoresSafeArea()
             
             // MARK: Controls Interface
-            ARControlsView(
-                artworkIsDone: .constant(false),
-                arObjects: $arObjects,
-                arObjectProperties: $arObjectProperties,
-                selectedIntention: selectedIntention
-            )
-            .onChange(of: arObjectProperties) {
-                updatePositioningHelper()
+            if !artworkIsDone {
+                ARControlsView(
+                    artworkIsDone: $artworkIsDone,
+                    arObjects: $arObjects,
+                    arObjectProperties: $arObjectProperties,
+                    selectedIntention: selectedIntention
+                )
+                .onChange(of: arObjectProperties) {
+                    updatePositioningHelper()
+                }
+            }
+            
+            // MARK: Validation Interface
+            if artworkIsDone {
+                ArtworkValidationView(artworkIsDone: $artworkIsDone)
             }
         }
     }
