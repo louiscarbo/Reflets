@@ -48,6 +48,13 @@ struct ARSelfPortraitView: View {
                 }
             }
             .ignoresSafeArea()
+            .onChange(of: artworkIsDone) {
+                if artworkIsDone {
+                    positioningHelperAnchor.children.removeAll()
+                } else {
+                    updatePositioningHelper()
+                }
+            }
             
             // MARK: Controls Interface
             if !artworkIsDone {

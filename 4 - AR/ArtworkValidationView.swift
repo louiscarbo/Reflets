@@ -39,7 +39,7 @@ struct ArtworkValidationView: View {
                     artworkTitle: artworkTitle
                 )
             default:
-                Step4()
+                Step4(darkenBackground: $darkenBackground)
             }
         }
     }
@@ -151,13 +151,7 @@ struct Step3: View {
         VStack {
             if darkenBackground {
                 Text(
-                """
-                What a meaningful title!
-                It perfectly captures the essence of your artwork.
-                
-                Take some time to appreciate your work.
-                Feel free to snap a screenshot or record a video to look back on whenever you want !
-                """
+                    "What a meaningful title! It perfectly captures the essence of your artwork.\n\nTake some time to appreciate your work. Feel free to snap a screenshot or record a video to look back on whenever you want !"
                 )
                 .padding(40)
                 .multilineTextAlignment(.center)
@@ -185,9 +179,10 @@ struct Step3: View {
                         darkenBackground = true
                         validationStep += 1
                     }
-                }
-                withAnimation(.easeInOut(duration: 1.0)) {
-                    darkenBackground = false
+                } else {
+                    withAnimation(.easeInOut(duration: 1.0)) {
+                        darkenBackground = false
+                    }
                 }
             }
             .buttonStyle(IntentionButton())
@@ -196,30 +191,49 @@ struct Step3: View {
 }
 
 struct Step4: View {
+    let texts = [
+        "Amazing work! Taking the time to create a self-portrait like this isn’t just creative—it’s a powerful way to explore who you are. Reflection helps you build self-awareness, spark creativity, and grow in ways you might not even realize yet.",
+        "Why not make introspection a regular practice? Try journaling, revisit this experience with a new intention, or even share your artwork with someone and ask for their perspective. Each step brings you closer to understanding yourself.",
+        "Keep creating, keep reflecting, and keep discovering—you’re doing something truly meaningful!\n\nThank you for creating with Reflets. We can’t wait to see what you make next!"
+    ]
+    @State var textIndex = 0
+    @Binding var darkenBackground: Bool
+    
     var body: some View {
         VStack {
-            Text(
-                """
-                Amazing work! Taking the time to create a self-portrait like this isn’t just creative—it’s a powerful way to explore who you are. Reflection helps you build self-awareness, spark creativity, and grow in ways you might not even realize yet.
-                                 
-                 Why not make introspection a regular practice? Try journaling, revisit this experience with a new intention, or even share your artwork with someone and ask for their perspective. Each step brings you closer to understanding yourself. Keep creating, keep reflecting, and keep discovering—you’re doing something truly meaningful!
-                """
-            )
-                .padding(40)
-                .multilineTextAlignment(.center)
-                .font(.title2)
-                .fontWidth(Font.Width(0.05))
-                .foregroundStyle(.white)
-                .background {
-                    RoundedRectangle(cornerRadius: 30)
-                        .foregroundStyle(.ultraThinMaterial.opacity(1.0))
-                        .blur(radius: 5)
-                        .padding(20)
-                }
-            Button("Back to home") {
-                
+            if darkenBackground {
+                Text(texts[textIndex])
+                    .padding(40)
+                    .multilineTextAlignment(.center)
+                    .font(.title2)
+                    .fontWidth(Font.Width(0.05))
+                    .foregroundStyle(.white)
+                    .background {
+                        RoundedRectangle(cornerRadius: 30)
+                            .foregroundStyle(.ultraThinMaterial.opacity(1.0))
+                            .blur(radius: 5)
+                            .padding(20)
+                    }
+            } else {
+                Spacer()
             }
-            .buttonStyle(IntentionButton())
+            if textIndex != 2 {
+                Button("Continue") {
+                    withAnimation(.easeInOut(duration: 1.0)) {
+                        textIndex += 1
+                    }
+                }
+                .buttonStyle(IntentionButton())
+            } else {
+                Button {
+                    withAnimation(.easeInOut(duration: 1.0)) {
+                        darkenBackground.toggle()
+                    }
+                } label: {
+                    Label(darkenBackground ? "Show artwork" : "Hide artwork", systemImage: darkenBackground ? "eye" : "eye.slash")
+                }
+                .buttonStyle(IntentionButton())
+            }
         }
     }
 }
