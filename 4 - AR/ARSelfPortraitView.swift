@@ -71,7 +71,7 @@ struct ARSelfPortraitView: View {
             
             // MARK: Validation Interface
             if artworkIsDone {
-                ArtworkValidationView(artworkIsDone: $artworkIsDone)
+                ARValidationView(artworkIsDone: $artworkIsDone)
             }
         }
     }
@@ -128,7 +128,15 @@ struct ARSelfPortraitView: View {
 struct PositioningHelperComponent: Component {}
 
 #Preview {
-    ARSelfPortraitView(
-        screenNumber: .constant(5),
-        selectedIntention: Intentions.proud.details)
+    ZStack {
+        GeometryReader { geometry in
+            Image("previewImage")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+        }
+        ARSelfPortraitView(
+            screenNumber: .constant(5),
+            selectedIntention: Intentions.proud.details)
+    }
 }

@@ -29,9 +29,8 @@ struct ARControlsView: View {
     
     // MARK: - ARControlsView body
     var body: some View {
-        ZStack(alignment: .leading) {
+        ZStack(alignment: .center) {
             VStack {
-                
                 // MARK: Top row buttons
                 HStack(spacing: 10) {
                     Button {
@@ -205,8 +204,21 @@ struct ARControlsView: View {
             }
             
             // MARK: Slider
-            SizeSliderView(sliderValue: $arObjectProperties.resizingFactor)
-                .offset(y: -30)
+            HStack {
+                SizeSliderView(sliderValue: $arObjectProperties.resizingFactor)
+                    .offset(y: -30)
+                Spacer()
+            }
+            .padding(.leading, 30)
+            
+            // MARK: ARIntroductionView
+            ARIntroductionView(
+                arObjects: $arObjects,
+                objectScale: $arObjectProperties.resizingFactor,
+                showObjectsCatalog: $showObjectsCatalog,
+                showCustomizationSheet: $showCustomizationSheet,
+                showInspirationSheet: $showInspirationSheet
+            )
         }
         .sheet(isPresented: $showCustomizationSheet) {
             ObjectSettingsView(
@@ -234,16 +246,15 @@ struct ARControlsView: View {
 
 #Preview {
     ZStack {
-        Image("previewImage")
-            .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-        ARControlsView(
-            artworkIsDone: .constant(false),
-            arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties()),
-            selectedIntention: Intentions.proud.details
-        )
+        GeometryReader { geometry in
+            Image("previewImage")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+        }
+        ARSelfPortraitView(
+            screenNumber: .constant(5),
+            selectedIntention: Intentions.proud.details)
     }
 }
 
@@ -270,7 +281,7 @@ struct SizeSliderView: View {
                     Spacer()
                         .frame(height: 130)
                 }
-
+                
                 // Slider Handle
                 ZStack {
                     Circle()
@@ -300,14 +311,14 @@ struct SizeSliderView: View {
                         .onChanged { value in
                             let sliderTop = -sliderHeight / 2
                             let sliderBottom = sliderHeight / 2
-
+                            
                             // Calculate the new drag offset relative to the initial offset
                             let newOffset = initialDragOffset + value.translation.height
                             dragOffset = max(sliderTop, min(sliderBottom, newOffset))
-
+                            
                             // Update the slider value based on the offset
                             sliderValue = Float(1 - (dragOffset + sliderHeight / 2) / sliderHeight)
-
+                            
                             // Trigger haptic feedback at edges (once per edge)
                             if (sliderValue == 0 || sliderValue == 1), !hasReachedEdge {
                                 hapticFeedback.impactOccurred()

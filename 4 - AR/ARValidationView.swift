@@ -1,5 +1,5 @@
 //
-//  ArtworkValidationView.swift
+//  ARValidationView.swift
 //  Reflets
 //
 //  Created by Louis Carbo Estaque on 06/01/2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ArtworkValidationView: View {
+struct ARValidationView: View {
     @Binding var artworkIsDone: Bool
     @State var artworkTitle = ""
     @State var darkenBackground = true
@@ -46,7 +46,7 @@ struct ArtworkValidationView: View {
 }
 
 #Preview {
-    ArtworkValidationView(
+    ARValidationView(
         artworkIsDone: .constant(true)
     )
 }
