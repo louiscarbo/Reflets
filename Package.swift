@@ -16,7 +16,7 @@ let package = Package(
         .iOSApplication(
             name: "Reflets",
             targets: ["AppModule"],
-            bundleIdentifier: "louiscarboestaque.Test",
+            bundleIdentifier: "louiscarboestaque.Reflets",
             teamIdentifier: "7T9Q86X738",
             displayVersion: "1.0",
             bundleVersion: "1",
