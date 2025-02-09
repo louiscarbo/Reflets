@@ -70,10 +70,8 @@ struct IntroductionView: View {
                 Welcome to Reflets!
 
                 In this experience, you’ll build a 3D vision board—a space to bring your dreams, ideas, and inspirations to life.
-
-                No rules, just creativity!
                 """
-            , buttonText: "Let's go!"
+            , buttonText: "Sounds interesting!"
         ),
         DialogueData(
             dialogueText:
@@ -82,7 +80,7 @@ struct IntroductionView: View {
 
                 Don’t worry, we’ve prepared some fun challenges to help you get started!
                 """
-            , buttonText: "Start creating!"
+            , buttonText: "Let's get started!"
         )
     ]
 }

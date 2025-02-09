@@ -65,7 +65,7 @@ struct HomeView: View {
                     .fontWeight(.light)
                     .fontWidth(.expanded)
                 
-                Text("Your AR self-portrait")
+                Text("Your AR vision board")
                     .font(.title2)
                     .fontWeight(.light)
                     .fontWidth(.expanded)
