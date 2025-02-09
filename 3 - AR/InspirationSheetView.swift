@@ -8,50 +8,6 @@
 import SwiftUI
 
 struct InspirationSheetView: View {
-    @State var selectedIntention: Intention
-    
-    let generalPrompts: [String] = [
-        "Try using AR as a way to tell a story! Which environment would best fit your intention?",
-        "Take a look around: what’s in your space that fits your intention? Add an object that interacts with it!",
-        "Could it be interesting to add a selfie in the artwork? If so, how can you customize it with objects to make it more impactful?"
-    ]
-    
-    let generalChallenges: [Challenge] = [
-        Challenge(
-            title: "Abstract You",
-            content: "Create a self-portrait using only shapes, colors, and textures. No selfies allowed!"
-        ),
-        Challenge(
-            title: "Environment Fusion",
-            content: "Blend your self-portrait with your surroundings. Can you make it feel like it belongs in the space?"
-        ),
-        Challenge(
-            title: "Layer Up",
-            content: "Build your self-portrait in layers—start with your environment, then add objects that reflect deeper aspects of yourself."
-        ),
-        Challenge(
-            title: "Perspective Play",
-            content: "Use size and distance creatively. Make one part of your self-portrait tiny and another part huge."
-        ),
-        Challenge(
-            title: "Opposite Worlds",
-            content: "Create a self-portrait with two contrasting themes—light/dark, calm/chaotic, or old/new. How do they interact?"
-        ),
-        Challenge(
-            title: "Color Story",
-            content: "Tell a story with colors. Choose a color palette that represents your personality or mood."
-        ),
-        Challenge(
-            title: "Word Art",
-            content: "Add words or phrases that represent you. How can you integrate them into your self-portrait?"
-        )
-    ]
-    
-    var allChallenges: [Challenge] {
-        generalChallenges + selectedIntention.challenges
-    }
-    
-    @State var currentChallenge: Challenge?
     
     // MARK: - InspirationSheetView
     var body: some View {
@@ -61,7 +17,7 @@ struct InspirationSheetView: View {
                     .font(.title)
                     .fontWeight(.semibold)
                     .fontWidth(.expanded)
-                Text(selectedIntention.title)
+                Text("Intention title here")
                     .italic()
                     .font(.title)
                     .fontWidth(.expanded)
@@ -78,7 +34,7 @@ struct InspirationSheetView: View {
                     .fontWeight(.semibold)
                     .fontWidth(.expanded)
 
-                ForEach(generalPrompts, id: \.self) { prompt in
+                ForEach(["Prompt1", "Prompt2", "Prompt3"], id: \.self) { prompt in
                     PromptView(prompt: prompt)
                 }
                 
@@ -88,7 +44,7 @@ struct InspirationSheetView: View {
                     .font(.title)
                     .fontWeight(.semibold)
                     .fontWidth(.expanded)
-                ForEach(selectedIntention.prompts, id: \.self) { prompt in
+                ForEach(["Prompt1", "Prompt2", "Prompt3"], id: \.self) { prompt in
                     PromptView(prompt: prompt)
                 }
                 
@@ -98,25 +54,18 @@ struct InspirationSheetView: View {
                     .font(.title)
                     .fontWeight(.semibold)
                     .fontWidth(.expanded)
-                if let currentChallenge = currentChallenge {
-                    PromptView(title: currentChallenge.title, prompt: currentChallenge.content)
-                        .id(currentChallenge)
-                        .transition(.slide.combined(with: .scale))
-                    Button {
-                        withAnimation(.bouncy) {
-                            self.currentChallenge = allChallenges.filter { $0 != currentChallenge }.randomElement()
-                        }
-                    } label: {
-                        Label("New Challenge", systemImage: "shuffle")
-                    }
-                    .buttonStyle(IntentionButton())
-                    .offset(x:10, y: -20)
-                    .rotationEffect(.degrees(Double.random(in: -3...3)))
-                    .shadow(radius: 3, y: 3)
+                PromptView(title: "Challenge title here", prompt: "Challenge content goes here")
+                    .id("Challenge title here")
+                    .transition(.slide.combined(with: .scale))
+                Button {
+                    
+                } label: {
+                    Label("New Challenge", systemImage: "shuffle")
                 }
-            }
-            .onAppear {
-                currentChallenge = allChallenges.randomElement()
+                .buttonStyle(IntentionButton())
+                .offset(x:10, y: -20)
+                .rotationEffect(.degrees(Double.random(in: -3...3)))
+                .shadow(radius: 3, y: 3)
             }
             .background {
                 RandomSymbolsView()
@@ -142,8 +91,7 @@ struct InspirationSheetView: View {
             showInspirationSheet: true,
             artworkIsDone: .constant(false),
             arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties()),
-            selectedIntention: Intentions.memory.details
+            arObjectProperties: .constant(ARObjectProperties())
         )
     }
 }

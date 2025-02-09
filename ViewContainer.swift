@@ -4,7 +4,6 @@ import SwiftUI
 
 struct ViewContainer: View {
     @State private var currentView = 0
-    @State private var selectedIntention: Intention? = nil
     
     var body: some View {
         ZStack {
@@ -19,8 +18,7 @@ struct ViewContainer: View {
                 );
             default:
                 ARSelfPortraitView(
-                    screenNumber: $currentView,
-                    selectedIntention: selectedIntention ?? Intentions.other.details
+                    screenNumber: $currentView
                 );
             }
         }

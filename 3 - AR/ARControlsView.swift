@@ -22,9 +22,6 @@ struct ARControlsView: View {
     @Binding var arObjects: [ARObject]
     @Binding var arObjectProperties: ARObjectProperties
     
-    // Intention
-    @State  var selectedIntention: Intention
-    
     let hapticFeedback = UINotificationFeedbackGenerator()
     
     // MARK: - ARControlsView body
@@ -239,7 +236,7 @@ struct ARControlsView: View {
             )
         }
         .sheet(isPresented: $showInspirationSheet) {
-            InspirationSheetView(selectedIntention: selectedIntention)
+            InspirationSheetView()
         }
     }
 }
@@ -253,8 +250,8 @@ struct ARControlsView: View {
                 .ignoresSafeArea()
         }
         ARSelfPortraitView(
-            screenNumber: .constant(5),
-            selectedIntention: Intentions.proud.details)
+            screenNumber: .constant(5)
+        )
     }
 }
 

@@ -221,7 +221,7 @@ struct TooltipView: View {
                 .ignoresSafeArea()
         }
         ARSelfPortraitView(
-            screenNumber: .constant(5),
-            selectedIntention: Intentions.proud.details)
+            screenNumber: .constant(5)
+        )
     }
 }
