@@ -17,11 +17,6 @@ struct ViewContainer: View {
                 IntroductionView(
                     screenNumber: $currentView
                 );
-            case 2:
-                IntentionSelectionView(
-                    screenNumber: $currentView,
-                    selectedIntention: $selectedIntention
-                );
             default:
                 ARSelfPortraitView(
                     screenNumber: $currentView,

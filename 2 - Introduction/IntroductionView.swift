@@ -68,32 +68,21 @@ struct IntroductionView: View {
             dialogueText:
                 """
                 Welcome to Reflets!
-                In this experience, you’ll create a self-portrait that’s all about you.
+
+                In this experience, you’ll build a 3D vision board—a space to bring your dreams, ideas, and inspirations to life.
+
+                No rules, just creativity!
                 """
-            , buttonText: "Sounds great!"
+            , buttonText: "Let's go!"
         ),
         DialogueData(
             dialogueText:
                 """
-                This isn’t just any self-portrait—it’s one that reflects your emotions, your experiences, and the things that inspire you.
-                Don’t worry, no art skills are needed—just your imagination!
+                Here’s how it works: You’ll pick objects that represent things you love, things you want, or things that inspire you, and arrange them in AR freely.
+
+                Don’t worry, we’ve prepared some fun challenges to help you get started!
                 """
-            , buttonText: "I’m ready!"
-        ),
-        DialogueData(
-            dialogueText:
-                """
-                To start, you’ll choose an intention for your artwork. Think of it as a focus that helps make your self-portrait meaningful and uniquely yours.
-                """
-            , buttonText: "Let’s do this!"
-        ),
-        DialogueData(
-            dialogueText:
-                """
-                You can pick from intentions we’ve prepared to guide you, or go freeform if you’re feeling creative.
-                Ready to start creating something amazing?
-                """
-            , buttonText: "Yes, I’m ready!"
+            , buttonText: "Start creating!"
         )
     ]
 }
