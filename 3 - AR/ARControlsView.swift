@@ -22,6 +22,9 @@ struct ARControlsView: View {
     @Binding var arObjects: [ARObject]
     @Binding var arObjectProperties: ARObjectProperties
     
+    // Challenges
+    @State private var selectedChallenge: Challenge? = nil
+    
     let hapticFeedback = UINotificationFeedbackGenerator()
     
     // MARK: - ARControlsView body
@@ -81,9 +84,27 @@ struct ARControlsView: View {
                     }
                 }
                 
+                // MARK: Selected Challenge -------------------------------
+                if let challenge = selectedChallenge {
+                    Button {
+                        selectedChallenge = nil
+                    } label: {
+                        PromptView(
+                            title: challenge.title,
+                            prompt: challenge.prompt,
+                            sfSymbol: challenge.sfSymbol,
+                            scrollEffect: false,
+                            slimVersion: true
+                        )
+                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding()
+                    .padding(.leading, 50)
+                }
+                
                 Spacer()
                 
-                // MARK: Bottom row buttons
+                // MARK: Bottom row buttons -------------------------------
                 HStack(spacing: 20) {
                     
                     // Remove button
@@ -236,7 +257,9 @@ struct ARControlsView: View {
             )
         }
         .sheet(isPresented: $showInspirationSheet) {
-            InspirationSheetView()
+            ChallengesView(
+                selectedChallenge: $selectedChallenge
+            )
         }
     }
 }

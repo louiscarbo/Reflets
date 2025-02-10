@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Challenge: Identifiable {
+struct Challenge: Identifiable, Hashable {
     let id = UUID()
     let title: String
     let prompt: String
@@ -56,11 +56,6 @@ let challenges: [Challenge] = [
         sfSymbol: "gamecontroller"
     ),
     Challenge(
-        title: "An Object With a Story",
-        prompt: "Pick an object and imagine the story behind it.",
-        sfSymbol: "book"
-    ),
-    Challenge(
         title: "Something Unexpected",
         prompt: "Add the first object that appears in your photos—no cheating allowed!",
         sfSymbol: "sparkles"
@@ -82,7 +77,7 @@ let challenges: [Challenge] = [
     ),
     Challenge(
         title: "A Taste of Happiness",
-        prompt: "Add something that represents your favorite food or drink.",
+        prompt: "Add something that represents a food or drink you'd like to try.",
         sfSymbol: "fork.knife"
     ),
     Challenge(
@@ -94,5 +89,15 @@ let challenges: [Challenge] = [
         title: "Build a Landmark",
         prompt: "Use shapes to create a structure that represents your dream city or place.",
         sfSymbol: "building.columns"
+    ),
+    Challenge(
+        title: "Feeling Inspired",
+        prompt: "Add a quote or phrase that resonates with your dreams for the future.",
+        sfSymbol: "text.quote"
+    ),
+    Challenge(
+        title: "Friendship Forever",
+        prompt: "Add an object that represents a friend who's always there for you, or someone you'd like to see more often.",
+        sfSymbol: "person.3"
     )
 ]
