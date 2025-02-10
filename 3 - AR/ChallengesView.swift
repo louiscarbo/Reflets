@@ -9,7 +9,12 @@ import SwiftUI
 
 struct ChallengesView: View {
     @Binding var selectedChallenge: Challenge?
+    @Binding var challenges: [Challenge]
     
+    private var displayedChallenges: [Challenge] {
+        Array(challenges.prefix(3))
+    }
+        
     @Environment(\.dismiss) var dismiss
     
     // MARK: - InspirationSheetView
@@ -28,7 +33,7 @@ struct ChallengesView: View {
                 Divider()
                     .padding(5)
                 
-                ForEach(challenges) { challenge in
+                ForEach(displayedChallenges) { challenge in
                     if challenge != selectedChallenge {
                         Button {
                             withAnimation {
@@ -45,6 +50,16 @@ struct ChallengesView: View {
                         }
                     }
                 }
+                
+                Button {
+                    withAnimation {
+                        cycleChallenges()
+                    }
+                } label: {
+                    Label("Next Challenges", systemImage: "shuffle")
+                }
+                .buttonStyle(IntentionButton())
+                .padding(.top, 10)
             }
             .background {
                 RandomSymbolsView()
@@ -55,6 +70,34 @@ struct ChallengesView: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(40.0)
+    }
+    
+    private func cycleChallenges() {
+        let totalChallenges = challenges.count
+        guard totalChallenges >= 6 else { return } // Ensure we have enough challenges
+
+        // Copy the array to store the new first three challenges
+        var newChallenges = challenges
+
+        for i in 0..<3 {
+            let newIndex = (i + 3) % totalChallenges // Ensure looping
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.2) { // Stagger animation
+                withAnimation(.easeInOut(duration: 0.6)) {
+                    challenges[i] = newChallenges[newIndex] // Visually update the displayed challenges
+                }
+            }
+        }
+
+        // After animations are fully done, update the array structure properly
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            withAnimation {
+                // Move the first three challenges to the end, so the order is now correct
+                let movedChallenges = challenges.prefix(3) // Get first three challenges
+                challenges.removeFirst(3) // Remove them from the start
+                challenges.append(contentsOf: movedChallenges) // Move them to the back
+            }
+        }
     }
 }
 
@@ -116,6 +159,7 @@ struct PromptView: View {
                                 .fontWidth(.expanded)
                                 .padding(.bottom, 5)
                                 .lineLimit(2)
+                                .multilineTextAlignment(.leading)
                         }
                     }
                     Text(prompt)

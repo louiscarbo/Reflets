@@ -24,6 +24,7 @@ struct ARControlsView: View {
     
     // Challenges
     @State private var selectedChallenge: Challenge? = nil
+    @State private var challengesList: [Challenge] = challenges
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -258,7 +259,8 @@ struct ARControlsView: View {
         }
         .sheet(isPresented: $showInspirationSheet) {
             ChallengesView(
-                selectedChallenge: $selectedChallenge
+                selectedChallenge: $selectedChallenge,
+                challenges: $challengesList
             )
         }
     }
