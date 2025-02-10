@@ -88,7 +88,9 @@ struct ARControlsView: View {
                 // MARK: Selected Challenge -------------------------------
                 if let challenge = selectedChallenge {
                     Button {
-                        selectedChallenge = nil
+                        withAnimation {
+                            selectedChallenge = nil
+                        }
                     } label: {
                         PromptView(
                             title: challenge.title,

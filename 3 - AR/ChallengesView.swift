@@ -10,10 +10,11 @@ import SwiftUI
 struct ChallengesView: View {
     @Binding var selectedChallenge: Challenge?
     @Binding var challenges: [Challenge]
-    
     private var displayedChallenges: [Challenge] {
         Array(challenges.prefix(3))
     }
+    
+    let hapticFeedback = UINotificationFeedbackGenerator()
         
     @Environment(\.dismiss) var dismiss
     
@@ -36,6 +37,7 @@ struct ChallengesView: View {
                 ForEach(displayedChallenges) { challenge in
                     if challenge != selectedChallenge {
                         Button {
+                            hapticFeedback.notificationOccurred(.success)
                             withAnimation {
                                 selectedChallenge = challenge
                             }
@@ -48,11 +50,14 @@ struct ChallengesView: View {
                                 sfSymbol: challenge.sfSymbol
                             )
                         }
+                        .id(challenge.id)
+                        .transition(.slide)
                     }
                 }
                 
                 Button {
                     withAnimation {
+                        selectedChallenge = nil
                         cycleChallenges()
                     }
                 } label: {
@@ -77,7 +82,7 @@ struct ChallengesView: View {
         guard totalChallenges >= 6 else { return } // Ensure we have enough challenges
 
         // Copy the array to store the new first three challenges
-        var newChallenges = challenges
+        let newChallenges = challenges
 
         for i in 0..<3 {
             let newIndex = (i + 3) % totalChallenges // Ensure looping
