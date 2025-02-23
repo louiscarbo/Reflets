@@ -27,6 +27,8 @@ struct ARControlsView: View {
     @State private var selectedChallenge: Challenge? = nil
     @State private var challengesList: [Challenge] = challenges
     @State private var focusChallenge: Bool = false
+    @State private var congratulationEffect: Bool = false
+    @State private var gaugeValue: Double = 0
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -261,6 +263,7 @@ struct ARControlsView: View {
                                 challengesList.removeAll { $0.id == selectedChallenge!.id }
                                 selectedChallenge = nil
                                 focusChallenge = false
+                                congratulationEffect = true
                             }
                         } label: {
                             Label("Done", systemImage: "checkmark")
@@ -268,6 +271,38 @@ struct ARControlsView: View {
                         .buttonStyle(TitleButton())
                     }
                     .offset(y: -40)
+                }
+            }
+            
+            // MARK: Challenge Completion Effect --------------------------
+            if congratulationEffect {
+                VStack {
+                    Text("\(completedChallenges.count)/17 completed!")
+                        .fontWidth(.expanded)
+                    Gauge(value: gaugeValue, in: 0...17) { }
+                    .tint(Gradient(colors: [.yellow, .pink, .purple]))
+                    .gaugeStyle(.accessoryCircularCapacity)
+                }
+                .padding(20)
+                .background {
+                    RoundedRectangle(cornerRadius: 30)
+                        .foregroundStyle(.ultraThinMaterial.opacity(1.0))
+                        .blur(radius: 5)
+                        .allowsHitTesting(false)
+                }
+                .transition(.scale)
+                .onAppear {
+                    gaugeValue = Double(completedChallenges.count) - 1
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation {
+                            gaugeValue = Double(completedChallenges.count)
+                        }
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        withAnimation {
+                            congratulationEffect = false
+                        }
+                    }
                 }
             }
             
