@@ -23,8 +23,10 @@ struct ARControlsView: View {
     @Binding var arObjectProperties: ARObjectProperties
     
     // Challenges
+    @State private var completedChallenges: [Challenge] = []
     @State private var selectedChallenge: Challenge? = nil
     @State private var challengesList: [Challenge] = challenges
+    @State private var focusChallenge: Bool = false
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -32,7 +34,7 @@ struct ARControlsView: View {
     var body: some View {
         ZStack(alignment: .center) {
             VStack {
-                // MARK: Top row buttons
+                // MARK: Top row buttons -------------------------------
                 HStack(spacing: 10) {
                     Button {
                         withAnimation {
@@ -86,26 +88,29 @@ struct ARControlsView: View {
                 }
                 
                 // MARK: Selected Challenge -------------------------------
-                if let challenge = selectedChallenge {
-                    Button {
-                        withAnimation {
-                            selectedChallenge = nil
+                if !focusChallenge {
+                    if let challenge = selectedChallenge {
+                        Button {
+                            withAnimation {
+                                focusChallenge.toggle()
+                            }
+                        } label: {
+                            PromptView(
+                                title: challenge.title,
+                                prompt: challenge.prompt,
+                                sfSymbol: challenge.sfSymbol,
+                                scrollEffect: false,
+                                slimVersion: true
+                            )
+                            .fixedSize(horizontal: false, vertical: true)
                         }
-                    } label: {
-                        PromptView(
-                            title: challenge.title,
-                            prompt: challenge.prompt,
-                            sfSymbol: challenge.sfSymbol,
-                            scrollEffect: false,
-                            slimVersion: true
-                        )
-                        .fixedSize(horizontal: false, vertical: true)
+                        .padding()
+                        .padding(.leading, 50)
                     }
-                    .padding()
-                    .padding(.leading, 50)
                 }
                 
                 Spacer()
+                    
                 
                 // MARK: Bottom row buttons -------------------------------
                 HStack(spacing: 20) {
@@ -224,7 +229,7 @@ struct ARControlsView: View {
                 }
             }
             
-            // MARK: Slider
+            // MARK: Slider ----------------------------------------------
             HStack {
                 SizeSliderView(sliderValue: $arObjectProperties.resizingFactor)
                     .offset(y: -30)
@@ -232,7 +237,41 @@ struct ARControlsView: View {
             }
             .padding(.leading, 30)
             
-            // MARK: ARIntroductionView
+            // MARK: Focus Challenge -------------------------------------
+            if focusChallenge {
+                VStack {
+                    TooltipView(
+                        title: selectedChallenge?.title ?? "",
+                        text: selectedChallenge?.prompt ?? ""
+                    )
+                    
+                    HStack {
+                        Button {
+                            withAnimation {
+                                focusChallenge = false
+                            }
+                        } label: {
+                            Label("Back", systemImage: "arrowshape.turn.up.backward")
+                        }
+                        .buttonStyle(TitleButton())
+                        
+                        Button {
+                            withAnimation {
+                                completedChallenges.append(selectedChallenge!)
+                                challengesList.removeAll { $0.id == selectedChallenge!.id }
+                                selectedChallenge = nil
+                                focusChallenge = false
+                            }
+                        } label: {
+                            Label("Done", systemImage: "checkmark")
+                        }
+                        .buttonStyle(TitleButton())
+                    }
+                    .offset(y: -40)
+                }
+            }
+            
+            // MARK: ARIntroductionView ---------------------------------
             ARIntroductionView(
                 arObjects: $arObjects,
                 objectScale: $arObjectProperties.resizingFactor,
@@ -261,6 +300,7 @@ struct ARControlsView: View {
         }
         .sheet(isPresented: $showInspirationSheet) {
             ChallengesView(
+                completedChallenges: $completedChallenges,
                 selectedChallenge: $selectedChallenge,
                 challenges: $challengesList
             )

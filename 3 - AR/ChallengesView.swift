@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ChallengesView: View {
+    @Binding var completedChallenges: [Challenge]
     @Binding var selectedChallenge: Challenge?
     @Binding var challenges: [Challenge]
     private var displayedChallenges: [Challenge] {
@@ -26,8 +27,24 @@ struct ChallengesView: View {
                     .font(.title)
                     .fontWeight(.semibold)
                     .fontWidth(.expanded)
-                Text("It can be difficult to find inspiration! Here are some challenges to get you started.")
+                    .padding(.bottom, 10)
+                Text("It can be difficult to find inspiration! Here are some challenges to get you started.\n\nTry completing a challenge by tapping on it.")
                     .font(.body)
+                    .fontWidth(.expanded)
+                
+                // Completed challenges ------------------------------
+                Divider()
+                    .padding(5)
+                ZStack {
+                    Gauge(value: Double(completedChallenges.count), in: 0...Double(challenges.count)) { }
+                    .tint(Gradient(colors: [.yellow, .pink, .purple]))
+                    
+                    Capsule()
+                        .strokeBorder(Color.black.opacity(0.2), lineWidth: 2)
+                        .blur(radius: 2)
+                }
+                
+                Text("\(completedChallenges.count)/17 completed")
                     .fontWidth(.expanded)
                 
                 // Challenges -------------------------------------
@@ -61,7 +78,7 @@ struct ChallengesView: View {
                         cycleChallenges()
                     }
                 } label: {
-                    Label("Next Challenges", systemImage: "shuffle")
+                    Label("New Challenges", systemImage: "shuffle")
                 }
                 .buttonStyle(IntentionButton())
                 .padding(.top, 10)
@@ -125,6 +142,9 @@ struct ChallengesView: View {
 
 // MARK: - PromptView
 struct PromptView: View {
+    @Environment(\.colorScheme) var colorScheme
+    private var isDarkMode: Bool { colorScheme == .dark }
+    
     var title: String? = nil
     var prompt: String
     var sfSymbol: String = "questionmark"
@@ -173,7 +193,7 @@ struct PromptView: View {
                         .multilineTextAlignment(.leading)
                 }
             }
-            .foregroundStyle(.black)
+            .foregroundStyle(isDarkMode ? .white : .black)
             .padding(slimVersion ? 15 : 20)
         }
         .rotationEffect(.degrees(slimVersion ? 0 : Double.random(in: -2...2)))

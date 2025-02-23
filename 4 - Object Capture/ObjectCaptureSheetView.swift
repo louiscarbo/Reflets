@@ -222,8 +222,10 @@ struct ImageApprovalView: View {
                     print("After animation update: \(imageRotationAngle) degrees")
                 }
                 .aspectRatio(contentMode: .fit)
+            Text("Tap the image to rotate it.")
             if imageHasNotBeenSegmented {
                 Text("The background could not be removed from this image. Do you still want to add it?")
+                
             }
             VStack {
                 Button("Choose another photo") {

@@ -69,7 +69,7 @@ struct IntroductionView: View {
                 """
                 Welcome to Reflets!
 
-                In this experience, you’ll build a 3D vision board—a space to bring your dreams, ideas, and inspirations to life.
+                In this experience, you’ll build an AR vision board—a space to bring your dreams, ideas, and inspirations to life.
                 """
             , buttonText: "Sounds interesting!"
         ),

@@ -22,7 +22,7 @@ let challenges: [Challenge] = [
     ),
     Challenge(
         title: "A Dream in the Making",
-        prompt: "Choose something that symbolizes a goal or dream you want to achieve.",
+        prompt: "Add something that symbolizes a goal or dream you want to achieve.",
         sfSymbol: "star"
     ),
     Challenge(
@@ -37,7 +37,7 @@ let challenges: [Challenge] = [
     ),
     Challenge(
         title: "A Memory to Keep",
-        prompt: "Pick something that reminds you of a moment you never want to forget.",
+        prompt: "Place something that reminds you of a moment you never want to forget.",
         sfSymbol: "photo"
     ),
     Challenge(

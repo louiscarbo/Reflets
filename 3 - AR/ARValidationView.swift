@@ -57,7 +57,7 @@ struct Step1: View {
     
     var body: some View {
         VStack {
-            Text("Are you happy with your self portrait?")
+            Text("Are you happy with your vision board?")
                 .padding(40)
                 .multilineTextAlignment(.center)
                 .font(.title2)
@@ -99,7 +99,7 @@ struct Step2: View {
     
     var body: some View {
         VStack {
-            Text("Wow, look at that! You've created something so uniquely you! Your intention really shines through! \n\n What would you like to name your artwork?")
+            Text("Wow, look at that! You've created something really unique that really represents your vision! Now, what would you like to name your vision board?")
                 .padding(40)
                 .multilineTextAlignment(.center)
                 .font(.title2)
@@ -192,9 +192,9 @@ struct Step3: View {
 
 struct Step4: View {
     let texts = [
-        "Amazing work! Taking the time to create a self-portrait like this isn’t just creative—it’s a powerful way to explore who you are. Reflection helps you build self-awareness, spark creativity, and grow in ways you might not even realize yet.",
-        "Why not make introspection a regular practice? Try journaling, revisit this experience with a new intention, or even share your artwork with someone and ask for their perspective. Each step brings you closer to understanding yourself.",
-        "Keep creating, keep reflecting, and keep discovering—you’re doing something truly meaningful!\n\nThank you for creating with Reflets. We can’t wait to see what you make next!"
+        "Amazing work! You’ve just built a vision board filled with your ideas, dreams, and inspirations. Taking the time to visualize what excites you is a powerful way to bring those aspirations to life.",
+        "Why stop here? Let this be a starting point—use your vision board as a reminder of what excites you, revisit it with fresh ideas, or even share it with someone who inspires you. Creativity and imagination fuel action, and every small step brings you closer to what you want.",
+        "Keep dreaming, keep building, and keep exploring—your ideas deserve space to grow!\n\nThank you for creating with Reflets. We can’t wait to see what you bring to life next!"
     ]
     @State var textIndex = 0
     @Binding var darkenBackground: Bool

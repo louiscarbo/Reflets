@@ -71,7 +71,7 @@ struct ARIntroductionView: View {
         switch state {
         case .addObject:
             TooltipView(
-                text: "Let's get started! Tap the + button to add your first object.",
+                text: "Let's start creating! Tap the + button to add your first object.",
                 symbol: Image(systemName: "plus")
             )
         case .removeObject:
@@ -86,7 +86,7 @@ struct ARIntroductionView: View {
             )
         case .changeTypeObject:
             TooltipView(
-                text: "Explore other object shapes and create custom objects from your photos in the catalog.",
+                text: "Try adding a custom object from your photos in the catalog.",
                 symbol: Image(systemName: "folder.badge.plus")
             )
         case .customizeObject:
@@ -96,7 +96,7 @@ struct ARIntroductionView: View {
             )
         case .inspirationAndFinish:
             TooltipView(
-                text: "Find inspiration and tips in the Inspiration page.",
+                text: "Open the Challenges tab to find inspiration for your vision board.",
                 symbol:
                     Image("Reflets")
                     .resizable()
@@ -155,6 +155,7 @@ struct ARIntroductionView: View {
 
 // MARK: - Tooltip View
 struct TooltipView: View {
+    var title: String? = nil
     let text: String
     var symbol: Image? = nil
     var showOKButton: Bool = false
@@ -170,12 +171,22 @@ struct TooltipView: View {
                         .frame(width: 50)
                 }
                 VStack {
-                    Text(text)
-                        .padding(20)
-                        .multilineTextAlignment(.center)
-                        .font(.title2)
-                        .fontWidth(Font.Width(0.05))
-                        .foregroundStyle(.white)
+                    VStack {
+                        if let title = title {
+                            Text(title)
+                                .multilineTextAlignment(.center)
+                                .font(.title2)
+                                .bold()
+                                .fontWidth(.expanded)
+                                .foregroundStyle(.white)
+                        }
+                        Text(text)
+                            .multilineTextAlignment(.center)
+                            .font(.title2)
+                            .fontWidth(Font.Width(0.05))
+                            .foregroundStyle(.white)
+                    }
+                    .padding(20)
                     
                     if let symbol = symbol {
                         Button { } label: {
