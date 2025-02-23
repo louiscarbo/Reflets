@@ -259,6 +259,7 @@ struct ARControlsView: View {
                         
                         Button {
                             withAnimation {
+                                hapticFeedback.notificationOccurred(.success)
                                 completedChallenges.append(selectedChallenge!)
                                 challengesList.removeAll { $0.id == selectedChallenge!.id }
                                 selectedChallenge = nil
@@ -280,7 +281,7 @@ struct ARControlsView: View {
                     Text("\(completedChallenges.count)/17 completed!")
                         .fontWidth(.expanded)
                     Gauge(value: gaugeValue, in: 0...17) { }
-                    .tint(Gradient(colors: [.yellow, .pink, .purple]))
+                    .tint(Gradient(colors: [.purple, .pink, .yellow]))
                     .gaugeStyle(.accessoryCircularCapacity)
                 }
                 .padding(20)
@@ -293,7 +294,7 @@ struct ARControlsView: View {
                 .transition(.scale)
                 .onAppear {
                     gaugeValue = Double(completedChallenges.count) - 1
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         withAnimation {
                             gaugeValue = Double(completedChallenges.count)
                         }
@@ -351,7 +352,7 @@ struct ARControlsView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         }
-        ARSelfPortraitView(
+        ARVisionBoardView(
             screenNumber: .constant(5)
         )
     }

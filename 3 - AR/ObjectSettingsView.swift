@@ -68,7 +68,7 @@ struct ObjectSettingsView: View {
             
             if needsProportionSlider {
                 HStack {
-                    Text("Ratio")
+                    Text("Length")
                         .fontWidth(.expanded)
                     Spacer()
                     Slider(value: $selectedProportion, in: 0.1...7.0)

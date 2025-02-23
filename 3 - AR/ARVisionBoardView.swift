@@ -12,7 +12,7 @@ struct UniqueIDComponent: Component {
     var id: Int
 }
 
-struct ARSelfPortraitView: View {
+struct ARVisionBoardView: View {
     // App level state
     @Binding var screenNumber: Int
     @State private var artworkIsDone: Bool = false
@@ -131,7 +131,7 @@ struct PositioningHelperComponent: Component {}
                 .scaledToFill()
                 .ignoresSafeArea()
         }
-        ARSelfPortraitView(
+        ARVisionBoardView(
             screenNumber: .constant(5)
         )
     }

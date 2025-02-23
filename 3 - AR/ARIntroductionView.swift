@@ -21,6 +21,8 @@ struct ARIntroductionView: View {
     @State var showedInspiration: Bool = false
     @State var completedStates: Set<IntroductionState> = []
     
+    @SceneStorage("showedARIntroduction") private var showedARINtroduction: Bool = false
+    
     enum IntroductionState: CaseIterable {
         case addObject, removeObject, scaleObject, changeTypeObject, customizeObject, inspirationAndFinish, last
     }
@@ -30,10 +32,12 @@ struct ARIntroductionView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            // Display instructions based on the current state
-            instructionView(for: currentState)
-                .transition(.opacity)
-                .animation(.easeInOut, value: currentState)
+            if !showedARINtroduction {
+                // Display instructions based on the current state
+                instructionView(for: currentState)
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: currentState)
+            }
         }
         .onAppear {
             updateIntroductionState()
@@ -161,6 +165,8 @@ struct TooltipView: View {
     var showOKButton: Bool = false
     var pushToTheRight: Bool = false
     
+    @SceneStorage("showedARIntroduction") private var showedARINtroduction: Bool = false
+    
     @State var showIntroduction = true
     
     var body: some View {
@@ -205,6 +211,7 @@ struct TooltipView: View {
                         Button("Start creating") {
                             withAnimation {
                                 showIntroduction = false
+                                showedARINtroduction = true
                             }
                         }
                         .buttonStyle(TitleButton())
@@ -231,7 +238,7 @@ struct TooltipView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         }
-        ARSelfPortraitView(
+        ARVisionBoardView(
             screenNumber: .constant(5)
         )
     }

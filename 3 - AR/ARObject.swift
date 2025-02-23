@@ -123,6 +123,16 @@ struct ARObject: Equatable {
                 )
             )
             modelEntity.model?.materials = [material]
+            
+            let bounds = modelEntity.visualBounds(relativeTo: nil)
+            let centerOffset = bounds.center
+            
+            let transformMatrix = Transform(
+                translation: SIMD3(-centerOffset.x, -centerOffset.y, 0)
+            ).matrix
+            
+            modelEntity.setTransformMatrix(transformMatrix, relativeTo: nil)
+            
             entity = modelEntity
         case .image:
             if let url = properties.imageURL {

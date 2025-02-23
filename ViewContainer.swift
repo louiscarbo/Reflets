@@ -17,7 +17,7 @@ struct ViewContainer: View {
                     screenNumber: $currentView
                 );
             default:
-                ARSelfPortraitView(
+                ARVisionBoardView(
                     screenNumber: $currentView
                 );
             }
