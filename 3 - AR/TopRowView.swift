@@ -44,25 +44,18 @@ struct TopRowView: View {
         }
         .padding(.horizontal, 30)
         .padding(.vertical)
-        .background {
-            ZStack {
-                Capsule()
-                    .foregroundStyle(.thinMaterial.opacity(0.7))
-                    .shadow(radius: 10)
-                
-                Capsule()
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.2),
-                                Color.black.opacity(0.2)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing),
-                        lineWidth: 15)
-                    .blur(radius: 4)
-                    .clipShape(Capsule())
-            }
+        .glassEffect(.clear)
+    }
+}
+
+#Preview {
+    ZStack {
+        GeometryReader { geometry in
+            Image("previewImage")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
         }
+        ARVisionBoardView(board: VisionBoard())
     }
 }

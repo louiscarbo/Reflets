@@ -62,7 +62,7 @@ struct HomeView: View {
                     ContentUnavailableView(
                         "No Vision Boards",
                         systemImage: "wand.and.stars",
-                        description: Text("Create your first AR Vision Board to start manifesting.")
+                        description: Text("Create your first AR Vision Board by tapping the + button.")
                     )
                     Spacer()
                 } else {
@@ -104,8 +104,6 @@ struct HomeView: View {
         let newBoard = VisionBoard()
         newBoard.name = "New Board"
         modelContext.insert(newBoard)
-        // Navigation is handled by the user tapping, or we can programmatically push if we bind the path.
-        // For now, let's just insert it.
     }
     
     private func deleteBoard(at offsets: IndexSet) {

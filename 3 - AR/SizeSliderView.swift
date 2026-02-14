@@ -10,7 +10,7 @@ import SwiftUI
 struct SizeSliderView: View {
     @Binding var sliderValue: Float // From 0 to 1
     @State private var dragOffset: CGFloat = 0 // Offset for the handle
-    @State private var sliderHeight: CGFloat = 300 // Height of the slider
+    @State private var sliderHeight: CGFloat = 200 // Height of the slider
     @State private var hasReachedEdge: Bool = false // To block repetitive haptic feedback
     private let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     @State private var initialDragOffset: CGFloat = 0
@@ -24,8 +24,7 @@ struct SizeSliderView: View {
                         .frame(height: 130)
                     Capsule()
                         .frame(width: 15, height: sliderHeight)
-                        .foregroundStyle(.thinMaterial.opacity(0.7))
-                        .shadow(radius: 10)
+                        .glassEffect(.clear)
                     Spacer()
                         .frame(height: 130)
                 }
@@ -88,5 +87,17 @@ struct SizeSliderView: View {
             }
         }
         .frame(width: 50) // Width of the slider
+    }
+}
+
+#Preview {
+    ZStack {
+        GeometryReader { geometry in
+            Image("previewImage")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+        }
+        ARVisionBoardView(board: VisionBoard())
     }
 }
