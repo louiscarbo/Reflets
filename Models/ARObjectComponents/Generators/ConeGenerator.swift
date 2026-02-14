@@ -18,7 +18,6 @@ struct ConeGenerator: EntityGeneratorStrategy {
         )
         let modelEntity = ModelEntity(mesh: mesh)
         modelEntity.model?.materials = [object.material]
-        modelEntity.position = object.position
         return modelEntity
     }
 }

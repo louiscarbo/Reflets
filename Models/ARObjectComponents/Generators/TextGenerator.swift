@@ -34,7 +34,6 @@ struct TextGenerator: EntityGeneratorStrategy {
         ).matrix
         
         modelEntity.setTransformMatrix(transformMatrix, relativeTo: nil)
-        modelEntity.position = object.position
         
         return modelEntity
     }

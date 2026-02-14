@@ -13,7 +13,6 @@ struct CubeGenerator: EntityGeneratorStrategy {
         let mesh = MeshResource.generateBox(size: scale)
         let modelEntity = ModelEntity(mesh: mesh)
         modelEntity.model?.materials = [object.material]
-        modelEntity.position = object.position
         return modelEntity
     }
 }

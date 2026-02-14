@@ -158,8 +158,7 @@ struct ARControlsView: View {
                     // Add button
                     Button {
                         let newObject = ARObject(
-                            properties: arObjectProperties,
-                            position: [0, 0, -1]
+                            properties: arObjectProperties
                         )
                         arObjects.append(newObject)
                         
@@ -186,8 +185,7 @@ struct ARControlsView: View {
                                     addObjectsTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { _ in
                                         withAnimation {
                                             let newObject = ARObject(
-                                                properties: arObjectProperties,
-                                                position: [0, 0, -1]
+                                                properties: arObjectProperties
                                             )
                                             arObjects.append(newObject)
                                         }

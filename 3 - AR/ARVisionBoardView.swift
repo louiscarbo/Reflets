@@ -9,18 +9,20 @@ import SwiftUI
 import RealityKit
 import SwiftData
 
-struct UniqueIDComponent: Component {
-    var id: Int
+struct UUIDComponent: Component {
+    var uuid: UUID
 }
 
 struct ARVisionBoardView: View {
-    // App level state
-    @Bindable var board: VisionBoard
-    @State private var artworkIsDone: Bool = false
+    @State private var viewModel: ARVisionBoardViewModel
+    @State private var initialObjectIDs: Set<UUID> = []
+    @State private var initialCameraTransform: simd_float4x4?
     
-    // AR Objects
-    let positioningHelperAnchor = AnchorEntity(.camera) // Anchor at the camera position
-    @State private var arObjectProperties = ARObjectProperties()
+    init(board: VisionBoard) {
+        self.viewModel = .init(board: board)
+    }
+    
+    let positioningHelperAnchor = AnchorEntity(.camera)
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -31,21 +33,40 @@ struct ARVisionBoardView: View {
                 
                 updatePositioningHelper()
                 
-            // MARK: Update closure
-            } update: { content in
-                // Check if an object was added
-                if board.objects.count > content.entities.count - 1 {
-                    addNewEntity(in: content)
+                // Capture the initial camera transform for this session
+                initialCameraTransform = positioningHelperAnchor.transformMatrix(relativeTo: nil)
+                
+                // Load all pre-existing objects from storage
+                for object in viewModel.board.objects {
+                    addExistingEntity(for: object, in: content)
                 }
                 
-                // Check if an object was removed
-                else if board.objects.count < content.entities.count - 1 {
-                    removeLastEntity(in: content)
+                // Track which objects were initially loaded
+                initialObjectIDs = Set(viewModel.board.objects.map { $0.id })
+                
+            // MARK: Update closure
+            } update: { content in
+                let currentIDs = Set(viewModel.board.objects.map { $0.id })
+                let existingIDs = Set(
+                    content.entities.compactMap { $0.components[UUIDComponent.self]?.uuid }
+                )
+                
+                // Detect additions (only objects added AFTER initial load)
+                let addedIDs = currentIDs.subtracting(existingIDs).subtracting(initialObjectIDs)
+                for object in viewModel.board.objects where addedIDs.contains(object.id) {
+                    addNewEntity(for: object, in: content)
+                    initialObjectIDs.insert(object.id)
+                }
+                
+                // Detect removals
+                let removedIDs = existingIDs.subtracting(currentIDs)
+                for uuid in removedIDs {
+                    removeEntity(with: uuid, in: content)
                 }
             }
             .ignoresSafeArea()
-            .onChange(of: artworkIsDone) {
-                if artworkIsDone {
+            .onChange(of: viewModel.artworkIsDone) {
+                if viewModel.artworkIsDone {
                     positioningHelperAnchor.children.removeAll()
                 } else {
                     updatePositioningHelper()
@@ -53,20 +74,20 @@ struct ARVisionBoardView: View {
             }
             
             // MARK: Controls Interface
-            if !artworkIsDone {
+            if !viewModel.artworkIsDone {
                 ARControlsView(
-                    artworkIsDone: $artworkIsDone,
-                    arObjects: $board.objects,
-                    arObjectProperties: $arObjectProperties
+                    artworkIsDone: $viewModel.artworkIsDone,
+                    arObjects: $viewModel.board.objects,
+                    arObjectProperties: $viewModel.currentARObjectProperties
                 )
-                .onChange(of: arObjectProperties) {
+                .onChange(of: viewModel.currentARObjectProperties) {
                     updatePositioningHelper()
                 }
             }
             
             // MARK: Validation Interface
-            if artworkIsDone {
-                ARValidationView(board: board, artworkIsDone: $artworkIsDone)
+            if viewModel.artworkIsDone {
+                ARValidationView(board: viewModel.board, artworkIsDone: $viewModel.artworkIsDone)
             }
         }
     }
@@ -79,49 +100,89 @@ struct ARVisionBoardView: View {
         }
         
         // Create the new Positioning Helper entity
-        var positioningHelperProperties = arObjectProperties
-        positioningHelperProperties.opacity = 0.5 * arObjectProperties.opacity
-        
-        // Use the convenience init I added to ARObject class
-        let tempObject = ARObject(
-            properties: positioningHelperProperties,
-            position: [0, 0, -1]
-        )
-        let entity = tempObject.generateEntity()
+        var positioningHelperProperties = viewModel.currentARObjectProperties
+        positioningHelperProperties.opacity /= 2
+        let helperObject = ARObject(properties: positioningHelperProperties)
+        let entity = helperObject.generateEntity()
         entity.components[PositioningHelperComponent.self] = PositioningHelperComponent()
+        entity.position = [0, 0, -1]
         
-        // Add the new Positioning Helper entity to the dynamicCameraAnchor
         positioningHelperAnchor.addChild(entity)
     }
-      
-    func addNewEntity(in content: RealityViewCameraContent) {
-        // Create the new object entity
-        guard let newObject = board.objects.last else { return }
-        let entity = newObject.generateEntity()
-        entity.components[UniqueIDComponent.self] = UniqueIDComponent(id: board.objects.count)
+    
+    /// Adds a pre-existing object loaded from storage at its stored offset from the initial camera
+    func addExistingEntity(for object: ARObject, in content: RealityViewCameraContent) {
+        guard let initialTransform = initialCameraTransform else {
+            print("Warning: Initial camera transform not yet captured")
+            return
+        }
         
-        // We take the current camera transform. The object itself has an offset of -1 (z) 
-        // which places it correctly in front of the camera.
-        let finalTransform = positioningHelperAnchor.transformMatrix(relativeTo: nil)
+        let entity = object.generateEntity()
         
-        // Create a world anchor fixed at the camera position
-        let anchor = AnchorEntity(world: finalTransform)
+        // Apply the stored offset to the initial camera position
+        let storedOffset = object.positionOffset
+        
+        // Create a transform that applies the offset in the camera's coordinate space
+        // The offset is already in camera-relative coordinates
+        var offsetTransform = initialTransform
+        offsetTransform.columns.3.x += storedOffset.x
+        offsetTransform.columns.3.y += storedOffset.y
+        offsetTransform.columns.3.z += storedOffset.z
+        
+        let anchor = AnchorEntity(world: offsetTransform)
         anchor.addChild(entity)
-        anchor.components[UniqueIDComponent.self] = UniqueIDComponent(id: board.objects.count)
+        anchor.components[UUIDComponent.self] = UUIDComponent(uuid: object.id)
         
-        print("Added entity with ID: \(board.objects.count)")
+        content.add(anchor)
+    }
+      
+    /// Adds a newly created object at the current camera/cursor position
+    func addNewEntity(for object: ARObject, in content: RealityViewCameraContent) {
+        guard let initialTransform = initialCameraTransform else {
+            print("Warning: Initial camera transform not yet captured")
+            return
+        }
+        
+        // Create the entity at local origin
+        let entity = object.generateEntity()
+        
+        guard let helperEntity = positioningHelperAnchor.children.first(where: {
+            $0.components[PositioningHelperComponent.self] != nil 
+        }) else {
+            print("Warning: Positioning helper not found")
+            return
+        }
+        
+        let helperWorldTransform = helperEntity.transformMatrix(relativeTo: nil)
+        let anchor = AnchorEntity(world: helperWorldTransform)
+        anchor.addChild(entity)
+        anchor.components[UUIDComponent.self] = UUIDComponent(uuid: object.id)
+        
+        // Compute and save the offset from the INITIAL camera position
+        let initialPosition = SIMD3<Float>(
+            initialTransform.columns.3.x,
+            initialTransform.columns.3.y,
+            initialTransform.columns.3.z
+        )
+        
+        let finalPosition = SIMD3<Float>(
+            helperWorldTransform.columns.3.x,
+            helperWorldTransform.columns.3.y,
+            helperWorldTransform.columns.3.z
+        )
+        
+        let offset = finalPosition - initialPosition
+        object.positionOffset = offset
+        
         content.add(anchor)
     }
     
-    func removeLastEntity(in content: RealityViewCameraContent) {
-        print("Removing entity with ID: \(board.objects.count + 1)")
-        
-        content.entities.removeAll(where: { entity in
-            if let uniqueIDComponent = entity.components[UniqueIDComponent.self] {
-                return uniqueIDComponent.id == board.objects.count + 1
-            }
-            return false
-        })
+    func removeEntity(with uuid: UUID, in content: RealityViewCameraContent) {
+        if let anchor = content.entities.first(where: {
+            $0.components[UUIDComponent.self]?.uuid == uuid 
+        }) {
+            content.remove(anchor)
+        }
     }
 }
 

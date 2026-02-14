@@ -13,7 +13,6 @@ struct SphereGenerator: EntityGeneratorStrategy {
         let mesh = MeshResource.generateSphere(radius: scale)
         let modelEntity = ModelEntity(mesh: mesh)
         modelEntity.model?.materials = [object.material]
-        modelEntity.position = object.position
         return modelEntity
     }
 }
