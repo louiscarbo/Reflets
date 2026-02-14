@@ -33,9 +33,8 @@ func createTextureFromPNG(image: UIImage) -> (TextureResource?, Float)? {
     }
 }
 
-func create2DEntityFromImage(url: URL, size: Float, opacity: Double = 1.0) -> Entity {
-    guard let uiImage = loadPNGFromURL(url: url),
-          let (texture, aspectRatio) = createTextureFromPNG(image: uiImage) else {
+func create2DEntityFromImage(image: UIImage, size: Float, opacity: Double = 1.0) -> Entity {
+    guard let (texture, aspectRatio) = createTextureFromPNG(image: image) else {
         return Entity()
     }
 
@@ -47,15 +46,19 @@ func create2DEntityFromImage(url: URL, size: Float, opacity: Double = 1.0) -> En
     material.color = .init(tint: UIColor.white.withAlphaComponent(CGFloat(opacity)), texture: .init(texture!))
     material.opacityThreshold = 0.01
     material.faceCulling = .none
-
-    let modelComponent = ModelComponent(mesh: planeMesh, materials: [material])
-    let entity = ModelEntity()
-    entity.components.set(modelComponent)
-    // The original code had a fixed position here, which might be undesirable in a generic utility but keeping for consistency
-    entity.position = [0, 0, -1] 
-
-    return entity
+    
+    let modelEntity = ModelEntity(mesh: planeMesh, materials: [material])
+    return modelEntity
 }
+
+func create2DEntityFromImage(url: URL, size: Float, opacity: Double = 1.0) -> Entity {
+    guard let uiImage = loadPNGFromURL(url: url) else {
+        return Entity()
+    }
+    return create2DEntityFromImage(image: uiImage, size: size, opacity: opacity)
+}
+
+
 
 func getDocumentsDirectory() -> URL? {
     FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first

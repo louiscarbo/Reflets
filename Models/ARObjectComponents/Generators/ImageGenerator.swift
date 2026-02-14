@@ -14,10 +14,10 @@ struct ImageGenerator: EntityGeneratorStrategy {
         let scale = object.size * resizingFactor
         
         let entity: Entity
-        if let id = object.imageID, 
-           let url = getDocumentsDirectory()?.appendingPathComponent(id).appendingPathExtension("png") {
+        if let customObject = object.customObject,
+           let uiImage = customObject.uiImage {
             entity = create2DEntityFromImage(
-                url: url,
+                image: uiImage,
                 size: scale * 3.5,
                 opacity: object.opacity
             )

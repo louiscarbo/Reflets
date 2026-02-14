@@ -30,8 +30,8 @@ final class ARObject {
     var size: Float
     var resizingFactor: Float
     
-    // UUID string for the image file saved in the document directory
-    var imageID: String?
+    // Relationship
+    var customObject: CustomObject?
     
     // Position flattened from SIMD3<Float>
     var x: Float
@@ -49,7 +49,7 @@ final class ARObject {
          opacity: Double = 1.0,
          size: Float = 1.0,
          resizingFactor: Float = 0.5,
-         imageID: String? = nil,
+         customObject: CustomObject? = nil,
          position: SIMD3<Float> = .zero) {
         
         self.id = UUID()
@@ -71,7 +71,7 @@ final class ARObject {
         self.opacity = opacity
         self.size = size
         self.resizingFactor = resizingFactor
-        self.imageID = imageID
+        self.customObject = customObject
         
         self.x = position.x
         self.y = position.y
@@ -88,7 +88,7 @@ final class ARObject {
             opacity: properties.opacity,
             size: properties.size,
             resizingFactor: properties.resizingFactor,
-            imageID: nil, // TODO: Handle image persistence from properties.imageURL if needed
+            customObject: properties.customObject,
             position: position
         )
     }

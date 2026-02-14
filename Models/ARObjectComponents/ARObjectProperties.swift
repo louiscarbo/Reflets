@@ -17,5 +17,5 @@ struct ARObjectProperties: Equatable {
     var opacity: Double = 1.0
     var size: Float = 1.0
     var resizingFactor: Float = 0.5
-    var imageURL: URL? = nil
+    var customObject: CustomObject?
 }
