@@ -99,7 +99,6 @@ struct ObjectsCatalogSheetView: View {
         .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(40.0)
     }
 }
 

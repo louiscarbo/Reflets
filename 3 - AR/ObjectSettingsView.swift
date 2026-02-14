@@ -82,7 +82,6 @@ struct ObjectSettingsView: View {
         .presentationBackground(.thinMaterial)
         .presentationDetents([.fraction(0.4), .large])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(40.0)
     }
 }
 

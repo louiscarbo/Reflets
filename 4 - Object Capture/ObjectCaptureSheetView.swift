@@ -99,7 +99,6 @@ struct ObjectCaptureSheetView: View {
         .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(40.0)
         .sheet(isPresented: $showCameraView) {
             CameraView(selectedImage: $selectedImage)
                 .background {

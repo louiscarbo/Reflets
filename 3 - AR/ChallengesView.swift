@@ -91,7 +91,6 @@ struct ChallengesView: View {
         .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(40.0)
     }
     
     private func cycleChallenges() {
