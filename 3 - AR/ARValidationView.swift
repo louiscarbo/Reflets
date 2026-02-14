@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ARValidationView: View {
+    @Bindable var board: VisionBoard
     @Binding var artworkIsDone: Bool
-    @State var artworkTitle = ""
     @State var darkenBackground = true
     
     @State private var validationStep = 0
@@ -30,13 +31,13 @@ struct ARValidationView: View {
             case 1:
                 Step2(
                     validationStep: $validationStep,
-                    artworkTitle: $artworkTitle
+                    artworkTitle: $board.name
                 )
             case 2:
                 Step3(
                     validationStep: $validationStep,
                     darkenBackground: $darkenBackground,
-                    artworkTitle: artworkTitle
+                    artworkTitle: board.name
                 )
             default:
                 Step4(darkenBackground: $darkenBackground)
@@ -46,7 +47,10 @@ struct ARValidationView: View {
 }
 
 #Preview {
-    ARValidationView(
+    let board = VisionBoard()
+    board.name = "My Dream"
+    return ARValidationView(
+        board: board,
         artworkIsDone: .constant(true)
     )
 }
