@@ -96,7 +96,6 @@ struct ObjectsCatalogSheetView: View {
             .padding(25)
         }
         .ignoresSafeArea()
-        .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
     }

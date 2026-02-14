@@ -88,7 +88,6 @@ struct ChallengesView: View {
             }
             .padding([.top, .horizontal], 25)
         }
-        .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
     }

@@ -96,7 +96,6 @@ struct ObjectCaptureSheetView: View {
             }
         }
         .padding(25)
-        .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showCameraView) {
