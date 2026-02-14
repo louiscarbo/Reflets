@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ObjectsCatalogSheetView: View {
     
@@ -14,14 +15,14 @@ struct ObjectsCatalogSheetView: View {
     let hapticFeedback = UINotificationFeedbackGenerator()
     
     @Binding var selectedType: ARObjectType
-    @Binding var imageURL: URL?
+    @Binding var selectedCustomObject: CustomObject?
     
     @State private var availableTypes: [ARObjectType] = [.sphere, .cube, .cone, .cylinder, .text]
     
     @State private var showObjectCaptureSheet: Bool = false
     
     @State private var shouldUpdateCustomObjects = false
-    @State private var customObjects: [CustomObjectPreview] = []
+    @Query(sort: \CustomObject.createdAt, order: .reverse) private var customObjects: [CustomObject]
     
     var body: some View {
         let simpleShapesColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
@@ -62,20 +63,22 @@ struct ObjectsCatalogSheetView: View {
                         .font(.title2)
                     
                     LazyVGrid(columns: customObjectsColumns) {
-                        ForEach(customObjects, id: \.self) { object in
-                            Button {
-                                dismiss()
-                                hapticFeedback.notificationOccurred(.success)
-                                selectedType = .image
-                                imageURL = object.url
-                            } label: {
-                                Image(uiImage: object.preview)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 50, height: 50)
+                        ForEach(customObjects) { object in
+                            if let uiImage = object.uiImage {
+                                Button {
+                                    dismiss()
+                                    hapticFeedback.notificationOccurred(.success)
+                                    selectedType = .image
+                                    selectedCustomObject = object
+                                } label: {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 50, height: 50)
+                                }
+                                .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
+                                .padding(.bottom, 10)
                             }
-                            .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
-                            .padding(.bottom, 10)
                         }
                         Button {
                             showObjectCaptureSheet = true
@@ -88,32 +91,13 @@ struct ObjectsCatalogSheetView: View {
                             ObjectCaptureSheetView(shouldUpdateCustomObjects: $shouldUpdateCustomObjects)
                         }
                     } // LazyVGrid
-                    .onChange(of: shouldUpdateCustomObjects) {
-                        Task {
-                            await updateCustomObject()
-                        }
-                    }
-                    .onAppear {
-                        Task {
-                            await updateCustomObject()
-                        }
-                    }
                 }
             }
             .padding(25)
         }
         .ignoresSafeArea()
-        .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(40.0)
-    }
-    
-    func updateCustomObject() async {
-        customObjects = await fetchSegmentedImagesFromTemporaryDirectory()
-        DispatchQueue.main.async {
-            shouldUpdateCustomObjects = false
-        }
     }
 }
 
@@ -132,7 +116,7 @@ struct ObjectsCatalogSheetView: View {
             arObjectProperties: .constant(ARObjectProperties())
         )
         .sheet(isPresented: $isPresented) {
-            ObjectsCatalogSheetView(selectedType: .constant(.cube), imageURL: .constant(nil))
+            ObjectsCatalogSheetView(selectedType: .constant(.cube), selectedCustomObject: .constant(nil))
         }
     }
 }

@@ -88,10 +88,8 @@ struct ChallengesView: View {
             }
             .padding([.top, .horizontal], 25)
         }
-        .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(40.0)
     }
     
     private func cycleChallenges() {

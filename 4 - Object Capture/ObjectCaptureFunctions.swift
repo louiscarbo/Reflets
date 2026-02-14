@@ -65,81 +65,6 @@ func getSegmentedImage(from image: UIImage?) async -> UIImage? {
     return UIImage(cgImage: cgImage)
 }
 
-func saveImageToTemporaryDirectory(image: UIImage) -> URL? {
-    guard let data = image.pngData() else { return nil }
-    let temporaryDirectory = FileManager.default.temporaryDirectory
-    let fileURL = temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension("png")
-    
-    do {
-        try data.write(to: fileURL)
-        return fileURL
-    } catch {
-        print("Error saving image to temporary directory: \(error.localizedDescription)")
-        return nil
-    }
-}
-
-func fetchSegmentedImagesFromTemporaryDirectory() async -> [CustomObjectPreview] {
-    let temporaryDirectory = FileManager.default.temporaryDirectory
-    do {
-        let fileURLs = try FileManager.default.contentsOfDirectory(at: temporaryDirectory, includingPropertiesForKeys: nil)
-        
-        // Filter and process PNG files concurrently
-        let previews = await withTaskGroup(of: CustomObjectPreview?.self) { group in
-            for url in fileURLs.filter({ $0.pathExtension == "png" }) {
-                group.addTask {
-                    if let image = UIImage(contentsOfFile: url.path),
-                       let resizedImage = resizeImage(image, to: CGSize(width: 50, height: 50)) {
-                        return CustomObjectPreview(preview: resizedImage, url: url)
-                    } else {
-                        return nil
-                    }
-                }
-            }
-            
-            var results = [CustomObjectPreview]()
-            for await preview in group {
-                if let preview = preview {
-                    results.append(preview)
-                }
-            }
-            return results
-        }
-        
-        return previews
-    } catch {
-        print("Error fetching images: \(error.localizedDescription)")
-        return []
-    }
-}
-
-func resizeImage(_ image: UIImage, to size: CGSize) -> UIImage? {
-    let renderer = UIGraphicsImageRenderer(size: size)
-    return renderer.image { _ in
-        image.draw(in: CGRect(origin: .zero, size: size))
-    }
-}
-
-func deleteAllSegmentedPNGs() {
-    let temporaryDirectory = FileManager.default.temporaryDirectory
-    
-    do {
-        // Get all files in the temporary directory
-        let fileURLs = try FileManager.default.contentsOfDirectory(at: temporaryDirectory, includingPropertiesForKeys: nil)
-        
-        // Filter for PNG files
-        let pngFiles = fileURLs.filter { $0.pathExtension == "png" }
-        
-        // Delete each PNG file
-        for fileURL in pngFiles {
-            try FileManager.default.removeItem(at: fileURL)
-        }
-        
-        print("All segmented PNGs have been deleted.")
-    } catch {
-        print("Error deleting PNGs: \(error.localizedDescription)")
-    }
-}
 
 func rotateImage90Degrees(image: UIImage) -> UIImage {
     // Define the new size: width becomes height, height becomes width
@@ -171,18 +96,5 @@ func rotateImage90Degrees(image: UIImage) -> UIImage {
     } else {
         print("Failed to get rotated image from context")
         return image
-    }
-}
-
-func logTemporaryDirectoryContents() {
-    let tempDirectory = FileManager.default.temporaryDirectory
-    do {
-        let contents = try FileManager.default.contentsOfDirectory(at: tempDirectory, includingPropertiesForKeys: nil)
-        print("Contents of Temporary Directory:")
-        for file in contents {
-            print("File: \(file.lastPathComponent)")
-        }
-    } catch {
-        print("Error reading temporary directory: \(error.localizedDescription)")
     }
 }

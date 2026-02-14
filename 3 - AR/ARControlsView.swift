@@ -331,7 +331,7 @@ struct ARControlsView: View {
         .sheet(isPresented: $showObjectsCatalog) {
             ObjectsCatalogSheetView(
                 selectedType: $arObjectProperties.type,
-                imageURL: $arObjectProperties.imageURL
+                selectedCustomObject: $arObjectProperties.customObject
             )
         }
         .sheet(isPresented: $showInspirationSheet) {

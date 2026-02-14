@@ -8,9 +8,11 @@
 import SwiftUI
 import PhotosUI
 import Vision
+import SwiftData
 
 struct ObjectCaptureSheetView: View {
     @Binding var shouldUpdateCustomObjects: Bool
+    @Environment(\.modelContext) var modelContext
     
     @State private var selectedImage: UIImage?
     @State private var selectedImageRotationAngle: CGFloat = 0
@@ -94,10 +96,8 @@ struct ObjectCaptureSheetView: View {
             }
         }
         .padding(25)
-        .presentationBackground(.thinMaterial)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(40.0)
         .sheet(isPresented: $showCameraView) {
             CameraView(selectedImage: $selectedImage)
                 .background {
@@ -142,7 +142,7 @@ struct ObjectCaptureSheetView: View {
             arObjectProperties: .constant(ARObjectProperties())
         )
         .sheet(isPresented: .constant(true)) {
-            ObjectsCatalogSheetView(selectedType: .constant(.cube), imageURL: .constant(nil))
+            ObjectsCatalogSheetView(selectedType: .constant(.cube), selectedCustomObject: .constant(nil))
         }
     }
 }
@@ -198,6 +198,7 @@ struct ImageApprovalView: View {
     @State private var hasTimedOut = false
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.modelContext) var modelContext
     
     var body: some View {
         VStack {
@@ -243,9 +244,9 @@ struct ImageApprovalView: View {
     }
     
     private func addToCustomObjects(image: UIImage) {
-        if saveImageToTemporaryDirectory(image: image) != nil {
-            dismiss()
-            shouldUpdateCustomObjects = true
-        }
+        let newObject = CustomObject(image: image)
+        modelContext.insert(newObject)
+        dismiss()
+        shouldUpdateCustomObjects = true
     }
 }

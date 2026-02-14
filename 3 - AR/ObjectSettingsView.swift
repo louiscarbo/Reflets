@@ -79,10 +79,8 @@ struct ObjectSettingsView: View {
             Spacer()
         }
         .padding(25)
-        .presentationBackground(.thinMaterial)
         .presentationDetents([.fraction(0.4), .large])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(40.0)
     }
 }
 
