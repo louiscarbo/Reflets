@@ -30,10 +30,7 @@ enum ARObjectType: String, Codable, CaseIterable {
     }
     
     var hasCustomRatio: Bool {
-        switch self {
-        case .cone, .cylinder: return true
-        default: return false
-        }
+        self == .cone || self == .cylinder
     }
     
     var SFSymbolName: String {

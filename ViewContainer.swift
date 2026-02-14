@@ -8,7 +8,7 @@ struct ViewContainer: View {
     
     var body: some View {
         if !hasSeenIntroduction {
-             IntroductionViewShim(hasSeenIntroduction: $hasSeenIntroduction)
+            IntroductionViewShim(hasSeenIntroduction: $hasSeenIntroduction)
         } else {
             NavigationStack(path: $navigationPath) {
                 HomeView()
