@@ -11,12 +11,16 @@ import SwiftData
 
 struct ARVisionBoardView: View {
     @Bindable var board: VisionBoard
-    @State private var artworkIsDone = false
-    @State private var currentARObjectProperties = ARObjectProperties()
     
+    @State private var editingSession: AREditingSession
     @State private var sceneManager = ARSceneManager()
     
     let cameraAnchor = AnchorEntity(.camera)
+    
+    init(board: VisionBoard) {
+        self.board = board
+        self._editingSession = State(initialValue: AREditingSession(board: board))
+    }
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -26,7 +30,7 @@ struct ARVisionBoardView: View {
                 content.add(cameraAnchor)
                 
                 sceneManager.updatePositioningHelper(
-                    with: currentARObjectProperties,
+                    with: editingSession.currentObjectProperties,
                     in: cameraAnchor
                 )
                 
@@ -42,37 +46,34 @@ struct ARVisionBoardView: View {
                 )
             }
             .ignoresSafeArea()
-            .onChange(of: artworkIsDone) {
-                if artworkIsDone {
+            .onChange(of: editingSession.artworkIsDone) {
+                if editingSession.artworkIsDone {
                     cameraAnchor.children.removeAll()
                 } else {
                     sceneManager.updatePositioningHelper(
-                        with: currentARObjectProperties,
+                        with: editingSession.currentObjectProperties,
                         in: cameraAnchor
                     )
                 }
             }
             
             // MARK: Controls Interface
-            if !artworkIsDone {
-                ARControlsView(
-                    artworkIsDone: $artworkIsDone,
-                    arObjects: $board.objects,
-                    arObjectProperties: $currentARObjectProperties
-                )
-                .onChange(of: currentARObjectProperties) {
-                    sceneManager.updatePositioningHelper(
-                        with: currentARObjectProperties,
-                        in: cameraAnchor
-                    )
-                }
+            if !editingSession.artworkIsDone {
+                ARControlsView(session: editingSession)
+                    .onChange(of: editingSession.currentObjectProperties) {
+                        sceneManager.updatePositioningHelper(
+                            with: editingSession.currentObjectProperties,
+                            in: cameraAnchor
+                        )
+                    }
             }
             
             // MARK: Validation Interface
-            if artworkIsDone {
-                ARValidationView(board: board, artworkIsDone: $artworkIsDone)
+            if editingSession.artworkIsDone {
+                ARValidationView(board: board, artworkIsDone: $editingSession.artworkIsDone)
             }
         }
+        .environment(\.editingSession, editingSession)
     }
     
 }

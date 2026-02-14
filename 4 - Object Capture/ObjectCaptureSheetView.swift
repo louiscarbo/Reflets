@@ -136,14 +136,10 @@ struct ObjectCaptureSheetView: View {
             .resizable()
             .scaledToFill()
             .ignoresSafeArea()
-        ARControlsView(
-            artworkIsDone: .constant(false),
-            arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties())
-        )
-        .sheet(isPresented: .constant(true)) {
-            ObjectsCatalogSheetView(selectedType: .constant(.cube), selectedCustomObject: .constant(nil))
-        }
+        ARControlsView(session: .init(board: .init()))
+            .sheet(isPresented: .constant(true)) {
+                ObjectsCatalogSheetView(selectedType: .constant(.cube), selectedCustomObject: .constant(nil))
+            }
     }
 }
 

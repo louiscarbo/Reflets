@@ -93,24 +93,20 @@ struct ObjectSettingsView: View {
             .resizable()
             .scaledToFill()
             .ignoresSafeArea()
-        ARControlsView(
-            artworkIsDone: .constant(false),
-            arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties())
-        )
-        .sheet(isPresented: $isPresented) {
-            NavigationStack {
-                ObjectSettingsView(
-                    needsColor: true,
-                    selectedColor: .constant(.red),
-                    isMetallic: .constant(true),
-                    selectedOpacity: .constant(0.9),
-                    needsText: true,
-                    textInput: $textInput,
-                    needsProportionSlider: true,
-                    selectedProportion: .constant(1.0)
-                )
+        ARControlsView(session: .init(board: .init()))
+            .sheet(isPresented: $isPresented) {
+                NavigationStack {
+                    ObjectSettingsView(
+                        needsColor: true,
+                        selectedColor: .constant(.red),
+                        isMetallic: .constant(true),
+                        selectedOpacity: .constant(0.9),
+                        needsText: true,
+                        textInput: $textInput,
+                        needsProportionSlider: true,
+                        selectedProportion: .constant(1.0)
+                    )
+                }
             }
-        }
     }
 }
