@@ -238,8 +238,6 @@ struct TooltipView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         }
-        ARVisionBoardView(
-            screenNumber: .constant(5)
-        )
+        ARVisionBoardView(board: VisionBoard())
     }
 }

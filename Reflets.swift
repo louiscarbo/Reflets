@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct Reflets: App {
@@ -7,5 +8,6 @@ struct Reflets: App {
         WindowGroup {
             ViewContainer()
         }
+        .modelContainer(for: VisionBoard.self)
     }
 }
