@@ -100,9 +100,12 @@ struct ARVisionBoardView: View {
         let entity = newObject.generateEntity()
         entity.components[UniqueIDComponent.self] = UniqueIDComponent(id: board.objects.count)
         
-        // Create the anchor entity
-        let anchor = AnchorEntity(.camera)
-        anchor.anchoring.trackingMode = .once
+        // We take the current camera transform. The object itself has an offset of -1 (z) 
+        // which places it correctly in front of the camera.
+        let finalTransform = positioningHelperAnchor.transformMatrix(relativeTo: nil)
+        
+        // Create a world anchor fixed at the camera position
+        let anchor = AnchorEntity(world: finalTransform)
         anchor.addChild(entity)
         anchor.components[UniqueIDComponent.self] = UniqueIDComponent(id: board.objects.count)
         
