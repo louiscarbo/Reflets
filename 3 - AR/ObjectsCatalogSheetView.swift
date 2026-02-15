@@ -21,7 +21,6 @@ struct ObjectsCatalogSheetView: View {
     
     @State private var showObjectCaptureSheet: Bool = false
     
-    @State private var shouldUpdateCustomObjects = false
     @Query(sort: \CustomObject.createdAt, order: .reverse) private var customObjects: [CustomObject]
     
     var body: some View {
@@ -64,21 +63,15 @@ struct ObjectsCatalogSheetView: View {
                     
                     LazyVGrid(columns: customObjectsColumns) {
                         ForEach(customObjects) { object in
-                            if let uiImage = object.uiImage {
-                                Button {
+                            AsyncThumbnailButton(
+                                object: object,
+                                onSelect: {
                                     dismiss()
                                     hapticFeedback.notificationOccurred(.success)
                                     selectedType = .image
                                     selectedCustomObject = object
-                                } label: {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 50, height: 50)
                                 }
-                                .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
-                                .padding(.bottom, 10)
-                            }
+                            )
                         }
                         Button {
                             showObjectCaptureSheet = true
@@ -88,7 +81,7 @@ struct ObjectsCatalogSheetView: View {
                         }
                         .buttonStyle(SFSymbolButtonStyle(symbolSize: 43))
                         .sheet(isPresented: $showObjectCaptureSheet) {
-                            ObjectCaptureSheetView(shouldUpdateCustomObjects: $shouldUpdateCustomObjects)
+                            ObjectCaptureSheetView()
                         }
                     } // LazyVGrid
                 }
@@ -114,6 +107,62 @@ struct ObjectsCatalogSheetView: View {
             .sheet(isPresented: $isPresented) {
                 ObjectsCatalogSheetView(selectedType: .constant(.cube), selectedCustomObject: .constant(nil))
             }
+    }
+}
+
+// MARK: - Async Thumbnail Loader
+
+private struct AsyncThumbnailButton: View {
+    let object: CustomObject
+    let onSelect: () -> Void
+    
+    @State private var loadedImage: UIImage?
+    @State private var isLoading = true
+    
+    var body: some View {
+        Button(action: onSelect) {
+            Group {
+                if let loadedImage {
+                    Image(uiImage: loadedImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                } else if isLoading {
+                    ProgressView()
+                        .frame(width: 50, height: 50)
+                } else {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
+        .padding(.bottom, 10)
+        .task(id: object.id) {
+            await loadThumbnail()
+        }
+    }
+    
+    private func loadThumbnail() async {
+        guard let imageData = object.imageData else {
+            isLoading = false
+            return
+        }
+        
+        // Decode off the main thread
+        let image = await Task.detached(priority: .userInitiated) {
+            UIImage(data: imageData)
+        }.value
+        
+        await MainActor.run {
+            withAnimation {
+                loadedImage = image
+                isLoading = false
+            }
+        }
     }
 }
 

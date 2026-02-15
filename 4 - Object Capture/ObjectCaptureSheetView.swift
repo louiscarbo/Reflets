@@ -11,7 +11,6 @@ import Vision
 import SwiftData
 
 struct ObjectCaptureSheetView: View {
-    @Binding var shouldUpdateCustomObjects: Bool
     @Environment(\.modelContext) var modelContext
     
     @State private var selectedImage: UIImage?
@@ -64,8 +63,7 @@ struct ObjectCaptureSheetView: View {
                             rotatedImage: selectedImage,
                             imageHasNotBeenSegmented: true,
                             selectedImage: $selectedImage,
-                            segmentedImage: $segmentedImage,
-                            shouldUpdateCustomObjects: $shouldUpdateCustomObjects
+                            segmentedImage: $segmentedImage
                         )
                     } else {
                         Text("An error occured. Please try again.")
@@ -81,8 +79,7 @@ struct ObjectCaptureSheetView: View {
                             image: segmentedImage,
                             rotatedImage: segmentedImage,
                             selectedImage: $selectedImage,
-                            segmentedImage: $segmentedImage,
-                            shouldUpdateCustomObjects: $shouldUpdateCustomObjects
+                            segmentedImage: $segmentedImage
                         )
                     } else {
                         Text("An error occured. Please try again.")
@@ -188,7 +185,6 @@ struct ImageApprovalView: View {
     
     @Binding var selectedImage: UIImage?
     @Binding var segmentedImage: UIImage?
-    @Binding var shouldUpdateCustomObjects: Bool
     
     @State private var imageRotationAngle: CGFloat = 0
     @State private var hasTimedOut = false
@@ -243,6 +239,5 @@ struct ImageApprovalView: View {
         let newObject = CustomObject(image: image)
         modelContext.insert(newObject)
         dismiss()
-        shouldUpdateCustomObjects = true
     }
 }
