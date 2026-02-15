@@ -19,6 +19,7 @@ struct ImageGenerator: EntityGeneratorStrategy {
            let uiImage = customObject.uiImage {
             entity = create2DEntityFromImage(
                 image: uiImage,
+                imageID: customObject.id,
                 size: scale * 3.5,
                 opacity: object.opacity
             )
@@ -31,12 +32,24 @@ struct ImageGenerator: EntityGeneratorStrategy {
 }
 
 private extension ImageGenerator {
-    func createTextureFromPNG(image: UIImage) -> (TextureResource?, Float)? {
+    struct CachedTexture {
+        let texture: TextureResource
+        let aspectRatio: Float
+    }
+
+    static var textureCache: [UUID: CachedTexture] = [:]
+
+    func createTextureFromPNG(image: UIImage, imageID: UUID) -> (TextureResource?, Float)? {
+        if let cached = Self.textureCache[imageID] {
+            return (cached.texture, cached.aspectRatio)
+        }
+
         let aspectRatio = Float(image.size.width / image.size.height)
         guard let cgImage = image.cgImage else { return nil }
         
         do {
             let texture = try TextureResource(image: cgImage, options: .init(semantic: .normal))
+            Self.textureCache[imageID] = CachedTexture(texture: texture, aspectRatio: aspectRatio)
             return (texture, aspectRatio)
         } catch {
             print("Error creating texture from image: \(error)")
@@ -44,8 +57,8 @@ private extension ImageGenerator {
         }
     }
     
-    func create2DEntityFromImage(image: UIImage, size: Float, opacity: Double = 1.0) -> Entity {
-        guard let (texture, aspectRatio) = createTextureFromPNG(image: image) else {
+    func create2DEntityFromImage(image: UIImage, imageID: UUID, size: Float, opacity: Double = 1.0) -> Entity {
+        guard let (texture, aspectRatio) = createTextureFromPNG(image: image, imageID: imageID) else {
             return Entity()
         }
         
