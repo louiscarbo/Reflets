@@ -16,6 +16,6 @@ struct ARObjectProperties: Equatable {
     var ratio: Float = 2.0
     var opacity: Double = 1.0
     var size: Float = 1.0
-    var resizingFactor: Float = 0.5
+    var resizingFactor: Float = 0.3
     var customObject: CustomObject?
 }

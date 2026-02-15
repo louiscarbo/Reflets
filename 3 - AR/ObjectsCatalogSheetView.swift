@@ -110,14 +110,10 @@ struct ObjectsCatalogSheetView: View {
             .resizable()
             .scaledToFill()
             .ignoresSafeArea()
-        ARControlsView(
-            artworkIsDone: .constant(false),
-            arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties())
-        )
-        .sheet(isPresented: $isPresented) {
-            ObjectsCatalogSheetView(selectedType: .constant(.cube), selectedCustomObject: .constant(nil))
-        }
+        ARControlsView(session: .init(board: .init()))
+            .sheet(isPresented: $isPresented) {
+                ObjectsCatalogSheetView(selectedType: .constant(.cube), selectedCustomObject: .constant(nil))
+            }
     }
 }
 

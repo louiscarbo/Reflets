@@ -25,7 +25,6 @@ struct ImageGenerator: EntityGeneratorStrategy {
             entity = Entity()
         }
         
-        entity.position = object.position
         return entity
     }
 }

@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct ChallengesView: View {
-    @Binding var completedChallenges: [Challenge]
+    var completedChallenges: [Challenge]
     @Binding var selectedChallenge: Challenge?
-    @Binding var challenges: [Challenge]
-    private var displayedChallenges: [Challenge] {
-        Array(challenges.prefix(3))
-    }
+    let availableChallenges: [Challenge]
+    
+    @State private var displayedChallenges: [Challenge] = []
     
     let hapticFeedback = UINotificationFeedbackGenerator()
         
@@ -36,7 +35,7 @@ struct ChallengesView: View {
                 Divider()
                     .padding(5)
                 ZStack {
-                    Gauge(value: Double(completedChallenges.count), in: 0...Double(challenges.count)) { }
+                    Gauge(value: Double(completedChallenges.count), in: 0...Double(availableChallenges.count)) { }
                     .tint(Gradient(colors: [.yellow, .pink, .purple]))
                     
                     Capsule()
@@ -51,7 +50,7 @@ struct ChallengesView: View {
                 Divider()
                     .padding(5)
                 
-                ForEach(displayedChallenges) { challenge in
+                ForEach(Array(displayedChallenges.prefix(3))) { challenge in
                     if challenge != selectedChallenge {
                         Button {
                             hapticFeedback.notificationOccurred(.success)
@@ -90,21 +89,26 @@ struct ChallengesView: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .onAppear {
+            if displayedChallenges.isEmpty {
+                displayedChallenges = availableChallenges
+            }
+        }
     }
     
     private func cycleChallenges() {
-        let totalChallenges = challenges.count
+        let totalChallenges = displayedChallenges.count
         guard totalChallenges >= 6 else { return } // Ensure we have enough challenges
 
         // Copy the array to store the new first three challenges
-        let newChallenges = challenges
+        let newChallenges = displayedChallenges
 
         for i in 0..<3 {
             let newIndex = (i + 3) % totalChallenges // Ensure looping
             
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.2) { // Stagger animation
                 withAnimation(.easeInOut(duration: 0.6)) {
-                    challenges[i] = newChallenges[newIndex] // Visually update the displayed challenges
+                    displayedChallenges[i] = newChallenges[newIndex] // Visually update the displayed challenges
                 }
             }
         }
@@ -113,9 +117,9 @@ struct ChallengesView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             withAnimation {
                 // Move the first three challenges to the end, so the order is now correct
-                let movedChallenges = challenges.prefix(3) // Get first three challenges
-                challenges.removeFirst(3) // Remove them from the start
-                challenges.append(contentsOf: movedChallenges) // Move them to the back
+                let movedChallenges = displayedChallenges.prefix(3) // Get first three challenges
+                displayedChallenges.removeFirst(3) // Remove them from the start
+                displayedChallenges.append(contentsOf: movedChallenges) // Move them to the back
             }
         }
     }
@@ -130,10 +134,7 @@ struct ChallengesView: View {
             .scaledToFill()
             .ignoresSafeArea()
         ARControlsView(
-            showInspirationSheet: true,
-            artworkIsDone: .constant(false),
-            arObjects: .constant([]),
-            arObjectProperties: .constant(ARObjectProperties())
+            session: .init(board: .init())
         )
     }
 }

@@ -33,7 +33,8 @@ final class ARObject {
     // Relationship
     var customObject: CustomObject?
     
-    // Position flattened from SIMD3<Float>
+    // Position offset relative to initial camera position (not absolute world coordinates)
+    // These represent where the object should be placed relative to the camera when the scene was created
     var x: Float
     var y: Float
     var z: Float
@@ -78,7 +79,7 @@ final class ARObject {
         self.z = position.z
     }
     
-    convenience init(properties: ARObjectProperties, position: SIMD3<Float>) {
+    convenience init(properties: ARObjectProperties) {
         self.init(
             type: properties.type,
             color: properties.color,
@@ -89,7 +90,7 @@ final class ARObject {
             size: properties.size,
             resizingFactor: properties.resizingFactor,
             customObject: properties.customObject,
-            position: position
+            position: .zero
         )
     }
 }
@@ -108,7 +109,7 @@ extension ARObject {
         }
     }
     
-    var position: SIMD3<Float> {
+    var positionOffset: SIMD3<Float> {
         get { SIMD3(x, y, z) }
         set { x = newValue.x; y = newValue.y; z = newValue.z }
     }
