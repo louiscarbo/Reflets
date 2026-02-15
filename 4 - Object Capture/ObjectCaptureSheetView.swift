@@ -222,6 +222,7 @@ private struct ImageApprovalView: View {
     
     @State private var rotationAngle: Double = 0
     @State private var isProcessing = false
+    @State private var hintRotation: Double = 0
     
     var body: some View {
         VStack {
@@ -231,16 +232,39 @@ private struct ImageApprovalView: View {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFit()
-                        .rotationEffect(.degrees(rotationAngle))
+                        .rotationEffect(.degrees(rotationAngle + hintRotation))
                 }
                 .onTapGesture {
                     withAnimation(.bouncy) {
                         rotationAngle += 90
                     }
                 }
+                .task {
+                    try? await Task.sleep(for: .seconds(2))
+                    while !Task.isCancelled {
+                        withAnimation(.bouncy(duration: 0.2)) {
+                            hintRotation = 5
+                        }
+                        try? await Task.sleep(for: .milliseconds(200))
+                        withAnimation(.bouncy(duration: 0.2)) {
+                            hintRotation = 0
+                        }
+                        try? await Task.sleep(for: .milliseconds(200))
+                        withAnimation(.bouncy(duration: 0.2)) {
+                            hintRotation = 5
+                        }
+                        try? await Task.sleep(for: .milliseconds(200))
+                        withAnimation(.bouncy(duration: 0.2)) {
+                            hintRotation = 0
+                        }
+                        try? await Task.sleep(for: .seconds(5))
+                    }
+                }
                 .aspectRatio(contentMode: .fit)
             
             Text("Tap the image to rotate it.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             
             if !backgroundRemoved {
                 Text("The background could not be removed from this image. Do you still want to add it?")
@@ -255,7 +279,7 @@ private struct ImageApprovalView: View {
                     isProcessing = true
                     Task {
                         let imageData = await Task.detached(priority: .userInitiated) {
-                            ImageProcessingService.processImageForStorage(image: image, degrees: rotationAngle)
+                            await ImageProcessingService.processImageForStorage(image: image, degrees: rotationAngle)
                         }.value
                         
                         await MainActor.run {
