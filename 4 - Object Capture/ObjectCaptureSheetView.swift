@@ -44,7 +44,7 @@ struct ObjectCaptureSheetView: View {
                     image: image,
                     backgroundRemoved: backgroundRemoved,
                     onReset: resetCapture,
-                    onApprove: { addToCustomObjects(image: $0) }
+                    onApprove: { addToCustomObjects(imageData: $0) }
                 )
                 
             case .error:
@@ -95,8 +95,8 @@ struct ObjectCaptureSheetView: View {
         photoPickerItem = nil
     }
     
-    private func addToCustomObjects(image: UIImage) {
-        let newObject = CustomObject(image: image)
+    private func addToCustomObjects(imageData: Data) {
+        let newObject = CustomObject(imageData: imageData)
         modelContext.insert(newObject)
         dismiss()
     }
@@ -218,29 +218,25 @@ private struct ImageApprovalView: View {
     let image: UIImage
     let backgroundRemoved: Bool
     let onReset: () -> Void
-    let onApprove: (UIImage) -> Void
+    let onApprove: (Data) -> Void
     
-    @State private var rotatedImage: UIImage
-    
-    init(image: UIImage, backgroundRemoved: Bool, onReset: @escaping () -> Void, onApprove: @escaping (UIImage) -> Void) {
-        self.image = image
-        self.backgroundRemoved = backgroundRemoved
-        self.onReset = onReset
-        self.onApprove = onApprove
-        self._rotatedImage = State(initialValue: image)
-    }
+    @State private var rotationAngle: Double = 0
+    @State private var isProcessing = false
     
     var body: some View {
         VStack {
             Rectangle()
                 .foregroundStyle(Color.clear)
                 .overlay {
-                    Image(uiImage: rotatedImage)
+                    Image(uiImage: image)
                         .resizable()
                         .scaledToFit()
+                        .rotationEffect(.degrees(rotationAngle))
                 }
                 .onTapGesture {
-                    rotatedImage = ImageProcessingService.rotateImage90Degrees(image: rotatedImage)
+                    withAnimation(.bouncy) {
+                        rotationAngle += 90
+                    }
                 }
                 .aspectRatio(contentMode: .fit)
             
@@ -253,11 +249,25 @@ private struct ImageApprovalView: View {
             VStack {
                 Button("Choose another photo", action: onReset)
                     .buttonStyle(IntentionButton(horizontalPadding: 30))
+                    .disabled(isProcessing)
                 
                 Button("Add") {
-                    onApprove(rotatedImage)
+                    isProcessing = true
+                    Task {
+                        let imageData = await Task.detached(priority: .userInitiated) {
+                            ImageProcessingService.processImageForStorage(image: image, degrees: rotationAngle)
+                        }.value
+                        
+                        await MainActor.run {
+                            if let imageData {
+                                onApprove(imageData)
+                            }
+                            isProcessing = false
+                        }
+                    }
                 }
                 .buttonStyle(IntentionButton(horizontalPadding: 30))
+                .disabled(isProcessing)
             }
         }
     }

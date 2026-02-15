@@ -19,9 +19,9 @@ final class CustomObject {
         return UIImage(data: imageData)
     }
     
-    init(image: UIImage) {
+    init(imageData: Data) {
         self.id = UUID()
         self.createdAt = Date()
-        self.imageData = image.pngData()
+        self.imageData = imageData
     }
 }

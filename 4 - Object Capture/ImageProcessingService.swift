@@ -8,10 +8,8 @@
 import UIKit
 import Vision
 
-/// A service dedicated to image processing and Vision tasks.
 enum ImageProcessingService {
     
-    /// Shared CIContext to avoid expensive recreation on every call.
     private static let ciContext = CIContext()
     
     /// Segments the foreground subject from the background using Vision.
@@ -55,16 +53,23 @@ enum ImageProcessingService {
         return UIImage(cgImage: cgImage)
     }
     
-    /// Rotates an image 90 degrees clockwise using UIGraphicsImageRenderer.
-    static func rotateImage90Degrees(image: UIImage) -> UIImage {
-        let newSize = CGSize(width: image.size.height, height: image.size.width)
+    /// Rotates an image by a specific number of degrees.
+    static func rotateImage(image: UIImage, degrees: Double) -> UIImage {
+        let normalizedDegrees = degrees.truncatingRemainder(dividingBy: 360)
+        if abs(normalizedDegrees) < 0.1 { return image }
+        
+        let radians = degrees * .pi / 180
+        
+        let transform = CGAffineTransform(rotationAngle: radians)
+        let newRect = CGRect(origin: .zero, size: image.size).applying(transform)
+        let newSize = newRect.size
         
         let renderer = UIGraphicsImageRenderer(size: newSize)
         return renderer.image { context in
             let cgContext = context.cgContext
             
             cgContext.translateBy(x: newSize.width / 2, y: newSize.height / 2)
-            cgContext.rotate(by: .pi / 2)
+            cgContext.rotate(by: radians)
             
             image.draw(in: CGRect(
                 x: -image.size.width / 2,
@@ -73,5 +78,11 @@ enum ImageProcessingService {
                 height: image.size.height
             ))
         }
+    }
+    
+    /// Rotates the image and converts it to PNG Data for storage.
+    static func processImageForStorage(image: UIImage, degrees: Double) -> Data? {
+        let rotatedImage = rotateImage(image: image, degrees: degrees)
+        return rotatedImage.pngData()
     }
 }
