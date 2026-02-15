@@ -24,17 +24,15 @@ struct TextGenerator: EntityGeneratorStrategy {
         
         let modelEntity = ModelEntity(mesh: mesh)
         modelEntity.model?.materials = [object.material]
-        
-        // Center the text
-        let bounds = modelEntity.visualBounds(relativeTo: nil)
+
+        // Center the text around its local origin
+        let bounds = modelEntity.visualBounds(relativeTo: modelEntity)
         let centerOffset = bounds.center
-        
-        let transformMatrix = Transform(
-            translation: SIMD3(-centerOffset.x, -centerOffset.y, 0)
-        ).matrix
-        
-        modelEntity.setTransformMatrix(transformMatrix, relativeTo: nil)
-        
-        return modelEntity
+
+        modelEntity.position = SIMD3(-centerOffset.x, -centerOffset.y, -centerOffset.z)
+
+        let container = Entity()
+        container.addChild(modelEntity)
+        return container
     }
 }
