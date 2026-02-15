@@ -39,7 +39,7 @@ private extension ImageGenerator {
 
     static var textureCache: [UUID: CachedTexture] = [:]
 
-    func createTextureFromPNG(image: UIImage, imageID: UUID) -> (TextureResource?, Float)? {
+    func createTextureFromPNG(image: UIImage, imageID: UUID) -> (TextureResource, Float)? {
         if let cached = Self.textureCache[imageID] {
             return (cached.texture, cached.aspectRatio)
         }
@@ -67,7 +67,7 @@ private extension ImageGenerator {
         let planeMesh = MeshResource.generatePlane(width: width, height: height)
         
         var material = UnlitMaterial()
-        material.color = .init(tint: UIColor.white.withAlphaComponent(CGFloat(opacity)), texture: .init(texture!))
+        material.color = .init(tint: UIColor.white.withAlphaComponent(CGFloat(opacity)), texture: .init(texture))
         material.opacityThreshold = 0.01
         material.faceCulling = .none
         
