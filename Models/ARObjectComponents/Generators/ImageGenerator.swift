@@ -37,23 +37,25 @@ private extension ImageGenerator {
         let aspectRatio: Float
     }
 
+    private static let cacheQueue = DispatchQueue(label: "louiscarboestaque.Reflets.imageGenerator.cacheQueue")
     static var textureCache: [UUID: CachedTexture] = [:]
 
     func createTextureFromPNG(image: UIImage, imageID: UUID) -> (TextureResource, Float)? {
-        if let cached = Self.textureCache[imageID] {
-            return (cached.texture, cached.aspectRatio)
-        }
+        Self.cacheQueue.sync {
+            if let cached = Self.textureCache[imageID] {
+                return (cached.texture, cached.aspectRatio)
+            }
 
-        let aspectRatio = Float(image.size.width / image.size.height)
-        guard let cgImage = image.cgImage else { return nil }
-        
-        do {
-            let texture = try TextureResource(image: cgImage, options: .init(semantic: .normal))
-            Self.textureCache[imageID] = CachedTexture(texture: texture, aspectRatio: aspectRatio)
-            return (texture, aspectRatio)
-        } catch {
-            print("Error creating texture from image: \(error)")
-            return nil
+            let aspectRatio = Float(image.size.width / image.size.height)
+            guard let cgImage = image.cgImage else { return nil }
+            
+            do {
+                let texture = try TextureResource(image: cgImage, options: .init(semantic: .normal))
+                Self.textureCache[imageID] = CachedTexture(texture: texture, aspectRatio: aspectRatio)
+                return (texture, aspectRatio)
+            } catch {
+                return nil
+            }
         }
     }
     
