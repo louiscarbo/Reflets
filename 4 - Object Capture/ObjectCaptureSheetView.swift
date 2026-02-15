@@ -80,7 +80,7 @@ struct ObjectCaptureSheetView: View {
     private func performSegmentation(on image: UIImage) async {
         // Try segmentation with timeout
         let segmentedImage = await withTimeout(seconds: 3) {
-            await getSegmentedImage(from: image)
+            await ImageProcessingService.getSegmentedImage(from: image)
         }
         
         if let segmentedImage {
@@ -240,7 +240,7 @@ private struct ImageApprovalView: View {
                         .scaledToFit()
                 }
                 .onTapGesture {
-                    rotatedImage = rotateImage90Degrees(image: rotatedImage)
+                    rotatedImage = ImageProcessingService.rotateImage90Degrees(image: rotatedImage)
                 }
                 .aspectRatio(contentMode: .fit)
             
