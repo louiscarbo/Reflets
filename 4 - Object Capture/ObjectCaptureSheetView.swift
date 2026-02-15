@@ -56,7 +56,7 @@ struct ObjectCaptureSheetView: View {
             }
         }
         .padding(25)
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showCameraView) {
             CameraView(onImageCaptured: handleCapturedImage)

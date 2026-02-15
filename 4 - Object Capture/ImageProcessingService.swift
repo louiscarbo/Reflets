@@ -31,7 +31,7 @@ enum ImageProcessingService {
                 
                 let outputPixelBuffer = try result.generateMaskedImage(
                     ofInstances: result.allInstances,
-                    from: VNImageRequestHandler(cgImage: cgImage),
+                    from: handler,
                     croppedToInstancesExtent: true
                 )
                 
