@@ -1,5 +1,5 @@
 //
-//  ObjectCaptureView.swift
+//  ObjectCaptureSheetView.swift
 //  Reflets
 //
 //  Created by Louis Carbo Estaque on 23/12/2024.
@@ -11,138 +11,173 @@ import Vision
 import SwiftData
 
 struct ObjectCaptureSheetView: View {
-    @Environment(\.modelContext) var modelContext
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     
-    @State private var selectedImage: UIImage?
-    @State private var selectedImageRotationAngle: CGFloat = 0
-
-    @State private var segmentedImage: UIImage?
-    @State private var segmentedImageRotationAngle: CGFloat = 0
-    
+    @State private var captureState: CaptureState = .selecting
     @State private var showCameraView = false
-    @State private var hasTimedOut = false
+    @State private var photoPickerItem: PhotosPickerItem?
     
-    @Environment(\.dismiss) var dismiss
-
-    // MARK: - ObjectCaptureSheetView
     var body: some View {
         VStack {
             Text("New Custom Object")
                 .font(.title)
                 .fontWeight(.semibold)
                 .fontWidth(.expanded)
+            
+            switch captureState {
+            case .selecting:
+                ImageSelectionView(
+                    photoPickerItem: $photoPickerItem,
+                    onPhotoSelected: loadImageFromPicker,
+                    onTakePhoto: { showCameraView = true }
+                )
                 
-            if selectedImage == nil {
-                VStack {
-                    PhotosPicker("Choose Photo", selection: $photoPickerItem, matching: .images)
-                        .onChange(of: photoPickerItem) {
-                            loadImageFromPicker()
-                        }
-                        .buttonStyle(IntentionButton(horizontalPadding: 30))
-                    
-                    Button("Take Photo") {
-                        showCameraView = true
+            case .segmenting(let image):
+                SegmentationLoadingView()
+                    .task {
+                        await performSegmentation(on: image)
                     }
-                    .buttonStyle(IntentionButton(horizontalPadding: 30))
-                }
-            } else {
-                if segmentedImage == nil && !hasTimedOut {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                if segmentedImage == nil {
-                                    hasTimedOut = true
-                                }
-                            }
-                        }
-                } else if hasTimedOut {
-                    if let selectedImage = selectedImage {
-                        ImageApprovalView(
-                            image: selectedImage,
-                            rotatedImage: selectedImage,
-                            imageHasNotBeenSegmented: true,
-                            selectedImage: $selectedImage,
-                            segmentedImage: $segmentedImage
-                        )
-                    } else {
-                        Text("An error occured. Please try again.")
-                            .onAppear{
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                    dismiss()
-                                }
-                            }
+                
+            case .reviewing(let image, let backgroundRemoved):
+                ImageApprovalView(
+                    image: image,
+                    backgroundRemoved: backgroundRemoved,
+                    onReset: resetCapture,
+                    onApprove: { addToCustomObjects(image: $0) }
+                )
+                
+            case .error:
+                ErrorView()
+                    .task {
+                        try? await Task.sleep(for: .seconds(3))
+                        dismiss()
                     }
-                } else {
-                    if let segmentedImage = segmentedImage {
-                        ImageApprovalView(
-                            image: segmentedImage,
-                            rotatedImage: segmentedImage,
-                            selectedImage: $selectedImage,
-                            segmentedImage: $segmentedImage
-                        )
-                    } else {
-                        Text("An error occured. Please try again.")
-                            .onAppear{
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                    dismiss()
-                                }
-                            }
-                    }
-                }
             }
         }
         .padding(25)
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showCameraView) {
-            CameraView(selectedImage: $selectedImage)
-                .background {
-                    Color.black.ignoresSafeArea()
-                }
-        }
-        .onChange(of: selectedImage) {
-            Task {
-                segmentedImage = await getSegmentedImage(from: selectedImage)
-            }
+            CameraView(onImageCaptured: handleCapturedImage)
         }
     }
-
-    // Image picker state and loader
-    @State private var photoPickerItem: PhotosPickerItem?
-
-    // MARK: - Image Loading Functions
+    
     private func loadImageFromPicker() {
         guard let photoPickerItem else { return }
         Task {
             if let data = try? await photoPickerItem.loadTransferable(type: Data.self),
                let image = UIImage(data: data) {
-                selectedImage = image
+                handleCapturedImage(image)
             }
+        }
+    }
+    
+    private func handleCapturedImage(_ image: UIImage) {
+        captureState = .segmenting(image: image)
+    }
+    
+    private func performSegmentation(on image: UIImage) async {
+        // Try segmentation with timeout
+        let segmentedImage = await withTimeout(seconds: 3) {
+            await getSegmentedImage(from: image)
+        }
+        
+        if let segmentedImage {
+            captureState = .reviewing(image: segmentedImage, backgroundRemoved: true)
+        } else {
+            captureState = .reviewing(image: image, backgroundRemoved: false)
+        }
+    }
+    
+    private func resetCapture() {
+        captureState = .selecting
+        photoPickerItem = nil
+    }
+    
+    private func addToCustomObjects(image: UIImage) {
+        let newObject = CustomObject(image: image)
+        modelContext.insert(newObject)
+        dismiss()
+    }
+    
+    private func withTimeout<T>(seconds: Double, operation: @escaping () async -> T?) async -> T? {
+        await withTaskGroup(of: T?.self) { group in
+            group.addTask {
+                await operation()
+            }
+            group.addTask {
+                try? await Task.sleep(for: .seconds(seconds))
+                return nil
+            }
+            
+            if let result = await group.next() {
+                group.cancelAll()
+                return result
+            }
+            return nil
         }
     }
 }
 
+// MARK: - Capture State
+
+private enum CaptureState {
+    case selecting
+    case segmenting(image: UIImage)
+    case reviewing(image: UIImage, backgroundRemoved: Bool)
+    case error
+}
+
 #Preview {
-    @Previewable @State var isPresented = false;
-    @Previewable @State var textInput = "Hello World!";
-    @Previewable @State var showCaptureView = false;
+    ARControlsView(session: .init(board: .init()))
+        .sheet(isPresented: .constant(true)) {
+            ObjectCaptureSheetView()
+        }
+}
+
+// MARK: - Image Selection View
+
+private struct ImageSelectionView: View {
+    @Binding var photoPickerItem: PhotosPickerItem?
+    let onPhotoSelected: () -> Void
+    let onTakePhoto: () -> Void
     
-    ZStack {
-        Image("previewImage")
-            .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-        ARControlsView(session: .init(board: .init()))
-            .sheet(isPresented: .constant(true)) {
-                ObjectsCatalogSheetView(selectedType: .constant(.cube), selectedCustomObject: .constant(nil))
-            }
+    var body: some View {
+        VStack {
+            PhotosPicker("Choose Photo", selection: $photoPickerItem, matching: .images)
+                .onChange(of: photoPickerItem) {
+                    onPhotoSelected()
+                }
+                .buttonStyle(IntentionButton(horizontalPadding: 30))
+            
+            Button("Take Photo", action: onTakePhoto)
+                .buttonStyle(IntentionButton(horizontalPadding: 30))
+        }
     }
 }
 
-// MARK: CameraView
-struct CameraView: UIViewControllerRepresentable {
-    @Binding var selectedImage: UIImage?
+// MARK: - Segmentation Loading View
+
+private struct SegmentationLoadingView: View {
+    var body: some View {
+        ProgressView()
+            .progressViewStyle(CircularProgressViewStyle())
+    }
+}
+
+// MARK: - Error View
+
+private struct ErrorView: View {
+    var body: some View {
+        Text("An error occurred. Please try again.")
+    }
+}
+
+// MARK: - Camera View
+
+private struct CameraView: UIViewControllerRepresentable {
+    let onImageCaptured: (UIImage) -> Void
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
@@ -154,19 +189,19 @@ struct CameraView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+        Coordinator(onImageCaptured: onImageCaptured)
     }
 
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: CameraView
+        let onImageCaptured: (UIImage) -> Void
 
-        init(_ parent: CameraView) {
-            self.parent = parent
+        init(onImageCaptured: @escaping (UIImage) -> Void) {
+            self.onImageCaptured = onImageCaptured
         }
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let image = info[.originalImage] as? UIImage {
-                parent.selectedImage = image
+                onImageCaptured(image)
             }
             picker.dismiss(animated: true)
         }
@@ -178,19 +213,22 @@ struct CameraView: UIViewControllerRepresentable {
 }
 
 // MARK: ImageApprovalView
-struct ImageApprovalView: View {
-    @State var image: UIImage
-    @State var rotatedImage: UIImage
-    @State var imageHasNotBeenSegmented = false
+
+private struct ImageApprovalView: View {
+    let image: UIImage
+    let backgroundRemoved: Bool
+    let onReset: () -> Void
+    let onApprove: (UIImage) -> Void
     
-    @Binding var selectedImage: UIImage?
-    @Binding var segmentedImage: UIImage?
+    @State private var rotatedImage: UIImage
     
-    @State private var imageRotationAngle: CGFloat = 0
-    @State private var hasTimedOut = false
-    
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.modelContext) var modelContext
+    init(image: UIImage, backgroundRemoved: Bool, onReset: @escaping () -> Void, onApprove: @escaping (UIImage) -> Void) {
+        self.image = image
+        self.backgroundRemoved = backgroundRemoved
+        self.onReset = onReset
+        self.onApprove = onApprove
+        self._rotatedImage = State(initialValue: image)
+    }
     
     var body: some View {
         VStack {
@@ -202,42 +240,25 @@ struct ImageApprovalView: View {
                         .scaledToFit()
                 }
                 .onTapGesture {
-                    print("Before rotationEffect: \(imageRotationAngle) degrees")
-                    
                     rotatedImage = rotateImage90Degrees(image: rotatedImage)
-                    
-                    print("After rotateImage90Degrees")
-                    
-                    withAnimation {
-                        imageRotationAngle -= 90
-                    }
-                    
-                    print("After animation update: \(imageRotationAngle) degrees")
                 }
                 .aspectRatio(contentMode: .fit)
+            
             Text("Tap the image to rotate it.")
-            if imageHasNotBeenSegmented {
+            
+            if !backgroundRemoved {
                 Text("The background could not be removed from this image. Do you still want to add it?")
-                
             }
+            
             VStack {
-                Button("Choose another photo") {
-                    hasTimedOut = false
-                    selectedImage = nil
-                    segmentedImage = nil
-                }
-                .buttonStyle(IntentionButton(horizontalPadding: 30))
+                Button("Choose another photo", action: onReset)
+                    .buttonStyle(IntentionButton(horizontalPadding: 30))
+                
                 Button("Add") {
-                    addToCustomObjects(image: rotatedImage)
+                    onApprove(rotatedImage)
                 }
                 .buttonStyle(IntentionButton(horizontalPadding: 30))
             }
         }
-    }
-    
-    private func addToCustomObjects(image: UIImage) {
-        let newObject = CustomObject(image: image)
-        modelContext.insert(newObject)
-        dismiss()
     }
 }
