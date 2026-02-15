@@ -63,7 +63,7 @@ struct ARControlsView: View {
         .sheet(isPresented: $session.showObjectsCatalog) {
             ObjectsCatalogSheetView(
                 selectedType: $session.currentObjectProperties.type,
-                selectedCustomObject: $session.currentObjectProperties.customObject
+                selectedsticker: $session.currentObjectProperties.sticker
             )
         }
         .sheet(isPresented: $session.showInspirationSheet) {

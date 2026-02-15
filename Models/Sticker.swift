@@ -1,5 +1,5 @@
 //
-//  CustomObject.swift
+//  Sticker.swift
 //  Reflets
 //
 //  Created by Louis Carbo Estaque on 14/02/2026.
@@ -9,7 +9,7 @@ import SwiftData
 import UIKit
 
 @Model
-final class CustomObject {
+final class Sticker {
     @Attribute(.unique) var id: UUID
     @Attribute(.externalStorage) var imageData: Data?
     var createdAt: Date

@@ -15,11 +15,11 @@ struct ImageGenerator: EntityGeneratorStrategy {
         let scale = object.size * resizingFactor
         
         let entity: Entity
-        if let customObject = object.customObject,
-           let uiImage = customObject.uiImage {
+        if let sticker = object.sticker,
+           let uiImage = sticker.uiImage {
             entity = create2DEntityFromImage(
                 image: uiImage,
-                imageID: customObject.id,
+                imageID: sticker.id,
                 size: scale * 3.5,
                 opacity: object.opacity
             )

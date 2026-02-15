@@ -90,7 +90,7 @@ struct ARIntroductionView: View {
             )
         case .changeTypeObject:
             TooltipView(
-                text: "Try adding a custom object from your photos in the catalog.",
+                text: "Try adding a 3D sticker from your photos in the catalog.",
                 symbol: Image(systemName: "folder.badge.plus")
             )
         case .customizeObject:

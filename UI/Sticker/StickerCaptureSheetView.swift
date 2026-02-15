@@ -1,5 +1,5 @@
 //
-//  ObjectCaptureSheetView.swift
+//  StickerCaptureSheetView.swift
 //  Reflets
 //
 //  Created by Louis Carbo Estaque on 23/12/2024.
@@ -10,7 +10,7 @@ import PhotosUI
 import Vision
 import SwiftData
 
-struct ObjectCaptureSheetView: View {
+struct StickerCaptureSheetView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
@@ -20,7 +20,7 @@ struct ObjectCaptureSheetView: View {
     
     var body: some View {
         VStack {
-            Text("New Custom Object")
+            Text("New Sticker")
                 .font(.title)
                 .fontWeight(.semibold)
                 .fontWidth(.expanded)
@@ -44,7 +44,7 @@ struct ObjectCaptureSheetView: View {
                     image: image,
                     backgroundRemoved: backgroundRemoved,
                     onReset: resetCapture,
-                    onApprove: { addToCustomObjects(imageData: $0) }
+                    onApprove: { addTostickers(imageData: $0) }
                 )
                 
             case .error:
@@ -95,8 +95,8 @@ struct ObjectCaptureSheetView: View {
         photoPickerItem = nil
     }
     
-    private func addToCustomObjects(imageData: Data) {
-        let newObject = CustomObject(imageData: imageData)
+    private func addTostickers(imageData: Data) {
+        let newObject = Sticker(imageData: imageData)
         modelContext.insert(newObject)
         dismiss()
     }
@@ -132,7 +132,7 @@ private enum CaptureState {
 #Preview {
     ARControlsView(session: .init(board: .init()))
         .sheet(isPresented: .constant(true)) {
-            ObjectCaptureSheetView()
+            StickerCaptureSheetView()
         }
 }
 

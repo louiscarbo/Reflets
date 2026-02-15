@@ -12,10 +12,10 @@ struct ObjectsCatalogSheetView: View {
     @Environment(\.dismiss) private var dismiss
     
     @Binding var selectedType: ARObjectType
-    @Binding var selectedCustomObject: CustomObject?
+    @Binding var selectedsticker: Sticker?
     
     @State private var showObjectCaptureSheet = false
-    @Query(sort: \CustomObject.createdAt, order: .reverse) private var customObjects: [CustomObject]
+    @Query(sort: \Sticker.createdAt, order: .reverse) private var stickers: [Sticker]
     
     private let hapticFeedback = UINotificationFeedbackGenerator()
     private let availableTypes: [ARObjectType] = [.sphere, .cube, .cone, .cylinder, .text]
@@ -34,10 +34,10 @@ struct ObjectsCatalogSheetView: View {
                         onSelect: selectShape
                     )
                     
-                    CustomObjectsSection(
-                        customObjects: customObjects,
+                    MyStickersSection(
+                        stickers: stickers,
                         showObjectCaptureSheet: $showObjectCaptureSheet,
-                        onSelect: selectCustomObject
+                        onSelect: selectsticker
                     )
                 }
             }
@@ -47,7 +47,7 @@ struct ObjectsCatalogSheetView: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showObjectCaptureSheet) {
-            ObjectCaptureSheetView()
+            StickerCaptureSheetView()
         }
     }
     
@@ -57,11 +57,11 @@ struct ObjectsCatalogSheetView: View {
         selectedType = type
     }
     
-    private func selectCustomObject(_ object: CustomObject) {
+    private func selectsticker(_ object: Sticker) {
         dismiss()
         hapticFeedback.notificationOccurred(.success)
         selectedType = .image
-        selectedCustomObject = object
+        selectedsticker = object
     }
 }
 
@@ -70,7 +70,7 @@ struct ObjectsCatalogSheetView: View {
         .sheet(isPresented: .constant(true)) {
             ObjectsCatalogSheetView(
                 selectedType: .constant(.cube),
-                selectedCustomObject: .constant(nil)
+                selectedsticker: .constant(nil)
             )
         }
 }
@@ -104,24 +104,24 @@ private struct SimpleShapesSection: View {
     }
 }
 
-// MARK: - Custom Objects Section
+// MARK: - My Stickers Section
 
-private struct CustomObjectsSection: View {
-    let customObjects: [CustomObject]
+private struct MyStickersSection: View {
+    let stickers: [Sticker]
     @Binding var showObjectCaptureSheet: Bool
-    let onSelect: (CustomObject) -> Void
+    let onSelect: (Sticker) -> Void
     
     private static let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
     
     var body: some View {
         Divider()
         
-        Text("Custom Objects")
+        Text("My Stickers")
             .fontWidth(.expanded)
             .font(.title2)
         
         LazyVGrid(columns: Self.columns) {
-            ForEach(customObjects) { object in
+            ForEach(stickers) { object in
                 AsyncThumbnailButton(
                     object: object,
                     onSelect: { onSelect(object) }
@@ -141,7 +141,7 @@ private struct CustomObjectsSection: View {
 // MARK: - Async Thumbnail Loader
 
 private struct AsyncThumbnailButton: View {
-    let object: CustomObject
+    let object: Sticker
     let onSelect: () -> Void
     
     @State private var loadedImage: UIImage?

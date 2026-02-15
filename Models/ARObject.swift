@@ -31,7 +31,7 @@ final class ARObject {
     var resizingFactor: Float
     
     // Relationship
-    var customObject: CustomObject?
+    var sticker: Sticker?
     
     // Position offset relative to initial camera position (not absolute world coordinates)
     // These represent where the object should be placed relative to the camera when the scene was created
@@ -50,7 +50,7 @@ final class ARObject {
          opacity: Double = 1.0,
          size: Float = 1.0,
          resizingFactor: Float = 0.5,
-         customObject: CustomObject? = nil,
+         sticker: Sticker? = nil,
          position: SIMD3<Float> = .zero) {
         
         self.id = UUID()
@@ -72,7 +72,7 @@ final class ARObject {
         self.opacity = opacity
         self.size = size
         self.resizingFactor = resizingFactor
-        self.customObject = customObject
+        self.sticker = sticker
         
         self.x = position.x
         self.y = position.y
@@ -89,7 +89,7 @@ final class ARObject {
             opacity: properties.opacity,
             size: properties.size,
             resizingFactor: properties.resizingFactor,
-            customObject: properties.customObject,
+            sticker: properties.sticker,
             position: .zero
         )
     }
