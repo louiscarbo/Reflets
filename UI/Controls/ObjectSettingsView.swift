@@ -9,9 +9,11 @@ import SwiftUI
 
 // MARK: - Main View
 struct ObjectSettingsView: View {
-    @Binding var properties: ARObjectProperties
-    
+    @Environment(\.editingSession) private var session
+
     var body: some View {
+        @Bindable var bindableSession = session
+        
         ScrollView {
             VStack(spacing: 20) {
                 Text("Object settings")
@@ -20,13 +22,13 @@ struct ObjectSettingsView: View {
                     .fontWidth(.expanded)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                MaterialSettingsView(properties: $properties)
+                MaterialSettingsView(properties: $bindableSession.currentObjectProperties)
                 
-                RotationSettingsView(properties: $properties)
+                RotationSettingsView(properties: $bindableSession.currentObjectProperties)
                 
-                ShapeSettingsView(properties: $properties)
+                ShapeSettingsView(properties: $bindableSession.currentObjectProperties)
                 
-                TextSettingsView(properties: $properties)
+                TextSettingsView(properties: $bindableSession.currentObjectProperties)
             }
             .padding(20)
             .background {
@@ -191,21 +193,6 @@ struct SettingRow<Content: View>: View {
 
 #Preview {
     @Previewable @State var isPresented = false;
-    @Previewable @State var properties = ARObjectProperties(
-        type: .text,
-        color: .red,
-        metallic: 1.0,
-        roughness: 0.5,
-        emissiveIntensity: 0.0,
-        text: "Hello World!",
-        ratio: 2.0,
-        opacity: 0.9,
-        size: 1.0,
-        resizingFactor: 0.5,
-        rotationSpeed: 0.0,
-        rotationAxis: .y,
-        sticker: nil
-    )
     
     ZStack {
         Image("previewImage")
@@ -215,8 +202,9 @@ struct SettingRow<Content: View>: View {
         ARControlsView(session: .init(board: .init()))
             .sheet(isPresented: $isPresented) {
                 NavigationStack {
-                    ObjectSettingsView(properties: $properties)
+                    ObjectSettingsView()
                 }
             }
+            .environment(\.editingSession, .init(board: .init()))
     }
 }

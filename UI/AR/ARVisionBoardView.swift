@@ -19,7 +19,7 @@ struct ARVisionBoardView: View {
     
     init(board: VisionBoard) {
         self.board = board
-        self._editingSession = State(initialValue: AREditingSession(board: board))
+        self._editingSession = .init(initialValue: .init(board: board))
     }
     
     var body: some View {

@@ -7,6 +7,15 @@
 
 import SwiftUI
 
+private struct EditingSessionKey: EnvironmentKey {
+    @MainActor static var defaultValue: AREditingSession {
+        AREditingSession(board: VisionBoard())
+    }
+}
+
 extension EnvironmentValues {
-    @Entry var editingSession: AREditingSession? = nil
+    var editingSession: AREditingSession {
+        get { self[EditingSessionKey.self] }
+        set { self[EditingSessionKey.self] = newValue }
+    }
 }

@@ -11,7 +11,7 @@ struct ChallengeCompletionView: View {
     @Environment(\.editingSession) private var session
     
     var body: some View {
-        if let session = session, session.congratulationEffect {
+        if session.congratulationEffect {
             VStack {
                 Text("\(session.completedChallenges.count)/\(challenges.count) completed!")
                     .fontWidth(.expanded)

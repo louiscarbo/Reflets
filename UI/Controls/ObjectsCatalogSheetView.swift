@@ -14,7 +14,6 @@ struct ObjectsCatalogSheetView: View {
     @Binding var selectedType: ARObjectType
     @Binding var selectedsticker: Sticker?
     
-    @State private var showObjectCaptureSheet = false
     @Query(sort: \Sticker.createdAt, order: .reverse) private var stickers: [Sticker]
     
     private let hapticFeedback = UINotificationFeedbackGenerator()
@@ -36,7 +35,6 @@ struct ObjectsCatalogSheetView: View {
                     
                     MyStickersSection(
                         stickers: stickers,
-                        showObjectCaptureSheet: $showObjectCaptureSheet,
                         onSelect: selectsticker
                     )
                 }
@@ -49,9 +47,6 @@ struct ObjectsCatalogSheetView: View {
         .ignoresSafeArea()
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .sheet(isPresented: $showObjectCaptureSheet) {
-            StickerCaptureSheetView()
-        }
     }
     
     private func selectShape(_ type: ARObjectType) {
@@ -112,7 +107,8 @@ private struct SimpleShapesSection: View {
 
 private struct MyStickersSection: View {
     let stickers: [Sticker]
-    @Binding var showObjectCaptureSheet: Bool
+    @Namespace private var namespace
+    @State private var showObjectCaptureSheet = false
     let onSelect: (Sticker) -> Void
     
     private static let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
@@ -136,6 +132,13 @@ private struct MyStickersSection: View {
                 showObjectCaptureSheet = true
             } label: {
                 Image(systemName: "plus")
+            }
+            .matchedTransitionSource(id: "objectCapture", in: namespace)
+            .sheet(isPresented: $showObjectCaptureSheet) {
+                StickerCaptureSheetView()
+                    .navigationTransition(
+                            .zoom(sourceID: "objectCapture", in: namespace)
+                        )
             }
         }
         .buttonStyle(SFSymbolButtonStyle(symbolSize: 90))

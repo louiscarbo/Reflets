@@ -13,7 +13,7 @@ struct ChallengeDetailView: View {
     let hapticFeedback = UINotificationFeedbackGenerator()
     
     var body: some View {
-        if let session = session, session.focusChallengeMode, let challenge = session.selectedChallenge {
+        if session.focusChallengeMode, let challenge = session.selectedChallenge {
             VStack {
                 TooltipView(
                     title: challenge.title,

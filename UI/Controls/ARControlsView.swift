@@ -48,9 +48,6 @@ struct ARControlsView: View {
                 showInspirationSheet: $session.showInspirationSheet
             )
         }
-        .sheet(isPresented: $session.showCustomizationSheet) {
-            ObjectSettingsView(properties: $session.currentObjectProperties)
-        }
         .sheet(isPresented: $session.showObjectsCatalog) {
             ObjectsCatalogSheetView(
                 selectedType: $session.currentObjectProperties.type,

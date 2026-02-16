@@ -22,7 +22,7 @@ struct TopRowView: View {
             
             Button {
                 withAnimation {
-                    session?.showInspirationSheet = true
+                    session.showInspirationSheet = true
                 }
             } label: {
                 Image("Reflets")
@@ -34,7 +34,7 @@ struct TopRowView: View {
             
             Button {
                 withAnimation {
-                    session?.showObjectsCatalog = true
+                    session.showObjectsCatalog = true
                 }
             } label: {
                 Image(systemName: "folder.badge.plus")
@@ -43,7 +43,7 @@ struct TopRowView: View {
             
             Button {
                 withAnimation(.easeInOut(duration: 1.0)) {
-                    session?.artworkIsDone = true
+                    session.artworkIsDone = true
                 }
             } label: {
                 Image(systemName: "checkmark")

@@ -11,24 +11,29 @@ struct BottomRowView: View {
     @Environment(\.editingSession) private var session
     
     var body: some View {
+        @Bindable var bindableSession = session
+        
         HStack(spacing: 20) {
             RepeatableButton(systemImage: "arrowshape.turn.up.backward") {
-                session?.removeLastObject()
+                session.removeLastObject()
             }
             .buttonStyle(SFSymbolButtonStyle(symbolSize: 60, rotateInTrigonometricDirection: true))
-            .disabled(session?.board.objects.isEmpty ?? true)
+            .disabled(session.board.objects.isEmpty)
             
             RepeatableButton(systemImage: "plus") {
-                session?.addObject()
+                session.addObject()
             }
             .buttonStyle(SFSymbolButtonStyle(symbolSize: 80))
             
             Button {
-                session?.showCustomizationSheet = true
+                session.showCustomizationSheet = true
             } label: {
                 Image(systemName: "paintbrush")
             }
             .buttonStyle(SFSymbolButtonStyle(symbolSize: 60))
+            .sheet(isPresented: $bindableSession.showCustomizationSheet) {
+                ObjectSettingsView()
+            }
         }
         .font(.title)
         .padding(.horizontal, 30)

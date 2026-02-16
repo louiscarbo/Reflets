@@ -11,7 +11,7 @@ struct ChallengeFloatingView: View {
     @Environment(\.editingSession) private var session
     
     var body: some View {
-        if let session = session, !session.focusChallengeMode, let challenge = session.selectedChallenge {
+        if !session.focusChallengeMode, let challenge = session.selectedChallenge {
             Button {
                 withAnimation {
                     session.toggleChallengeFocus()

@@ -240,7 +240,7 @@ private struct ImageApprovalView: View {
                     }
                 }
                 .task {
-                    try? await Task.sleep(for: .seconds(2))
+                    try? await Task.sleep(for: .seconds(0.5))
                     while !Task.isCancelled {
                         withAnimation(.bouncy(duration: 0.2)) {
                             hintRotation = 5
@@ -293,6 +293,7 @@ private struct ImageApprovalView: View {
                 .buttonStyle(IntentionButton(horizontalPadding: 30))
                 .disabled(isProcessing)
             }
+            .font(.title2)
         }
     }
 }
