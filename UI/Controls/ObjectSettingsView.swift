@@ -8,22 +8,11 @@
 import SwiftUI
 
 struct ObjectSettingsView: View {
-    @State var needsColor: Bool = true
-    @Binding var selectedColor: Color
-    @Binding var metallic: Float
-    @Binding var roughness: Float
-    @Binding var emissiveIntensity: Float
+    @Binding var properties: ARObjectProperties
     
-    @Binding var selectedOpacity: Double
-    
-    @State var needsText: Bool
-    @Binding var textInput: String
-    
-    @State var needsProportionSlider: Bool
-    @Binding var selectedProportion: Float
-    
-    @Binding var rotationSpeed: Float
-    @Binding var rotationAxis: RotationAxis
+    private var needsColor: Bool { properties.type.hasCustomColor }
+    private var needsText: Bool { properties.type.hasCustomText }
+    private var needsProportionSlider: Bool { properties.type.hasCustomRatio }
     
     var body: some View {
         VStack {
@@ -38,7 +27,7 @@ struct ObjectSettingsView: View {
                     Text("Color")
                         .fontWidth(.expanded)
                     Spacer()
-                    ColorPicker("", selection: $selectedColor, supportsOpacity: false)
+                    ColorPicker("", selection: $properties.color, supportsOpacity: false)
                 }
             }
             
@@ -46,7 +35,7 @@ struct ObjectSettingsView: View {
                 Text("Opacity")
                     .fontWidth(.expanded)
                 Spacer()
-                Slider(value: $selectedOpacity)
+                Slider(value: $properties.opacity)
                     .frame(width: 220)
             }
             
@@ -56,8 +45,8 @@ struct ObjectSettingsView: View {
                         .fontWidth(.expanded)
                     Spacer()
                     Slider(value: Binding(
-                        get: { Double(metallic) },
-                        set: { metallic = Float($0) }
+                        get: { Double(properties.metallic) },
+                        set: { properties.metallic = Float($0) }
                     ), in: 0...1)
                         .frame(width: 220)
                 }
@@ -67,8 +56,8 @@ struct ObjectSettingsView: View {
                         .fontWidth(.expanded)
                     Spacer()
                     Slider(value: Binding(
-                        get: { Double(roughness) },
-                        set: { roughness = Float($0) }
+                        get: { Double(properties.roughness) },
+                        set: { properties.roughness = Float($0) }
                     ), in: 0...1)
                         .frame(width: 220)
                 }
@@ -78,8 +67,8 @@ struct ObjectSettingsView: View {
                         .fontWidth(.expanded)
                     Spacer()
                     Slider(value: Binding(
-                        get: { Double(emissiveIntensity) },
-                        set: { emissiveIntensity = Float($0) }
+                        get: { Double(properties.emissiveIntensity) },
+                        set: { properties.emissiveIntensity = Float($0) }
                     ), in: 0...5)
                         .frame(width: 220)
                 }
@@ -90,18 +79,18 @@ struct ObjectSettingsView: View {
                     .fontWidth(.expanded)
                 Spacer()
                 Slider(value: Binding(
-                    get: { Double(rotationSpeed) },
-                    set: { rotationSpeed = Float($0) }
+                    get: { Double(properties.rotationSpeed) },
+                    set: { properties.rotationSpeed = Float($0) }
                 ), in: 0...2)
                     .frame(width: 220)
             }
             
-            if rotationSpeed > 0 {
+            if properties.rotationSpeed > 0 {
                 HStack {
                     Text("Axis")
                         .fontWidth(.expanded)
                     Spacer()
-                    Picker("Axis", selection: $rotationAxis) {
+                    Picker("Axis", selection: $properties.rotationAxis) {
                         ForEach(RotationAxis.allCases, id: \.self) { axis in
                             Image(systemName: axis.sfSymbolString)
                         }
@@ -116,7 +105,7 @@ struct ObjectSettingsView: View {
                     Text("Text")
                         .fontWidth(.expanded)
                     Spacer()
-                    TextField("Hello World!", text: $textInput)
+                    TextField("Hello World!", text: $properties.text)
                         .textFieldStyle(.roundedBorder)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 220)
@@ -128,7 +117,7 @@ struct ObjectSettingsView: View {
                     Text("Length")
                         .fontWidth(.expanded)
                     Spacer()
-                    Slider(value: $selectedProportion, in: 0.1...7.0)
+                    Slider(value: $properties.ratio, in: 0.1...7.0)
                         .frame(width: 220)
                 }
             }
@@ -143,7 +132,21 @@ struct ObjectSettingsView: View {
 
 #Preview {
     @Previewable @State var isPresented = false;
-    @Previewable @State var textInput = "Hello World!";
+    @Previewable @State var properties = ARObjectProperties(
+        type: .text,
+        color: .red,
+        metallic: 1.0,
+        roughness: 0.5,
+        emissiveIntensity: 0.0,
+        text: "Hello World!",
+        ratio: 2.0,
+        opacity: 0.9,
+        size: 1.0,
+        resizingFactor: 0.5,
+        rotationSpeed: 0.0,
+        rotationAxis: .y,
+        sticker: nil
+    )
     
     ZStack {
         Image("previewImage")
@@ -153,20 +156,7 @@ struct ObjectSettingsView: View {
         ARControlsView(session: .init(board: .init()))
             .sheet(isPresented: $isPresented) {
                 NavigationStack {
-                    ObjectSettingsView(
-                        needsColor: true,
-                        selectedColor: .constant(.red),
-                        metallic: .constant(1.0),
-                        roughness: .constant(0.5),
-                        emissiveIntensity: .constant(0.0),
-                        selectedOpacity: .constant(0.9),
-                        needsText: true,
-                        textInput: $textInput,
-                        needsProportionSlider: true,
-                        selectedProportion: .constant(1.0),
-                        rotationSpeed: .constant(0.0),
-                        rotationAxis: .constant(.y)
-                    )
+                    ObjectSettingsView(properties: $properties)
                 }
             }
     }
