@@ -49,16 +49,7 @@ struct ARControlsView: View {
             )
         }
         .sheet(isPresented: $session.showCustomizationSheet) {
-            ObjectSettingsView(
-                needsColor: session.currentObjectProperties.type.hasCustomColor,
-                selectedColor: $session.currentObjectProperties.color,
-                isMetallic: $session.currentObjectProperties.metallic,
-                selectedOpacity: $session.currentObjectProperties.opacity,
-                needsText: session.currentObjectProperties.type.hasCustomText,
-                textInput: $session.currentObjectProperties.text,
-                needsProportionSlider: session.currentObjectProperties.type.hasCustomRatio,
-                selectedProportion: $session.currentObjectProperties.ratio
-            )
+            ObjectSettingsView(properties: $session.currentObjectProperties)
         }
         .sheet(isPresented: $session.showObjectsCatalog) {
             ObjectsCatalogSheetView(

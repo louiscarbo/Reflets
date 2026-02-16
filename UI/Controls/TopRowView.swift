@@ -9,9 +9,17 @@ import SwiftUI
 
 struct TopRowView: View {
     @Environment(\.editingSession) private var session
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         HStack(spacing: 10) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+            }
+            .buttonStyle(SFSymbolButtonStyle())
+            
             Button {
                 withAnimation {
                     session?.showInspirationSheet = true
@@ -22,7 +30,7 @@ struct TopRowView: View {
                     .scaledToFit()
                     .frame(height: 31)
             }
-            .buttonStyle(SFSymbolButtonStyle(symbolSize: 16))
+            .buttonStyle(SFSymbolButtonStyle())
             
             Button {
                 withAnimation {
@@ -31,7 +39,7 @@ struct TopRowView: View {
             } label: {
                 Image(systemName: "folder.badge.plus")
             }
-            .buttonStyle(SFSymbolButtonStyle(symbolSize: 20))
+            .buttonStyle(SFSymbolButtonStyle())
             
             Button {
                 withAnimation(.easeInOut(duration: 1.0)) {
@@ -40,7 +48,7 @@ struct TopRowView: View {
             } label: {
                 Image(systemName: "checkmark")
             }
-            .buttonStyle(SFSymbolButtonStyle(symbolSize: 20))
+            .buttonStyle(SFSymbolButtonStyle())
         }
         .padding(.horizontal, 30)
         .padding(.vertical)

@@ -21,8 +21,8 @@ struct ObjectsCatalogSheetView: View {
     private let availableTypes: [ARObjectType] = [.sphere, .cube, .cone, .cylinder, .text]
     
     var body: some View {
-        VStack {
-            ScrollView {
+        ScrollView {
+            VStack {
                 Text("Objects Catalog")
                     .font(.title)
                     .fontWeight(.semibold)
@@ -40,6 +40,9 @@ struct ObjectsCatalogSheetView: View {
                         onSelect: selectsticker
                     )
                 }
+            }
+            .background {
+                RandomSymbolsView()
             }
             .padding(25)
         }
@@ -97,7 +100,8 @@ private struct SimpleShapesSection: View {
                 } label: {
                     Image(systemName: type.SFSymbolName)
                 }
-                .buttonStyle(SFSymbolButtonStyle())
+                .buttonStyle(SFSymbolButtonStyle(symbolSize: 70))
+                .font(.title)
                 .padding(.bottom, 10)
             }
         }
@@ -133,8 +137,9 @@ private struct MyStickersSection: View {
             } label: {
                 Image(systemName: "plus")
             }
-            .buttonStyle(SFSymbolButtonStyle(symbolSize: 43))
         }
+        .buttonStyle(SFSymbolButtonStyle(symbolSize: 90))
+        .font(.title)
     }
 }
 
@@ -167,7 +172,6 @@ private struct AsyncThumbnailButton: View {
                 }
             }
         }
-        .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
         .padding(.bottom, 10)
         .task(id: object.id) {
             await loadThumbnail()

@@ -15,21 +15,22 @@ struct BottomRowView: View {
             RepeatableButton(systemImage: "arrowshape.turn.up.backward") {
                 session?.removeLastObject()
             }
-            .buttonStyle(SFSymbolButtonStyle(rotateInTrigonometricDirection: true))
+            .buttonStyle(SFSymbolButtonStyle(symbolSize: 60, rotateInTrigonometricDirection: true))
             .disabled(session?.board.objects.isEmpty ?? true)
             
             RepeatableButton(systemImage: "plus") {
                 session?.addObject()
             }
-            .buttonStyle(SFSymbolButtonStyle(symbolSize: 45))
+            .buttonStyle(SFSymbolButtonStyle(symbolSize: 80))
             
             Button {
                 session?.showCustomizationSheet = true
             } label: {
                 Image(systemName: "paintbrush")
             }
-            .buttonStyle(SFSymbolButtonStyle())
+            .buttonStyle(SFSymbolButtonStyle(symbolSize: 60))
         }
+        .font(.title)
         .padding(.horizontal, 30)
         .padding(.vertical)
         .glassEffect(.clear)
