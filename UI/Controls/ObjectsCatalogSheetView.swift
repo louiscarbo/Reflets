@@ -97,7 +97,8 @@ private struct SimpleShapesSection: View {
                 } label: {
                     Image(systemName: type.SFSymbolName)
                 }
-                .buttonStyle(SFSymbolButtonStyle())
+                .buttonStyle(SFSymbolButtonStyle(symbolSize: 70))
+                .font(.title)
                 .padding(.bottom, 10)
             }
         }
@@ -133,8 +134,9 @@ private struct MyStickersSection: View {
             } label: {
                 Image(systemName: "plus")
             }
-            .buttonStyle(SFSymbolButtonStyle(symbolSize: 43))
         }
+        .buttonStyle(SFSymbolButtonStyle(symbolSize: 90))
+        .font(.title)
     }
 }
 
@@ -167,7 +169,6 @@ private struct AsyncThumbnailButton: View {
                 }
             }
         }
-        .buttonStyle(SFSymbolButtonStyle(symbolSize: 40))
         .padding(.bottom, 10)
         .task(id: object.id) {
             await loadThumbnail()

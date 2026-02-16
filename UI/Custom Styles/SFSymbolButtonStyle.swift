@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SFSymbolButtonStyle: ButtonStyle {
-    var symbolSize: CGFloat = 30
+    var symbolSize: CGFloat = 50
     var foregroundColor: Color = .black
     var backgroundColor: Color = Color(red: 240/255, green: 240/255, blue: 230/255)
     var rotateInTrigonometricDirection: Bool = false
@@ -21,7 +21,6 @@ struct SFSymbolButtonStyle: ButtonStyle {
         ZStack {
             Circle()
                 .foregroundStyle(backgroundColor)
-                .frame(maxWidth: .infinity)
                 .shadow(radius: 5.0)
                         
             Circle()
@@ -56,16 +55,13 @@ struct SFSymbolButtonStyle: ButtonStyle {
                             configuration.isPressed ? 0.1 : 0.2
                     )
                 )
-                .padding(0.3 * symbolSize)
                 .offset(y: -2)
                 .blur(radius: 4)
             
             configuration.label
                 .offset(y: -2)
-                .font(.system(size: symbolSize)) // SF Symbol size
                 .fontWeight(.semibold)
                 .foregroundColor(foregroundColor) // Icon color
-                .padding(16/30 * symbolSize)
                 .rotationEffect(
                     disabled ? .zero :
                         configuration.isPressed ? .degrees(rotateInTrigonometricDirection ? -15 : 15) : .zero
@@ -80,7 +76,7 @@ struct SFSymbolButtonStyle: ButtonStyle {
                     )
                 )
         }
-        .fixedSize()
+        .frame(width: symbolSize, height: symbolSize)
         .scaleEffect(configuration.isPressed ? pressedEffectScale : 1.0) // Pressed effect
     }
 }

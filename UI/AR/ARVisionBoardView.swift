@@ -73,6 +73,7 @@ struct ARVisionBoardView: View {
                 ARValidationView(board: board, artworkIsDone: $editingSession.artworkIsDone)
             }
         }
+        .navigationBarBackButtonHidden(true)
         .environment(\.editingSession, editingSession)
     }
     
