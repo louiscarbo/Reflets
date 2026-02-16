@@ -29,6 +29,9 @@ struct ObjectSettingsView: View {
                 TextSettingsView(properties: $properties)
             }
             .padding(20)
+            .background {
+                RandomSymbolsView()
+            }
         }
         .presentationDetents([.fraction(0.4), .large])
         .presentationDragIndicator(.visible)

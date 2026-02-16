@@ -21,8 +21,8 @@ struct ObjectsCatalogSheetView: View {
     private let availableTypes: [ARObjectType] = [.sphere, .cube, .cone, .cylinder, .text]
     
     var body: some View {
-        VStack {
-            ScrollView {
+        ScrollView {
+            VStack {
                 Text("Objects Catalog")
                     .font(.title)
                     .fontWeight(.semibold)
@@ -40,6 +40,9 @@ struct ObjectsCatalogSheetView: View {
                         onSelect: selectsticker
                     )
                 }
+            }
+            .background {
+                RandomSymbolsView()
             }
             .padding(25)
         }
