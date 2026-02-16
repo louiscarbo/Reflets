@@ -176,16 +176,24 @@ extension ARObject {
         let duration: Double = Double(1 / rotationSpeed)
         let axis = rotationAxis.vector
         
-        let from = Transform(rotation: .init(angle: .pi, axis: axis))
+        let currentPosition = entity.position
+        
+        let from = Transform(
+            rotation: .init(angle: .pi, axis: axis),
+            translation: currentPosition
+        )
 
         let definition1 = FromToByAnimation(
             from: from,
             duration: duration,
             timing: .linear,
-            bindTarget: .transform,
+            bindTarget: .transform
         )
         
-        let to = Transform(rotation: .init(angle: -1 * .pi, axis: axis))
+        let to = Transform(
+            rotation: .init(angle: -1 * .pi, axis: axis),
+            translation: currentPosition
+        )
         
         let definition2 = FromToByAnimation(
             to: to,

@@ -142,6 +142,8 @@ class ARSceneManager {
         let entity = helperObject.generateEntity()
         entity.components[PositioningHelperComponent.self] = PositioningHelperComponent()
         entity.position = [0, 0, -1]
+
+        helperObject.applyRotationAnimation(to: entity)
         
         self.positioningHelperEntity = entity
         
