@@ -20,5 +20,6 @@ struct ARObjectProperties: Equatable {
     var size: Float = 1.0
     var resizingFactor: Float = 0.5
     var rotationSpeed: Float = 0.0
+    var rotationAxis: RotationAxis = .y
     var sticker: Sticker?
 }

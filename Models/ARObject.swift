@@ -32,6 +32,7 @@ final class ARObject {
     var size: Float
     var resizingFactor: Float
     var rotationSpeed: Float
+    var rotationAxisRawValue: String
     
     // Relationship
     var sticker: Sticker?
@@ -56,6 +57,7 @@ final class ARObject {
          size: Float = 1.0,
          resizingFactor: Float = 0.5,
          rotationSpeed: Float = 0.0,
+         rotationAxis: RotationAxis = .y,
          sticker: Sticker? = nil,
          position: SIMD3<Float> = .zero) {
         
@@ -81,6 +83,7 @@ final class ARObject {
         self.size = size
         self.resizingFactor = resizingFactor
         self.rotationSpeed = rotationSpeed
+        self.rotationAxisRawValue = rotationAxis.rawValue
         self.sticker = sticker
         
         self.x = position.x
@@ -101,6 +104,7 @@ final class ARObject {
             size: properties.size,
             resizingFactor: properties.resizingFactor,
             rotationSpeed: properties.rotationSpeed,
+            rotationAxis: properties.rotationAxis,
             sticker: properties.sticker,
             position: .zero
         )
@@ -124,6 +128,11 @@ extension ARObject {
     var positionOffset: SIMD3<Float> {
         get { SIMD3(x, y, z) }
         set { x = newValue.x; y = newValue.y; z = newValue.z }
+    }
+    
+    var rotationAxis: RotationAxis {
+        get { RotationAxis(rawValue: rotationAxisRawValue) ?? .y }
+        set { rotationAxisRawValue = newValue.rawValue }
     }
     
     var material: PhysicallyBasedMaterial {
@@ -165,8 +174,9 @@ extension ARObject {
         guard rotationSpeed > 0 else { return }
         
         let duration: Double = Double(1 / rotationSpeed)
+        let axis = rotationAxis.vector
         
-        let from = Transform(rotation: .init(angle: .pi, axis: [0, 0, 1]))
+        let from = Transform(rotation: .init(angle: .pi, axis: axis))
 
         let definition1 = FromToByAnimation(
             from: from,
@@ -175,7 +185,7 @@ extension ARObject {
             bindTarget: .transform,
         )
         
-        let to = Transform(rotation: .init(angle: -1 * .pi, axis: [0, 0, 1]))
+        let to = Transform(rotation: .init(angle: -1 * .pi, axis: axis))
         
         let definition2 = FromToByAnimation(
             to: to,

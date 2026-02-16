@@ -60,7 +60,8 @@ struct ARControlsView: View {
                 textInput: $session.currentObjectProperties.text,
                 needsProportionSlider: session.currentObjectProperties.type.hasCustomRatio,
                 selectedProportion: $session.currentObjectProperties.ratio,
-                rotationSpeed: $session.currentObjectProperties.rotationSpeed
+                rotationSpeed: $session.currentObjectProperties.rotationSpeed,
+                rotationAxis: $session.currentObjectProperties.rotationAxis
             )
         }
         .sheet(isPresented: $session.showObjectsCatalog) {

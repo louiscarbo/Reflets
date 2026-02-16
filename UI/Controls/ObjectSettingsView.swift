@@ -23,6 +23,7 @@ struct ObjectSettingsView: View {
     @Binding var selectedProportion: Float
     
     @Binding var rotationSpeed: Float
+    @Binding var rotationAxis: RotationAxis
     
     var body: some View {
         VStack {
@@ -95,6 +96,21 @@ struct ObjectSettingsView: View {
                     .frame(width: 220)
             }
             
+            if rotationSpeed > 0 {
+                HStack {
+                    Text("Axis")
+                        .fontWidth(.expanded)
+                    Spacer()
+                    Picker("Axis", selection: $rotationAxis) {
+                        ForEach(RotationAxis.allCases, id: \.self) { axis in
+                            Image(systemName: axis.sfSymbolString)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 220)
+                }
+            }
+            
             if needsText {
                 HStack {
                     Text("Text")
@@ -148,7 +164,8 @@ struct ObjectSettingsView: View {
                         textInput: $textInput,
                         needsProportionSlider: true,
                         selectedProportion: .constant(1.0),
-                        rotationSpeed: .constant(0.0)
+                        rotationSpeed: .constant(0.0),
+                        rotationAxis: .constant(.y)
                     )
                 }
             }
