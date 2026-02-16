@@ -49,6 +49,9 @@ class ARSceneManager {
         anchor.components[UUIDComponent.self] = UUIDComponent(uuid: object.id)
         
         content.add(anchor)
+        
+        // Apply rotation animation AFTER anchoring
+        object.applyRotationAnimation(to: entity)
     }
     
     /// Adds a newly created object at the current camera/cursor position (1m in front)
@@ -77,6 +80,9 @@ class ARSceneManager {
         object.positionOffset = offset
         
         content.add(anchor)
+        
+        // Apply rotation animation AFTER anchoring
+        object.applyRotationAnimation(to: entity)
     }
     
     /// Removes an entity by its UUID

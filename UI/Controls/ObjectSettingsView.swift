@@ -10,7 +10,9 @@ import SwiftUI
 struct ObjectSettingsView: View {
     @State var needsColor: Bool = true
     @Binding var selectedColor: Color
-    @Binding var isMetallic: Bool
+    @Binding var metallic: Float
+    @Binding var roughness: Float
+    @Binding var emissiveIntensity: Float
     
     @Binding var selectedOpacity: Double
     
@@ -19,6 +21,8 @@ struct ObjectSettingsView: View {
     
     @State var needsProportionSlider: Bool
     @Binding var selectedProportion: Float
+    
+    @Binding var rotationSpeed: Float
     
     var body: some View {
         VStack {
@@ -50,8 +54,45 @@ struct ObjectSettingsView: View {
                     Text("Metallic")
                         .fontWidth(.expanded)
                     Spacer()
-                    Toggle(isOn: $isMetallic) { }
+                    Slider(value: Binding(
+                        get: { Double(metallic) },
+                        set: { metallic = Float($0) }
+                    ), in: 0...1)
+                        .frame(width: 220)
                 }
+                
+                HStack {
+                    Text("Roughness")
+                        .fontWidth(.expanded)
+                    Spacer()
+                    Slider(value: Binding(
+                        get: { Double(roughness) },
+                        set: { roughness = Float($0) }
+                    ), in: 0...1)
+                        .frame(width: 220)
+                }
+                
+                HStack {
+                    Text("Glow")
+                        .fontWidth(.expanded)
+                    Spacer()
+                    Slider(value: Binding(
+                        get: { Double(emissiveIntensity) },
+                        set: { emissiveIntensity = Float($0) }
+                    ), in: 0...5)
+                        .frame(width: 220)
+                }
+            }
+            
+            HStack {
+                Text("Rotation")
+                    .fontWidth(.expanded)
+                Spacer()
+                Slider(value: Binding(
+                    get: { Double(rotationSpeed) },
+                    set: { rotationSpeed = Float($0) }
+                ), in: 0...2)
+                    .frame(width: 220)
             }
             
             if needsText {
@@ -99,12 +140,15 @@ struct ObjectSettingsView: View {
                     ObjectSettingsView(
                         needsColor: true,
                         selectedColor: .constant(.red),
-                        isMetallic: .constant(true),
+                        metallic: .constant(1.0),
+                        roughness: .constant(0.5),
+                        emissiveIntensity: .constant(0.0),
                         selectedOpacity: .constant(0.9),
                         needsText: true,
                         textInput: $textInput,
                         needsProportionSlider: true,
-                        selectedProportion: .constant(1.0)
+                        selectedProportion: .constant(1.0),
+                        rotationSpeed: .constant(0.0)
                     )
                 }
             }
