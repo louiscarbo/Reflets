@@ -96,7 +96,8 @@ struct StickerCaptureSheetView: View {
     }
     
     private func addTostickers(imageData: Data) {
-        let newObject = Sticker(imageData: imageData)
+        let thumbnailData = ImageProcessingService.makeThumbnailData(from: imageData)
+        let newObject = Sticker(imageData: imageData, thumbnailData: thumbnailData)
         modelContext.insert(newObject)
         dismiss()
     }

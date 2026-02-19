@@ -7,6 +7,7 @@
 
 import UIKit
 import Vision
+import ImageIO
 
 enum ImageProcessingService {
     
@@ -84,5 +85,18 @@ enum ImageProcessingService {
     static func processImageForStorage(image: UIImage, degrees: Double) -> Data? {
         let rotatedImage = rotateImage(image: image, degrees: degrees)
         return rotatedImage.pngData()
+    }
+
+    /// Creates a small thumbnail using ImageIO subsample-at-decode (never fully expands the full image).
+    /// Preserves alpha (PNG output) so transparent sticker backgrounds are retained.
+    static func makeThumbnailData(from data: Data, maxPixelSize: Int = 200) -> Data? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true
+        ]
+        guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
+        return UIImage(cgImage: cgImage).pngData()
     }
 }

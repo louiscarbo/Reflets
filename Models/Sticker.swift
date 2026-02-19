@@ -12,6 +12,8 @@ import UIKit
 final class Sticker {
     @Attribute(.unique) var id: UUID
     @Attribute(.externalStorage) var imageData: Data?
+    /// Small pre-downsampled thumbnail for fast display in the catalog.
+    @Attribute(.externalStorage) var thumbnailData: Data?
     var createdAt: Date
     
     var uiImage: UIImage? {
@@ -19,9 +21,10 @@ final class Sticker {
         return UIImage(data: imageData)
     }
     
-    init(imageData: Data) {
+    init(imageData: Data, thumbnailData: Data? = nil) {
         self.id = UUID()
         self.createdAt = Date()
         self.imageData = imageData
+        self.thumbnailData = thumbnailData
     }
 }

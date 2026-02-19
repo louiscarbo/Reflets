@@ -131,8 +131,18 @@ private struct MyStickersSection: View {
             Button {
                 showObjectCaptureSheet = true
             } label: {
-                Image(systemName: "plus")
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [6]))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 90, height: 90)
+                    .overlay {
+                        Image(systemName: "plus")
+                            .font(.title)
+                            .foregroundStyle(.secondary)
+                    }
             }
+            .buttonStyle(.plain)
+            .contentShape(.rect)
             .matchedTransitionSource(id: "objectCapture", in: namespace)
             .sheet(isPresented: $showObjectCaptureSheet) {
                 StickerCaptureSheetView()
@@ -141,8 +151,6 @@ private struct MyStickersSection: View {
                         )
             }
         }
-        .buttonStyle(SFSymbolButtonStyle(symbolSize: 90))
-        .font(.title)
     }
 }
 
@@ -154,6 +162,8 @@ private struct AsyncThumbnailButton: View {
     
     @State private var loadedImage: UIImage?
     @State private var isLoading = true
+
+    private let outlineWidth: Float = 5
     
     var body: some View {
         Button(action: onSelect) {
@@ -162,19 +172,27 @@ private struct AsyncThumbnailButton: View {
                     Image(uiImage: loadedImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 50, height: 50)
+                        .frame(width: 90, height: 90)
+                        .layerEffect(
+                            ShaderLibrary.outline(.float(outlineWidth)),
+                            maxSampleOffset: CGSize(
+                                width: CGFloat(outlineWidth),
+                                height: CGFloat(outlineWidth)
+                            )
+                        )
                 } else if isLoading {
                     ProgressView()
-                        .frame(width: 50, height: 50)
+                        .frame(width: 90, height: 90)
                 } else {
                     Image(systemName: "photo")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 30, height: 30)
+                        .frame(width: 60, height: 60)
                         .foregroundStyle(.secondary)
                 }
             }
         }
+        .buttonStyle(StickerButtonStyle())
         .padding(.bottom, 10)
         .task(id: object.id) {
             await loadThumbnail()
@@ -182,14 +200,22 @@ private struct AsyncThumbnailButton: View {
     }
     
     private func loadThumbnail() async {
-        guard let imageData = object.imageData else {
+        // Prefer the pre-generated small thumbnail; fall back to the full image.
+        let data = object.thumbnailData ?? object.imageData
+        let hasThumbnail = object.thumbnailData != nil
+        guard let data else {
             isLoading = false
             return
         }
         
-        // Decode off the main thread
-        let image = await Task.detached(priority: .userInitiated) {
-            UIImage(data: imageData)
+        // If we fell back to the full image, use ImageIO to subsample at decode time.
+        let image = await Task.detached(priority: .userInitiated) { () -> UIImage? in
+            if hasThumbnail {
+                return UIImage(data: data)
+            } else {
+                return ImageProcessingService.makeThumbnailData(from: data)
+                    .flatMap { UIImage(data: $0) }
+            }
         }.value
         
         await MainActor.run {
@@ -198,6 +224,16 @@ private struct AsyncThumbnailButton: View {
                 isLoading = false
             }
         }
+    }
+}
+
+// MARK: - Sticker Button Style
+
+private struct StickerButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.88 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 
