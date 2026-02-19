@@ -14,8 +14,7 @@ struct ARVisionBoardView: View {
     
     @State private var editingSession: AREditingSession
     @State private var sceneManager = ARSceneManager()
-    
-    let cameraAnchor = AnchorEntity(.camera)
+    @State private var cameraAnchor = AnchorEntity(.camera)
     
     init(board: VisionBoard) {
         self.board = board

@@ -20,7 +20,7 @@ class VisionBoard {
     
     init() {
         self.id = UUID()
-        self.name = ""
+        self.name = "New Board"
         self.date = .now
         self.lastOpened = .now
         self.objects = []

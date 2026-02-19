@@ -49,12 +49,10 @@ struct HomeView: View {
                         .font(.title)
                         .fontWidth(.expanded)
                     Spacer()
-                    Button(action: createNewBoard) {
-                        Image(systemName: "plus")
-                            .font(.title2)
-                            .padding(8)
-                            .background(.ultraThinMaterial, in: Circle())
-                    }
+                    Button("New Board", systemImage: "plus", action: createNewBoard)
+                        .fontWidth(.expanded)
+                        .buttonStyle(.glassProminent)
+                        .tint(.orange)
                 }
                 .padding()
                 
@@ -62,9 +60,8 @@ struct HomeView: View {
                     ContentUnavailableView(
                         "No Vision Boards",
                         systemImage: "wand.and.stars",
-                        description: Text("Create your first AR Vision Board by tapping the + button.")
+                        description: Text("Create your first AR Vision Board by tapping \"New Board\".")
                     )
-                    Spacer()
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [
@@ -101,7 +98,6 @@ struct HomeView: View {
     
     private func createNewBoard() {
         let newBoard = VisionBoard()
-        newBoard.name = "New Board"
         modelContext.insert(newBoard)
     }
     
