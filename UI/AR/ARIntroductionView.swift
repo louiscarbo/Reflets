@@ -201,7 +201,8 @@ struct TooltipView: View {
                                 .scaledToFit()
                                 .frame(height: 31)
                         }
-                        .buttonStyle(SFSymbolButtonStyle(symbolSize: 30))
+                        .font(.title)
+                        .buttonStyle(SFSymbolButtonStyle(symbolSize: 60))
                         .padding(.bottom, 20)
                         .opacity(0.7)
                         .allowsHitTesting(false)

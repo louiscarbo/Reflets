@@ -184,6 +184,7 @@ struct SettingRow<Content: View>: View {
     var body: some View {
         HStack {
             Text(label)
+                .font(.title3)
                 .fontWidth(.expanded)
             Spacer()
             content

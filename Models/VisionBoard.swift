@@ -13,6 +13,7 @@ class VisionBoard {
     var id: UUID
     var name: String
     var date: Date
+    var lastOpened: Date
     @Relationship(deleteRule: .cascade) var objects: [ARObject]
     
     var completedChallengeIDs: [String] = []
@@ -21,6 +22,7 @@ class VisionBoard {
         self.id = UUID()
         self.name = ""
         self.date = .now
+        self.lastOpened = .now
         self.objects = []
         self.completedChallengeIDs = []
     }

@@ -11,8 +11,8 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
     
-    @Query(sort: \VisionBoard.date, order: .reverse) private var boards: [VisionBoard]
-    @State private var path = NavigationPath()
+    @Query(sort: \VisionBoard.lastOpened, order: .reverse) private var boards: [VisionBoard]
+    @Namespace private var namespace
     
     // Gradient definitions
     var lightGradient: [Color] {
@@ -66,37 +66,36 @@ struct HomeView: View {
                     )
                     Spacer()
                 } else {
-                    List {
-                        ForEach(boards) { board in
-                            NavigationLink(value: board) {
-                                HStack {
-                                    VStack(alignment: .leading) {
-                                        Text(board.name.isEmpty ? "Untitled Board" : board.name)
-                                            .font(.headline)
-                                        Text(board.date.formatted(date: .abbreviated, time: .shortened))
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    Spacer()
-                                    Text("\(board.objects.count) items")
-                                        .font(.caption)
-                                        .padding(6)
-                                        .background(.ultraThinMaterial, in: Capsule())
+                    ScrollView {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 0),
+                            GridItem(.flexible(), spacing: 0)
+                        ], spacing: 0) {
+                            ForEach(boards) { board in
+                                NavigationLink {
+                                    ARVisionBoardView(board: board)
+                                        .navigationTransition(.zoom(sourceID: board.id, in: namespace))
+                                        .onAppear {
+                                            board.lastOpened = .now
+                                        }
+                                } label: {
+                                    VisionBoardGridCell(board: board)
+                                        .matchedTransitionSource(id: board.id, in: namespace)
                                 }
-                                .padding(.vertical, 4)
+                                .buttonStyle(.plain)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        deleteBoard(board)
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
                             }
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
                         }
-                        .onDelete(perform: deleteBoard)
+                        .padding(.horizontal)
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
                 }
             }
-        }
-        .navigationDestination(for: VisionBoard.self) { board in
-            ARVisionBoardView(board: board)
         }
     }
     
@@ -106,9 +105,8 @@ struct HomeView: View {
         modelContext.insert(newBoard)
     }
     
-    private func deleteBoard(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(boards[index])
-        }
+    private func deleteBoard(_ board: VisionBoard) {
+        modelContext.delete(board)
     }
 }
+
