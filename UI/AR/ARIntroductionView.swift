@@ -75,45 +75,44 @@ struct ARIntroductionView: View {
         switch state {
         case .addObject:
             TooltipView(
-                text: "Let's start creating! Tap the + button to add your first object.",
+                text: "What matters to you right now? Tap + to place it here.",
                 symbol: Image(systemName: "plus")
             )
         case .removeObject:
             TooltipView(
-                text: "Use the undo button to remove the last object.",
+                text: "Changed your mind? Undo the last thing placed.",
                 symbol: Image(systemName: "arrowshape.turn.up.backward")
             )
         case .scaleObject:
             TooltipView(
-                text: "Use the slider on the left to scale the object.",
+                text: "Use the slider to resize it.",
                 pushToTheRight: true
             )
         case .changeTypeObject:
             TooltipView(
-                text: "Try adding a 3D sticker from your photos in the catalog.",
+                text: "You can also add a 3D sticker from your own photos. Try it in the catalog.",
                 symbol: Image(systemName: "folder.badge.plus")
             )
         case .customizeObject:
             TooltipView(
-                text: "Tap the paintbrush to customize your object.",
+                text: "Tap the paintbrush to change how your object looks.",
                 symbol: Image(systemName: "paintbrush")
             )
         case .inspirationAndFinish:
             TooltipView(
-                text: "Open the Challenges tab to find inspiration for your vision board.",
+                text: "Need a nudge? Open Challenges to find prompts that ask you something about yourself.",
                 symbol:
                     Image("Reflets")
                     .resizable()
             )
         case .last:
             TooltipView(
-                text: "You’re all set! Tap the checkmark when you’re done to finalize your artwork.",
+                text: "When you're ready, tap the checkmark to see what you've built.",
                 symbol: Image(systemName: "checkmark"),
                 showOKButton: true
             )
         }
     }
-    
     // MARK: - State Update Logic
     private func updateIntroductionState() {
         // Avoid repeating states

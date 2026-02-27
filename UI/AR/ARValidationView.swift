@@ -61,7 +61,7 @@ struct Step1: View {
     
     var body: some View {
         VStack {
-            Text("Are you happy with your vision board?")
+            Text("Does this feel right?")
                 .padding(40)
                 .multilineTextAlignment(.center)
                 .font(.title2)
@@ -103,7 +103,7 @@ struct Step2: View {
     
     var body: some View {
         VStack {
-            Text("Wow, look at that! You've created something really unique that really represents your vision! Now, what would you like to name your vision board?")
+            Text("Every object you placed is a piece of you.\n\nWhat would you call this collection?")
                 .padding(40)
                 .multilineTextAlignment(.center)
                 .font(.title2)
@@ -116,7 +116,7 @@ struct Step2: View {
                         .padding(20)
                 }
             
-            TextField("Name your artwork", text: $artworkTitle)
+            TextField("A name...", text: $artworkTitle)
                 .textFieldStyle(IntentionTextFieldStyle())
                 .padding(.horizontal, 40)
             
@@ -155,7 +155,7 @@ struct Step3: View {
         VStack {
             if darkenBackground {
                 Text(
-                    "What a meaningful title! It perfectly captures the essence of your artwork.\n\nTake some time to appreciate your work. Feel free to snap a screenshot or record a video to look back on whenever you want !"
+                    "It now lives in your world.\n\nLook at it from different angles. Screenshot it or record it to look back on it later."
                 )
                 .padding(40)
                 .multilineTextAlignment(.center)
@@ -196,9 +196,9 @@ struct Step3: View {
 
 struct Step4: View {
     let texts = [
-        "Amazing work! You’ve just built a vision board filled with your ideas, dreams, and inspirations. Taking the time to visualize what excites you is a powerful way to bring those aspirations to life.",
-        "Why stop here? Let this be a starting point—use your vision board as a reminder of what excites you, revisit it with fresh ideas, or even share it with someone who inspires you. Creativity and imagination fuel action, and every small step brings you closer to what you want.",
-        "Keep dreaming, keep building, and keep exploring—your ideas deserve space to grow!\n\nThank you for creating with Reflets. We can’t wait to see what you bring to life next!"
+        "This is your reflection, built from everything that matters to you right now.",
+        "Vision boards work because they make your mind commit to what it wants. You just did that.",
+        "Come back to it. In six months, it will mean something different."
     ]
     @State var textIndex = 0
     @Binding var darkenBackground: Bool
@@ -234,7 +234,7 @@ struct Step4: View {
                         darkenBackground.toggle()
                     }
                 } label: {
-                    Label(darkenBackground ? "Show artwork" : "Hide artwork", systemImage: darkenBackground ? "eye" : "eye.slash")
+                    Label(darkenBackground ? "Show vision board" : "Hide vision board", systemImage: darkenBackground ? "eye" : "eye.slash")
                 }
                 .buttonStyle(IntentionButton())
             }

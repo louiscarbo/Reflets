@@ -67,20 +67,20 @@ struct IntroductionView: View {
         DialogueData(
             dialogueText:
                 """
-                Welcome to Reflets!
+                Reflets is French for "reflections."
 
-                In this experience, you’ll build an AR vision board—a space to bring your dreams, ideas, and inspirations to life.
+                The things you surround yourself with say something about you. What if they could actually exist in your space?
                 """
-            , buttonText: "Sounds interesting!"
+            , buttonText: "Show me"
         ),
         DialogueData(
             dialogueText:
                 """
-                Here’s how it works: You’ll pick objects that represent things you love, things you want, or things that inspire you, and arrange them in AR freely.
+                Place objects that represent what you love, want, or dream about. Arrange them freely in your real world.
 
-                Don’t worry, we’ve prepared some fun challenges to help you get started!
+                Not sure where to start? Challenges will give you a nudge.
                 """
-            , buttonText: "Let's get started!"
+            , buttonText: "Begin"
         )
     ]
 }
