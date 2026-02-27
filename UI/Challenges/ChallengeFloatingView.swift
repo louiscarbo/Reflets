@@ -14,7 +14,7 @@ struct ChallengeFloatingView: View {
         if !session.focusChallengeMode, let challenge = session.selectedChallenge {
             Button {
                 withAnimation {
-                    session.toggleChallengeFocus()
+                    session.focusChallengeMode.toggle()
                 }
             } label: {
                 PromptView(

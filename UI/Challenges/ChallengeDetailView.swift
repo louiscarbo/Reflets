@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ChallengeDetailView: View {
     @Environment(\.editingSession) private var session
+    let nameSpace: Namespace.ID
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -19,16 +20,19 @@ struct ChallengeDetailView: View {
                     title: challenge.title,
                     text: challenge.prompt
                 )
+                .matchedGeometryEffect(id: "challengeView", in: nameSpace, properties: .position)
                 
                 HStack {
                     Button {
                         withAnimation {
-                            session.toggleChallengeFocus()
+                            session.selectedChallenge = nil
+                            session.focusChallengeMode.toggle()
                         }
                     } label: {
-                        Label("Back", systemImage: "arrowshape.turn.up.backward")
+                        Label("Cancel", systemImage: "xmark")
                     }
                     .buttonStyle(TitleButton())
+                    .animation(.bouncy(extraBounce: 0.5), value: session.focusChallengeMode)
                     
                     Button {
                         withAnimation {
@@ -39,6 +43,7 @@ struct ChallengeDetailView: View {
                         Label("Done", systemImage: "checkmark")
                     }
                     .buttonStyle(TitleButton())
+                    .animation(.bouncy(extraBounce: 0.5), value: session.focusChallengeMode)
                 }
                 .offset(y: -40)
             }

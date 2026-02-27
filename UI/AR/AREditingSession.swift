@@ -86,8 +86,4 @@ class AREditingSession {
     func selectChallenge(_ challenge: Challenge) {
         selectedChallenge = challenge
     }
-    
-    func toggleChallengeFocus() {
-        focusChallengeMode.toggle()
-    }
 }

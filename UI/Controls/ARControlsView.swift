@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ARControlsView: View {
     @Bindable var session: AREditingSession
+    @Namespace private var animationNamespace
     
     var body: some View {
         ZStack(alignment: .center) {
@@ -18,6 +19,8 @@ struct ARControlsView: View {
                 
                 // MARK: Selected Challenge Display
                 ChallengeFloatingView()
+                    .matchedGeometryEffect(id: "challengeView", in: animationNamespace, properties: .frame)
+                    .animation(.bouncy, value: session.focusChallengeMode)
                 
                 Spacer()
                 
@@ -33,8 +36,21 @@ struct ARControlsView: View {
             }
             .padding(.leading, 30)
             
+            // MARK: Dark overlay behind ChallengeDetailView
+            if session.focusChallengeMode {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+                    .onTapGesture {
+                        withAnimation(.bouncy) {
+                            session.focusChallengeMode = false
+                        }
+                    }
+            }
+            
             // MARK: Challenge Detail View
-            ChallengeDetailView()
+            ChallengeDetailView(nameSpace: animationNamespace)
+                .animation(.bouncy, value: session.focusChallengeMode)
             
             // MARK: Challenge Completion Effect
             ChallengeCompletionView()
