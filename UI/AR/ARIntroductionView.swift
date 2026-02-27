@@ -95,7 +95,7 @@ struct ARIntroductionView: View {
             )
         case .customizeObject:
             TooltipView(
-                text: "Tap the paintbrush to change how your object looks.",
+                text: "Tap the paintbrush to change how your object looks and moves.",
                 symbol: Image(systemName: "paintbrush")
             )
         case .inspirationAndFinish:

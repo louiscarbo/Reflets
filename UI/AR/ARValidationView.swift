@@ -197,7 +197,7 @@ struct Step3: View {
 struct Step4: View {
     let texts = [
         "This is your reflection, built from everything that matters to you right now.",
-        "Vision boards work because they make your mind commit to what it wants. You just did that.",
+        "Vision boards work because they make your mind commit to what it wants. You just did that!",
         "Come back to it. In six months, it will mean something different."
     ]
     @State var textIndex = 0
