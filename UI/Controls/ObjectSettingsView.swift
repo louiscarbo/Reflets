@@ -22,13 +22,13 @@ struct ObjectSettingsView: View {
                     .fontWidth(.expanded)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                MaterialSettingsView(properties: $bindableSession.currentObjectProperties)
-                
-                RotationSettingsView(properties: $bindableSession.currentObjectProperties)
+                TextSettingsView(properties: $bindableSession.currentObjectProperties)
                 
                 ShapeSettingsView(properties: $bindableSession.currentObjectProperties)
                 
-                TextSettingsView(properties: $bindableSession.currentObjectProperties)
+                MaterialSettingsView(properties: $bindableSession.currentObjectProperties)
+                
+                RotationSettingsView(properties: $bindableSession.currentObjectProperties)
             }
             .padding(20)
             .background {

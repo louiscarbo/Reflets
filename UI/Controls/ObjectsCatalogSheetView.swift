@@ -121,13 +121,6 @@ private struct MyStickersSection: View {
             .font(.title2)
         
         LazyVGrid(columns: Self.columns) {
-            ForEach(stickers) { object in
-                AsyncThumbnailButton(
-                    object: object,
-                    onSelect: { onSelect(object) }
-                )
-            }
-            
             Button {
                 showObjectCaptureSheet = true
             } label: {
@@ -149,6 +142,13 @@ private struct MyStickersSection: View {
                     .navigationTransition(
                             .zoom(sourceID: "objectCapture", in: namespace)
                         )
+            }
+            
+            ForEach(stickers) { object in
+                AsyncThumbnailButton(
+                    object: object,
+                    onSelect: { onSelect(object) }
+                )
             }
         }
     }
@@ -180,6 +180,7 @@ private struct AsyncThumbnailButton: View {
                                 height: CGFloat(outlineWidth)
                             )
                         )
+                        .shadow(radius: 4, y: 4)
                 } else if isLoading {
                     ProgressView()
                         .frame(width: 90, height: 90)
