@@ -21,16 +21,13 @@ let package = Package(
             displayVersion: "1.0",
             bundleVersion: "1",
             appIcon: .asset("AppIcon"),
-            accentColor: .presetColor(.orange),
+            accentColor: .presetColor(.purple),
             supportedDeviceFamilies: [
                 .pad,
                 .phone
             ],
             supportedInterfaceOrientations: [
                 .portrait
-//                .landscapeRight,
-//                .landscapeLeft,
-//                .portraitUpsideDown(.when(deviceFamilies: [.pad]))
             ],
             capabilities: [
                 .camera(purposeString: "The app uses the camera to display content in Augmented Reality.")

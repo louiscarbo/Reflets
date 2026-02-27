@@ -346,7 +346,7 @@ private struct RevealingText: View {
             for i in 0...text.count {
                 guard !Task.isCancelled else { return }
                 revealed = i
-                try? await Task.sleep(for: .milliseconds(50))
+                try? await Task.sleep(for: .milliseconds(40))
             }
         }
     }
