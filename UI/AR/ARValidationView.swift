@@ -232,7 +232,7 @@ struct Step4: View {
                 }
                 .buttonStyle(IntentionButton())
             } else {
-                Button("Back to Home") {
+                Button("Back to Vision Boards") {
                     onGoHome()
                 }
                 .buttonStyle(IntentionButton())
