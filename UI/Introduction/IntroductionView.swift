@@ -40,7 +40,7 @@ struct IntroductionView: View {
                     .font(.title2)
                     .fontWidth(.expanded)
                     .foregroundStyle(.primary)
-
+                    
                     HStack {
                         Spacer()
                         Button(dialogueData[dialogueNumber].buttonText) {
@@ -50,6 +50,7 @@ struct IntroductionView: View {
                         .buttonStyle(IntentionButton())
                     }
                 }
+                .frame(maxWidth: 500)
                 .padding(.horizontal, 32)
                 .transition(.opacity)
             }
@@ -228,8 +229,8 @@ private struct AnimatedSymbolsLayer: View {
         "figure.2.and.child.holdinghands"
     ]
 
-    private let count   = 120
-    private let columns = 8
+    private let count   = 180
+    private let columns = 12
     private let size: CGFloat = 70
 
     // The parent now ONLY needs to care about the initial grid layout
