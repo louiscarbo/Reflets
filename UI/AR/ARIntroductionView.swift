@@ -100,14 +100,14 @@ struct ARIntroductionView: View {
             )
         case .inspirationAndFinish:
             TooltipView(
-                text: "Need a nudge? Open Challenges to find prompts that ask you something about yourself.",
+                text: "Need a nudge? Open Challenges for prompts that push your vision board further.",
                 symbol:
                     Image("Reflets")
                     .resizable()
             )
         case .last:
             TooltipView(
-                text: "When you're ready, tap the checkmark to see what you've built.",
+                text: "When you're ready, tap the checkmark to finalize your vision board.",
                 symbol: Image(systemName: "checkmark"),
                 showOKButton: true
             )

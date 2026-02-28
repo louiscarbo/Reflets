@@ -115,13 +115,13 @@ struct IntroductionView: View {
     let dialogueData = [
         DialogueData(
             dialogueText:
-                "Reflets is French for \"reflections.\"\n\nThe things you surround yourself with say something about you.\n\nWhat if they could actually exist in your space?",
+                "Reflets is French for \"reflections.\"\n\nThe things you surround yourself with say something about who you are — and who you want to become.\n\nWhat if your vision board actually existed in your space?",
             buttonText: "Show me"
         ),
         DialogueData(
             dialogueText:
-                "Place objects that represent what you love, want, or dream about. Arrange them freely in your real world.\n\nNot sure where to start? Challenges will give you a nudge.",
-            buttonText: "Begin"
+                "Build an AR vision board — place objects that represent what you love, what you want, and who you're becoming. Arrange them freely in your real world.\n\nNot sure where to start? Challenges will give you a nudge.",
+            buttonText: "Let's build it"
         )
     ]
 }

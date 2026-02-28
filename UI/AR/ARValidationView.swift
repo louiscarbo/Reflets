@@ -61,7 +61,7 @@ struct Step1: View {
     
     var body: some View {
         VStack {
-            Text("Does this feel right?")
+            Text("Does this vision feel right?")
                 .padding(40)
                 .multilineTextAlignment(.center)
                 .font(.title2)
@@ -103,7 +103,7 @@ struct Step2: View {
     
     var body: some View {
         VStack {
-            Text("Every object you placed is a piece of you.\n\nWhat would you call this collection?")
+            Text("Every object you placed is a piece of you.\n\nWhat would you call this vision board?")
                 .padding(40)
                 .multilineTextAlignment(.center)
                 .font(.title2)
@@ -116,7 +116,7 @@ struct Step2: View {
                         .padding(20)
                 }
             
-            TextField("A name...", text: $artworkTitle)
+            TextField("My vision board...", text: $artworkTitle)
                 .textFieldStyle(IntentionTextFieldStyle())
                 .padding(.horizontal, 40)
             
@@ -155,7 +155,7 @@ struct Step3: View {
         VStack {
             if darkenBackground {
                 Text(
-                    "It now lives in your world.\n\nLook at it from different angles. Screenshot it or record it to look back on it later."
+                    "It now lives in your world.\n\nWalk around it. Look at it from every angle. Screenshot or record it — and come back to it when you need a reminder of what you're working towards."
                 )
                 .padding(40)
                 .multilineTextAlignment(.center)

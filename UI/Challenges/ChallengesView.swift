@@ -27,7 +27,7 @@ struct ChallengesView: View {
                     .fontWeight(.semibold)
                     .fontWidth(.expanded)
                     .padding(.bottom, 10)
-                Text("Need a nudge? Here are some challenges to get you started.\n\nTap one to make it your focus.")
+                Text("Need a nudge? These challenges help you build a vision board that actually means something.\n\nTap one to set it as your active focus.")
                     .font(.body)
                     .fontWidth(.expanded)
                 
