@@ -13,6 +13,10 @@ struct HomeView: View {
     
     @Query(sort: \VisionBoard.lastOpened, order: .reverse) private var boards: [VisionBoard]
     @Namespace private var namespace
+
+    @State private var boardToRename: VisionBoard? = nil
+    @State private var renameText: String = ""
+    @State private var boardToDelete: VisionBoard? = nil
     
     // Gradient definitions
     var lightGradient: [Color] {
@@ -81,8 +85,14 @@ struct HomeView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .contextMenu {
+                                    Button {
+                                        renameText = board.name
+                                        boardToRename = board
+                                    } label: {
+                                        Label("Rename", systemImage: "pencil")
+                                    }
                                     Button(role: .destructive) {
-                                        deleteBoard(board)
+                                        boardToDelete = board
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
@@ -94,6 +104,24 @@ struct HomeView: View {
                 }
             }
         }
+        .confirmationDialog(
+            "Delete \"\(boardToDelete?.name ?? "")\"?",
+            isPresented: Binding(get: { boardToDelete != nil }, set: { if !$0 { boardToDelete = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let board = boardToDelete { deleteBoard(board) }
+                boardToDelete = nil
+            }
+        } message: {
+            Text("This vision board and all its objects will be permanently deleted.")
+        }
+        .sheet(item: $boardToRename) { board in
+            RenameBoardSheet(board: board, renameText: $renameText) {
+                boardToRename = nil
+            }
+            .presentationDetents([.height(260)])
+        }
     }
     
     private func createNewBoard() {
@@ -103,6 +131,52 @@ struct HomeView: View {
     
     private func deleteBoard(_ board: VisionBoard) {
         modelContext.delete(board)
+    }
+}
+
+struct RenameBoardSheet: View {
+    @FocusState private var isFocused: Bool
+    @Bindable var board: VisionBoard
+    @Binding var renameText: String
+    var onDismiss: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text("What would you like to call this vision board?")
+                .padding(40)
+                .multilineTextAlignment(.center)
+                .font(.title2)
+                .fontWidth(Font.Width(0.05))
+                .foregroundStyle(.primary)
+
+            TextField("My vision board...", text: $renameText)
+                .textFieldStyle(IntentionTextFieldStyle())
+                .padding(.horizontal, 40)
+                .focused($isFocused)
+                .onAppear {
+                    isFocused = true
+                }
+
+            HStack {
+                Button {
+                    onDismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+                .buttonStyle(SFSymbolButtonStyle(rotateInTrigonometricDirection: true))
+                .padding(.trailing, 20)
+
+                Button {
+                    board.name = renameText
+                    onDismiss()
+                } label: {
+                    Image(systemName: "checkmark")
+                }
+                .buttonStyle(SFSymbolButtonStyle())
+                .disabled(renameText.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+            .padding(.top, -8)
+        }
     }
 }
 

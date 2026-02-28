@@ -16,6 +16,8 @@ struct ARVisionBoardView: View {
     @State private var sceneManager = ARSceneManager()
     @State private var cameraAnchor = AnchorEntity(.camera)
     
+    @Environment(\.dismiss) private var dismiss
+    
     init(board: VisionBoard) {
         self.board = board
         self._editingSession = .init(initialValue: .init(board: board))
@@ -69,7 +71,7 @@ struct ARVisionBoardView: View {
             
             // MARK: Validation Interface
             if editingSession.artworkIsDone {
-                ARValidationView(board: board, artworkIsDone: $editingSession.artworkIsDone)
+                ARValidationView(board: board, artworkIsDone: $editingSession.artworkIsDone, onGoHome: { dismiss() })
             }
         }
         .navigationBarBackButtonHidden(true)

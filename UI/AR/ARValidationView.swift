@@ -11,6 +11,7 @@ import SwiftData
 struct ARValidationView: View {
     @Bindable var board: VisionBoard
     @Binding var artworkIsDone: Bool
+    var onGoHome: () -> Void
     @State var darkenBackground = true
     
     @State private var validationStep = 0
@@ -40,7 +41,7 @@ struct ARValidationView: View {
                     artworkTitle: board.name
                 )
             default:
-                Step4(darkenBackground: $darkenBackground)
+                Step4(darkenBackground: $darkenBackground, onGoHome: onGoHome)
             }
         }
     }
@@ -51,7 +52,8 @@ struct ARValidationView: View {
     board.name = "My Dream"
     return ARValidationView(
         board: board,
-        artworkIsDone: .constant(true)
+        artworkIsDone: .constant(true),
+        onGoHome: {}
     )
 }
 
@@ -202,6 +204,7 @@ struct Step4: View {
     ]
     @State var textIndex = 0
     @Binding var darkenBackground: Bool
+    var onGoHome: () -> Void
     
     var body: some View {
         VStack {
@@ -229,12 +232,8 @@ struct Step4: View {
                 }
                 .buttonStyle(IntentionButton())
             } else {
-                Button {
-                    withAnimation(.easeInOut(duration: 1.0)) {
-                        darkenBackground.toggle()
-                    }
-                } label: {
-                    Label(darkenBackground ? "Show vision board" : "Hide vision board", systemImage: darkenBackground ? "eye" : "eye.slash")
+                Button("Back to Home") {
+                    onGoHome()
                 }
                 .buttonStyle(IntentionButton())
             }
